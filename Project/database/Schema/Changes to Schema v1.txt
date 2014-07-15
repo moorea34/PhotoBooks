@@ -1,0 +1,4 @@
+-store address as VARCHAR(250)
+-added date to event DATE
+
+-keep birthday/anniversary in client

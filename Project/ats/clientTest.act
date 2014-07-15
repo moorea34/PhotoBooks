@@ -1,0 +1,45 @@
+Package		photobooks.presentation
+
+Select		MainWindow			clientTab
+
+Test		ClientsPage			firstNameBox	"Steven"
+
+Test		ClientsPage			lastNameBox		"Morrison"
+
+Test		ClientsPage			emailBox		"email@email.ca"
+
+Click		ClientsPage			btnModifyClient
+
+Set			ClientsPage			firstNameBox	"New"
+
+Set			ClientsPage			lastNameBox		"Client"
+
+Set			ClientsPage			emailBox		"email@email.com"
+
+Click		ClientsPage			btnModifyClient
+
+Test		ClientsPage			firstNameBox	"New"
+
+Test		ClientsPage			lastNameBox		"Client"
+
+Test		ClientsPage			emailBox		"email@email.com"
+
+Click		ClientsPage			btnRemoveClient
+
+Test		ClientsPage			firstNameBox	"Ryan"
+
+Test		ClientsPage			lastNameBox		"Pope"
+
+Test		ClientsPage			emailBox		"email@email.ca"
+
+Click		ClientsPage			btnRemoveClient
+
+Test		ClientsPage			firstNameBox	""
+
+Test		ClientsPage			lastNameBox		""
+
+Test		ClientsPage			emailBox		""
+
+Select		MainWindow			fileItem
+
+Select		MainWindow			exit

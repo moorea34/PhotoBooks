@@ -1,0 +1,27 @@
+Package		photobooks.presentation
+
+Select			MainWindow			eventItem
+
+Select			MainWindow			manageEvents
+
+Click			ManageEventsWindow	btnAddEvent
+
+SelectComboByIndex AddEventWindow	clientCombo		1
+
+TestComboValue	AddEventWindow		clientCombo		"Morrison, Steven"	
+
+TestComboValue	AddEventWindow		eventType		"Meeting"
+
+TestComboValue	AddEventWindow		day				"1"		
+
+TestComboValue	AddEventWindow		month			"January"
+
+TestComboValue	AddEventWindow		year			"2014"	
+
+Click			AddEventWindow		btnOkay
+
+Click			ManageEventsWindow	btnClose	
+
+Select			MainWindow			fileItem
+
+Select			MainWindow			exit

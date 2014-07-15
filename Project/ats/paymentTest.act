@@ -1,0 +1,25 @@
+Package		photobooks.presentation
+
+Select					MainWindow			billTab
+
+Click					BillsPage			btnAddBill
+
+SelectComboByIndex		BillEditor			cbClient	0
+
+Set						BillEditor			tbDescription	"Description"
+
+Click					BillEditor			btnAddItem
+
+SelectComboByIndex		EditBillItemWindow	cbItem	0
+
+TestComboValue			EditBillItemWindow	cbItem	"Test Package 2"
+
+Click					EditBillItemWindow	btnSave
+
+Click					AddBillWindow		btnSaveAsInvoice
+
+Select					MainWindow			billTab
+
+Select					MainWindow			fileItem
+
+Select					MainWindow			exit

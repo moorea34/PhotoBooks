@@ -1,0 +1,300 @@
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>call setClasspath
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>REM @echo off
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>set CLASSPATH=.;bin\;libs\jsqldb.jar;libs\junit.jar;libs\hsqldb.jar;libs\mockito-all-1.9.5.jar;libs\org.ecl
+ipse.core.commands_3.6.2.v20130123-162658.jar;libs\org.eclipse.equinox.common_3.6.100.v20120522-1841.jar;libs\org.eclipse.jface_3.8.102.v20130123-162658.ja
+r;libs\org.eclipse.jface.databinding_1.6.0.v20120912-132807.jar;libs\org.eclipse.jface.databinding.source_1.6.0.v20120912-132807.jar;libs\org.eclipse.jface
+.source_3.8.102.v20130123-162658.jar;libs\org.eclipse.jface.text_3.8.2.v20121126-164145.jar;libs\org.eclipse.jface.text.source_3.8.2.v20121126-164145.jar;l
+ibs\org.eclipse.osgi_3.8.2.v20130124-134944.jar;libs\org.eclipse.ui.workbench_3.104.0.v20130204-164612.jar;libs\swt.jar;libs\atr.jar;
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>REM Running Unit Tests
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>java junit.swingui.TestRunner tests.UnitTests
+Opened HSQL database PhotoBooks
+Object tests.StubGatewayTest$TestClass does not extend DBObject
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>timeout 10
+
+Waiting for  0 seconds, press a key to continue ...
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>REM Running Integration Tests
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>java junit.swingui.TestRunner tests.IntegrationTests
+Opened HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+Opened HSQL database PhotoBooks
+Closed HSQL database PhotoBooks
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>timeout 10
+
+Waiting for  0 seconds, press a key to continue ...
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>REM Running Acceptance Tests
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>java -cp .;bin\;libs\jsqldb.jar;libs\junit.jar;libs\hsqldb.jar;libs\mockito-all-1.9.5.jar;libs\org.eclipse.
+core.commands_3.6.2.v20130123-162658.jar;libs\org.eclipse.equinox.common_3.6.100.v20120522-1841.jar;libs\org.eclipse.jface_3.8.102.v20130123-162658.jar;lib
+s\org.eclipse.jface.databinding_1.6.0.v20120912-132807.jar;libs\org.eclipse.jface.databinding.source_1.6.0.v20120912-132807.jar;libs\org.eclipse.jface.sour
+ce_3.8.102.v20130123-162658.jar;libs\org.eclipse.jface.text_3.8.2.v20121126-164145.jar;libs\org.eclipse.jface.text.source_3.8.2.v20121126-164145.jar;libs\o
+rg.eclipse.osgi_3.8.2.v20130124-134944.jar;libs\org.eclipse.ui.workbench_3.104.0.v20130204-164612.jar;libs\swt.jar;libs\atr.jar; acceptanceTests.TestRunner
+
+
+
+Starting acceptance tests.
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/billTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          billTab
+Opening Main Window...
+Opened HSQL database PhotoBooks
+Selected Package id: 1
+Closing Main Window...
+
+Click                   BillsPage                           btnAddBill
+
+SelectComboByIndex      BillEditor                          cbClient             0
+
+Set                     BillEditor                          tbDescription        "Description"
+
+Click                   BillEditor                          btnAddItem
+
+SelectComboByIndex      EditBillItemWindow                  cbItem               0
+
+TestComboValue          EditBillItemWindow                  cbItem               "Test Package"
+
+Click                   EditBillItemWindow                  btnSave
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/billTest.act
+
+Tests passed: 1; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/clientTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          clientTab
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Test                    ClientsPage                         firstNameBox         "Steven"
+
+Test                    ClientsPage                         lastNameBox          "Morrison"
+
+Test                    ClientsPage                         emailBox             "email@email.ca"
+
+Click                   ClientsPage                         btnModifyClient
+
+Set                     ClientsPage                         firstNameBox         "New"
+
+Set                     ClientsPage                         lastNameBox          "Client"
+
+Set                     ClientsPage                         emailBox             "email@email.com"
+
+Click                   ClientsPage                         btnModifyClient
+Selected client id: 1
+
+Test                    ClientsPage                         firstNameBox         "New"
+
+Test                    ClientsPage                         lastNameBox          "Client"
+
+Test                    ClientsPage                         emailBox             "email@email.com"
+
+Click                   ClientsPage                         btnRemoveClient
+Selected client id: 2
+
+Test                    ClientsPage                         firstNameBox         "Ryan"
+
+Test                    ClientsPage                         lastNameBox          "Pope"
+
+Test                    ClientsPage                         emailBox             "email@email.ca"
+
+Click                   ClientsPage                         btnRemoveClient
+
+Test                    ClientsPage                         firstNameBox         ""
+
+Test                    ClientsPage                         lastNameBox          ""
+
+Test                    ClientsPage                         emailBox             ""
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/clientTest.act
+
+Tests passed: 12; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/eventTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          eventItem
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Select                  MainWindow                          manageEvents
+
+Click                   ManageEventsWindow                  btnAddEvent
+
+SelectComboByIndex      AddEventWindow                      clientCombo          1
+
+TestComboValue          AddEventWindow                      clientCombo          "Morrison, Steven"
+
+TestComboValue          AddEventWindow                      eventType            "Meeting"
+
+TestComboValue          AddEventWindow                      day                  "1"
+
+TestComboValue          AddEventWindow                      month                "January"
+
+TestComboValue          AddEventWindow                      year                 "2014"
+
+Click                   AddEventWindow                      btnOkay
+
+Click                   ManageEventsWindow                  btnClose
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/eventTest.act
+
+Tests passed: 5; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/packageTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          packagesTab
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Test                    PackagesPage                        nameBox              "Test Package"
+
+Test                    PackagesPage                        priceBox             "12.34"
+
+Test                    PackagesPage                        descripBox           "This is a test package"
+
+Click                   PackagesPage                        modifyButton
+
+Set                     PackagesPage                        nameBox              "Package"
+
+Set                     PackagesPage                        priceBox             "100.0"
+
+Set                     PackagesPage                        descripBox           "Hello"
+
+Click                   PackagesPage                        modifyButton
+Selected Package id: 1
+
+Test                    PackagesPage                        nameBox              "Package"
+
+Test                    PackagesPage                        priceBox             "100.0"
+
+Test                    PackagesPage                        descripBox           "Hello"
+
+Click                   PackagesPage                        removeButton
+Selected Package id: 2
+Selected Package id: 2
+
+Test                    PackagesPage                        nameBox              "Test Package 2"
+
+Test                    PackagesPage                        priceBox             "43.21"
+
+Test                    PackagesPage                        descripBox           "This is another test package"
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/packageTest.act
+
+Tests passed: 9; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/paymentTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          billTab
+Opening Main Window...
+Selected Package id: 2
+Closing Main Window...
+
+Click                   BillsPage                           btnAddBill
+
+SelectComboByIndex      BillEditor                          cbClient             0
+
+Set                     BillEditor                          tbDescription        "Description"
+
+Click                   BillEditor                          btnAddItem
+
+SelectComboByIndex      EditBillItemWindow                  cbItem               0
+
+TestComboValue          EditBillItemWindow                  cbItem               "Test Package 2"
+
+Click                   EditBillItemWindow                  btnSave
+
+Click                   AddBillWindow                       btnSaveAsInvoice
+
+Select                  MainWindow                          billTab
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/paymentTest.act
+
+Tests passed: 1; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+Totals for all scripts in directory C:\Users\Ryan\Documents\GitHub\COMP3350\Project
+
+Tests passed: 28; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+Elapsed time: 40.403 seconds
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+C:\Users\Ryan\Documents\GitHub\COMP3350\Project>pause
+Press any key to continue . . .

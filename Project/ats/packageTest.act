@@ -1,0 +1,37 @@
+Package		photobooks.presentation
+
+Select		MainWindow			packagesTab
+
+Test		PackagesPage		nameBox			"Test Package"
+
+Test		PackagesPage		priceBox		"12.34"
+
+Test		PackagesPage		descripBox		"This is a test package"
+
+Click		PackagesPage		modifyButton
+
+Set			PackagesPage		nameBox			"Package"
+
+Set			PackagesPage		priceBox		"100.0"
+
+Set			PackagesPage		descripBox		"Hello"
+
+Click		PackagesPage		modifyButton
+
+Test		PackagesPage		nameBox			"Package"
+
+Test		PackagesPage		priceBox		"100.0"
+
+Test		PackagesPage		descripBox		"Hello"
+
+Click		PackagesPage		removeButton
+
+Test		PackagesPage		nameBox			"Test Package 2"
+
+Test		PackagesPage		priceBox		"43.21"
+
+Test		PackagesPage		descripBox		"This is another test package"
+
+Select		MainWindow			fileItem
+
+Select		MainWindow			exit

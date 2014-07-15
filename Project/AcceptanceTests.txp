@@ -1,0 +1,247 @@
+
+
+Starting acceptance tests.
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/billTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          billTab
+Opening Main Window...
+Opened HSQL database PhotoBooks
+Selected Package id: 1
+Closing Main Window...
+
+Click                   BillsPage                           btnAddBill
+
+SelectComboByIndex      BillEditor                          cbClient             0
+
+Set                     BillEditor                          tbDescription        "Description"
+
+Click                   BillEditor                          btnAddItem
+
+SelectComboByIndex      EditBillItemWindow                  cbItem               0
+
+TestComboValue          EditBillItemWindow                  cbItem               "Test Package"
+
+Click                   EditBillItemWindow                  btnSave
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/billTest.act
+
+Tests passed: 1; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/clientTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          clientTab
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Test                    ClientsPage                         firstNameBox         "Steven"
+
+Test                    ClientsPage                         lastNameBox          "Morrison"
+
+Test                    ClientsPage                         emailBox             "email@email.ca"
+
+Click                   ClientsPage                         btnModifyClient
+
+Set                     ClientsPage                         firstNameBox         "New"
+
+Set                     ClientsPage                         lastNameBox          "Client"
+
+Set                     ClientsPage                         emailBox             "email@email.com"
+
+Click                   ClientsPage                         btnModifyClient
+Selected client id: 1
+
+Test                    ClientsPage                         firstNameBox         "New"
+
+Test                    ClientsPage                         lastNameBox          "Client"
+
+Test                    ClientsPage                         emailBox             "email@email.com"
+
+Click                   ClientsPage                         btnRemoveClient
+Selected client id: 2
+
+Test                    ClientsPage                         firstNameBox         "Ryan"
+
+Test                    ClientsPage                         lastNameBox          "Pope"
+
+Test                    ClientsPage                         emailBox             "email@email.ca"
+
+Click                   ClientsPage                         btnRemoveClient
+
+Test                    ClientsPage                         firstNameBox         ""
+
+Test                    ClientsPage                         lastNameBox          ""
+
+Test                    ClientsPage                         emailBox             ""
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/clientTest.act
+
+Tests passed: 12; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/eventTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          eventItem
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Select                  MainWindow                          manageEvents
+
+Click                   ManageEventsWindow                  btnAddEvent
+
+SelectComboByIndex      AddEventWindow                      clientCombo          1
+
+TestComboValue          AddEventWindow                      clientCombo          "Morrison, Steven"
+
+TestComboValue          AddEventWindow                      eventType            "Meeting"
+
+TestComboValue          AddEventWindow                      day                  "1"
+
+TestComboValue          AddEventWindow                      month                "January"
+
+TestComboValue          AddEventWindow                      year                 "2014"
+
+Click                   AddEventWindow                      btnOkay
+
+Click                   ManageEventsWindow                  btnClose
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/eventTest.act
+
+Tests passed: 5; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/packageTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          packagesTab
+Opening Main Window...
+Selected Package id: 1
+Closing Main Window...
+
+Test                    PackagesPage                        nameBox              "Test Package"
+
+Test                    PackagesPage                        priceBox             "12.34"
+
+Test                    PackagesPage                        descripBox           "This is a test package"
+
+Click                   PackagesPage                        modifyButton
+
+Set                     PackagesPage                        nameBox              "Package"
+
+Set                     PackagesPage                        priceBox             "100.0"
+
+Set                     PackagesPage                        descripBox           "Hello"
+
+Click                   PackagesPage                        modifyButton
+Selected Package id: 1
+
+Test                    PackagesPage                        nameBox              "Package"
+
+Test                    PackagesPage                        priceBox             "100.0"
+
+Test                    PackagesPage                        descripBox           "Hello"
+
+Click                   PackagesPage                        removeButton
+Selected Package id: 2
+Selected Package id: 2
+
+Test                    PackagesPage                        nameBox              "Test Package 2"
+
+Test                    PackagesPage                        priceBox             "43.21"
+
+Test                    PackagesPage                        descripBox           "This is another test package"
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/packageTest.act
+
+Tests passed: 9; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/paymentTest.act
+
+Package                 photobooks.presentation
+
+Select                  MainWindow                          billTab
+Opening Main Window...
+Selected Package id: 2
+Closing Main Window...
+
+Click                   BillsPage                           btnAddBill
+
+SelectComboByIndex      BillEditor                          cbClient             0
+
+Set                     BillEditor                          tbDescription        "Description"
+
+Click                   BillEditor                          btnAddItem
+
+SelectComboByIndex      EditBillItemWindow                  cbItem               0
+
+TestComboValue          EditBillItemWindow                  cbItem               "Test Package 2"
+
+Click                   EditBillItemWindow                  btnSave
+
+Click                   AddBillWindow                       btnSaveAsInvoice
+
+Select                  MainWindow                          billTab
+
+Select                  MainWindow                          fileItem
+
+Select                  MainWindow                          exit
+
+-------------------------------------------------------------------------------
+
+Script C:\Users\Ryan\Documents\GitHub\COMP3350\Project/ATs/paymentTest.act
+
+Tests passed: 1; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+Totals for all scripts in directory C:\Users\Ryan\Documents\GitHub\COMP3350\Project
+
+Tests passed: 28; tests failed: 0; invalid parameters: 0; invalid commands: 0
+
+Elapsed time: 40.403 seconds
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
