@@ -1,7 +1,6 @@
 package photobooks.presentation;
 
 import photobooks.objects.*;
-import photobooks.objects.Event.EventType;
 import photobooks.application.Globals;
 import photobooks.business.*;
 
@@ -31,10 +30,10 @@ public class ManageEventsWindow extends Dialog
 	private ListViewer listViewer;
 	private Button btnRemoveEvent, btnAddEvent, btnClose;
 	private ClientManager _clientManager;
-	final private String[] EVENT_TYPES = {
+	/*final private String[] EVENT_TYPES = {
 			EventType.Meeting.toString(),
 			EventType.Photoshoot.toString()
-	};
+	};*/
 
 	public ManageEventsWindow( Shell parent, int style, EventManager manager, ClientManager clientManager ) 
 	{

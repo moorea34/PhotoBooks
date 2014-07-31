@@ -2,8 +2,6 @@ package photobooks.business;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.text.DecimalFormat;
-import java.util.Calendar;
 
 import photobooks.application.Utility;
 import photobooks.objects.Address;

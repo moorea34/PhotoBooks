@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import photobooks.application.Globals;
@@ -38,7 +37,7 @@ import acceptanceTests.Register;
 
 public class ClientsPage extends Composite
 {
-	private Shell shell;
+	//private Shell shell;
 	private static final int YEAR_CONST = 1940;
 	private Composite _parent;
 	private Text firstNameBox;
@@ -65,7 +64,7 @@ public class ClientsPage extends Composite
 	public ClientsPage(Composite parent, int style, ClientManager clientManager, BillsPage billsPage) 
 	{
 		super(parent, style);
-		shell = parent.getShell();
+		//shell = parent.getShell();
 		Register.newWindow(this);
 		
 		currClientID = -1;

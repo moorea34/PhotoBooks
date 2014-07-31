@@ -14,7 +14,7 @@ public class EventIntegrationTests extends TestCase
 	private boolean _isStub;
 	private ClientManager _clientManager;
 	private EventManager _eventManager;
-	private final int CLIENT_ID = 3;
+	//private final int CLIENT_ID = 3;
 	
 	public void tearDown()
 	{

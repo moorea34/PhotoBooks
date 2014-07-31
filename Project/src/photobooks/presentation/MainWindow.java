@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -46,7 +45,7 @@ public class MainWindow {
 	
 	final private String PRODUCT_TYPE = "Product";
 	final private String PACKAGE_TYPE = "Package";
-	private MenuItem fileItem, exit, eventItem, addEvent, checkForEventsItem;
+	private MenuItem fileItem, exit, eventItem, checkForEventsItem;
 	private MenuItem manageEvents;
 
 	public MainWindow() 

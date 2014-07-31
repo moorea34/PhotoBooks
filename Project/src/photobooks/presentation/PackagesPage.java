@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.jface.viewers.ListViewer;
@@ -44,7 +43,7 @@ public class PackagesPage extends Composite
 	@SuppressWarnings("unused")
 	private IDao _dao;
 	private Composite _parent;
-	private Shell shell;
+	//private Shell shell;
 	private ProductPackageManager _packageManager;
 	private ProductManager _productManager;
 	private TreeViewer treeViewer;
@@ -68,7 +67,7 @@ public class PackagesPage extends Composite
 	public PackagesPage(Composite parent, int style, ProductPackageManager packageManager, ProductManager productManager) 
 	{
 		super(parent, style);
-		shell = parent.getShell();
+		//shell = parent.getShell();
 		Register.newWindow(this);
 		_parent = parent;
 		currSelectedID = -1;

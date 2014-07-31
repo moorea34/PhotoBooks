@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import photobooks.application.Globals;
-import photobooks.application.Utility;
 import photobooks.business.BillManager;
 import photobooks.business.ClientManager;
 import photobooks.business.PaymentManager;
