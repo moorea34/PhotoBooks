@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Button;
 
+import photobooks.application.Utility;
 import photobooks.objects.Payment;
 
 public class AddPaymentWindow extends Dialog {
@@ -58,9 +59,9 @@ public class AddPaymentWindow extends Dialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		shlAddPayment = new Shell(getParent(), getStyle() | SWT.APPLICATION_MODAL);
+		shlAddPayment = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shlAddPayment.setSize(480, 310);
-		shlAddPayment.setMinimumSize(480, 310);
+		shlAddPayment.setMinimumSize(700, 340);
 		shlAddPayment.setText("Add Payment");
 		shlAddPayment.setLayout(new FormLayout());
 
@@ -76,6 +77,7 @@ public class AddPaymentWindow extends Dialog {
 		FormData fd_btnCancel = new FormData();
 		fd_btnCancel.right = new FormAttachment(100, -10);
 		fd_btnCancel.width = 120;
+		fd_btnCancel.height = 30;
 		fd_btnCancel.bottom = new FormAttachment(100, -10);
 		btnCancel.setLayoutData(fd_btnCancel);
 		btnCancel.setText("Cancel");
@@ -92,6 +94,7 @@ public class AddPaymentWindow extends Dialog {
 		fd_btnSave.left = new FormAttachment(0, 10);
 		fd_btnSave.top = new FormAttachment(btnCancel, 0, SWT.TOP);
 		fd_btnSave.width = 120;
+		fd_btnSave.height = 30;
 		btnSave.setLayoutData(fd_btnSave);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
@@ -109,5 +112,8 @@ public class AddPaymentWindow extends Dialog {
 		{
 			_paymentEditor.setPayment(_payment);
 		}
+		
+		Utility.setFont(shlAddPayment);
+		Utility.centerScreen(shlAddPayment);
 	}
 }

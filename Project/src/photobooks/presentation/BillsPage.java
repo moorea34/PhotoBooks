@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import photobooks.application.Globals;
+import photobooks.application.Utility;
 import photobooks.business.BillManager;
 import photobooks.business.ClientManager;
 import photobooks.business.PaymentManager;
@@ -94,7 +95,7 @@ public class BillsPage extends Composite {
 
 		FormData fd__billEditor = new FormData();
 		fd__billEditor.right = new FormAttachment(100, -6);
-		fd__billEditor.bottom = new FormAttachment(composite, 0, SWT.BOTTOM);
+		fd__billEditor.bottom = new FormAttachment(composite, -10, SWT.BOTTOM);
 		fd__billEditor.top = new FormAttachment(composite, 0, SWT.TOP);
 		fd__billEditor.left = new FormAttachment(composite, 6);
 
@@ -126,7 +127,7 @@ public class BillsPage extends Composite {
 					payment.setDate(Calendar.getInstance());//Set for display
 					payment.setInvoiceId(_bill.getID());
 
-					AddPaymentWindow paymentWnd = new AddPaymentWindow(shell, SWT.SHELL_TRIM | SWT.RESIZE, payment);
+					AddPaymentWindow paymentWnd = new AddPaymentWindow(shell, SWT.SHELL_TRIM, payment);
 					Object result = paymentWnd.open();
 
 					if (result != null)
@@ -193,11 +194,10 @@ public class BillsPage extends Composite {
 
 		Button btnRemoveBill = new Button(this, SWT.NONE);
 		FormData fd_btnRemoveBill = new FormData();
-		fd_btnRemoveBill.width = 120;
-		fd_btnRemoveBill.bottom = new FormAttachment(composite, 31, SWT.BOTTOM);
-		fd_btnRemoveBill.height = 25;
+		fd_btnRemoveBill.width = 140;
+		fd_btnRemoveBill.height = 30;
 		fd_btnRemoveBill.top = new FormAttachment(composite, 6);
-		fd_btnRemoveBill.right = new FormAttachment(100, -10);
+		fd_btnRemoveBill.right = new FormAttachment(100, -5);
 		btnRemoveBill.setLayoutData(fd_btnRemoveBill);
 		btnRemoveBill.setText("Remove Bill");
 
@@ -239,9 +239,8 @@ public class BillsPage extends Composite {
 
 		btnModifyBill = new Button(this, SWT.NONE);
 		FormData fd_btnModifyBill = new FormData();
-		fd_btnModifyBill.top = new FormAttachment(composite, 6);
-		fd_btnModifyBill.width = 120;
-		fd_btnModifyBill.height = 25;
+		fd_btnModifyBill.top = new FormAttachment(btnRemoveBill, 0, SWT.TOP);
+		fd_btnModifyBill.width = 140;
 		fd_btnModifyBill.bottom = new FormAttachment(btnRemoveBill, 0, SWT.BOTTOM);
 		fd_btnModifyBill.right = new FormAttachment(btnRemoveBill, -6);
 		btnModifyBill.setLayoutData(fd_btnModifyBill);
@@ -266,9 +265,9 @@ public class BillsPage extends Composite {
 		btnAddBill = new Button(this, SWT.NONE);
 		btnAddBill.setText("Add Bill");
 		FormData fd_btnAddBill = new FormData();
-		fd_btnAddBill.width = 120;
-		fd_btnAddBill.height = 25;
+		fd_btnAddBill.width = 140;
 		fd_btnAddBill.top = new FormAttachment(btnRemoveBill, 0, SWT.TOP);
+		fd_btnAddBill.bottom = new FormAttachment(btnRemoveBill, 0, SWT.BOTTOM);
 		fd_btnAddBill.right = new FormAttachment(btnModifyBill, -6);
 		btnAddBill.setLayoutData(fd_btnAddBill);
 		btnAddBill.addSelectionListener(new SelectionAdapter() 
@@ -328,7 +327,7 @@ public class BillsPage extends Composite {
 		FormData fd_composite = new FormData();
 		fd_composite.top = new FormAttachment(0, 10);
 		fd_composite.left = new FormAttachment(0, 10);
-		fd_composite.bottom = new FormAttachment(100, -60);
+		fd_composite.bottom = new FormAttachment(100, -37);
 		fd_composite.right = new FormAttachment(0, 170);
 		composite.setLayoutData(fd_composite);
 		composite.setLayout(new TreeColumnLayout());
@@ -478,8 +477,8 @@ public class BillsPage extends Composite {
 		FormData clientSearch = new FormData();
 		clientSearch.top = new FormAttachment(composite, 6);
 		clientSearch.left = new FormAttachment(composite, 0, SWT.LEFT);
-		clientSearch.width = 155;
-		clientSearch.height = 16;
+		clientSearch.right = new FormAttachment(composite, 0, SWT.RIGHT);
+		clientSearch.height = 18;
 		txtSearchClients.setLayoutData(clientSearch);
 
 

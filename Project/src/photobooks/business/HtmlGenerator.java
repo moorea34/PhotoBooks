@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
+import photobooks.application.Utility;
 import photobooks.objects.Address;
 import photobooks.objects.Bill;
 import photobooks.objects.BillPackage;
@@ -15,7 +16,6 @@ import photobooks.objects.PhoneNumber;
 
 public class HtmlGenerator
 {
-	private static DecimalFormat format = new DecimalFormat("0.00");
 	private static String _billTemplate = null;
 	
 	private static void loadTemplate()
@@ -43,45 +43,6 @@ public class HtmlGenerator
 			System.out.println("Error loading bill template: " + e.toString());
 			_billTemplate = null;
 		}
-	}
-	
-	private static String formatDate(Calendar calendar)
-	{
-		return String.format("%d/%d/%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-	}
-	
-	private static String formatMoney(double price)
-	{
-		if (Math.abs(price) < 0.01)
-			return "0.00";
-		else
-			return format.format(price);
-	}
-	
-	private static String formatPhoneNumber(String number)
-	{
-		String result = "";
-		char c;
-		int numberCount = 0;
-		
-		if (number != null)
-		{
-			for (int i = number.length() - 1; i >= 0; --i)
-			{
-				c = number.charAt(i);
-				
-				if (c >= '0' && c <= '9')
-				{
-					if (numberCount == 4 || numberCount == 7 || numberCount == 10)
-						result = "." + result;
-					
-					result = c + result;
-					numberCount++;
-				}
-			}
-		}
-		
-		return result;
 	}
 	
 	private static String clientData(String data)
@@ -124,7 +85,7 @@ public class HtmlGenerator
 				else
 					first = false;
 		
-				temp += formatPhoneNumber(phone.getNumber());
+				temp += Utility.formatPhoneNumber(phone.getNumber());
 			}
 	
 			clientInfo += clientData(temp);
@@ -145,12 +106,12 @@ public class HtmlGenerator
 			
 			for (BillPackage billPackage : bill.getPackages())
 			{
-				billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%d</td> <td>$%s</td> <td>$%s</td> </tr>", billPackage.getPackage().getName(), billPackage.getAmount(), formatMoney(billPackage.getPrice()), formatMoney(billPackage.getPrice() * billPackage.getAmount()));
+				billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%d</td> <td>$%s</td> <td>$%s</td> </tr>", billPackage.getPackage().getName(), billPackage.getAmount(), Utility.formatMoney(billPackage.getPrice()), Utility.formatMoney(billPackage.getPrice() * billPackage.getAmount()));
 			}
 			
 			for (BillProduct billProduct : bill.getProducts())
 			{
-				billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%d</td> <td>$%s</td> <td>$%s</td> </tr>", billProduct.getProduct().getName(), billProduct.getAmount(), formatMoney(billProduct.getPrice()), formatMoney(billProduct.getPrice() * billProduct.getAmount()));
+				billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%d</td> <td>$%s</td> <td>$%s</td> </tr>", billProduct.getProduct().getName(), billProduct.getAmount(), Utility.formatMoney(billProduct.getPrice()), Utility.formatMoney(billProduct.getPrice() * billProduct.getAmount()));
 			}
 			
 			billInfo += "</table>";
@@ -159,10 +120,10 @@ public class HtmlGenerator
 			
 			//Write out values for totals
 			billInfo += "<div class=\"totalsvalues\">";
-			billInfo += "<p>$" + formatMoney(bill.total()) + "</p>";
-			billInfo += "<p>$" + formatMoney(bill.getGst() * bill.total()) + "</p>";
-			billInfo += "<p>$" + formatMoney(bill.getPst() * bill.total()) + "</p>";
-			billInfo += "<p>$" + formatMoney(bill.total() + bill.getTaxes()) + "</p>";
+			billInfo += "<p>$" + Utility.formatMoney(bill.total()) + "</p>";
+			billInfo += "<p>$" + Utility.formatMoney(bill.getGst() * bill.total()) + "</p>";
+			billInfo += "<p>$" + Utility.formatMoney(bill.getPst() * bill.total()) + "</p>";
+			billInfo += "<p>$" + Utility.formatMoney(bill.total() + bill.getTaxes()) + "</p>";
 			billInfo += "</div>";
 			
 			//Write out labels for totals
@@ -183,7 +144,7 @@ public class HtmlGenerator
 				
 				for (Payment payment : bill.getPayments())
 				{
-					billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%s</td> <td>$%s</td> </tr>", formatDate(payment.getDate()), payment.getTenderType().toString(), formatMoney(payment.getAmount()));
+					billInfo += String.format("<tr> <td class=\"tdleft\">%s</td> <td class=\"tdleft\">%s</td> <td>$%s</td> </tr>", Utility.formatDate(payment.getDate()), payment.getTenderType().toString(), Utility.formatMoney(payment.getAmount()));
 				}
 				
 				billInfo += "</table>";
@@ -192,8 +153,8 @@ public class HtmlGenerator
 				
 				//Write out values for totals
 				billInfo += "<div class=\"totalsvalues\">";
-				billInfo += "<p>$" + formatMoney(bill.totalPayments()) + "</p>";
-				billInfo += "<p>$" + formatMoney((bill.total() + bill.getTaxes()) - bill.totalPayments()) + "</p>";
+				billInfo += "<p>$" + Utility.formatMoney(bill.totalPayments()) + "</p>";
+				billInfo += "<p>$" + Utility.formatMoney((bill.total() + bill.getTaxes()) - bill.totalPayments()) + "</p>";
 				billInfo += "</div>";
 				
 				//Write out labels for totals
@@ -218,7 +179,7 @@ public class HtmlGenerator
 		
 		if (_bill != null && _billTemplate != null)
 		{
-			String date = formatDate(_bill.getDate());
+			String date = Utility.formatDate(_bill.getDate());
 			String clientInfo = createClient(_bill.getClient());
 			String content = createBillContent(_bill);
 		

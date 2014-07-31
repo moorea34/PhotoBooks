@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 
+import photobooks.application.Utility;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
 import photobooks.objects.BillPackage;
@@ -88,7 +89,7 @@ public class EditBillItemWindow extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		shell.setSize(450, 192);
+		shell.setSize(700, 230);
 		shell.setText("Edit Item");
 		shell.setLayout(new FormLayout());
 		
@@ -101,7 +102,7 @@ public class EditBillItemWindow extends Dialog {
 		
 		Label lblDescription = new Label(shell, SWT.NONE);
 		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.right = new FormAttachment(0, 81);
+		fd_lblDescription.width = 85;
 		fd_lblDescription.top = new FormAttachment(lblItem, 15);
 		fd_lblDescription.left = new FormAttachment(0, 10);
 		lblDescription.setLayoutData(fd_lblDescription);
@@ -204,6 +205,7 @@ public class EditBillItemWindow extends Dialog {
 		Button btnCancel = new Button(shell, SWT.NONE);
 		FormData fd_btnCancel = new FormData();
 		fd_btnCancel.width = 80;
+		fd_btnCancel.height = 30;
 		fd_btnCancel.bottom = new FormAttachment(100, -10);
 		fd_btnCancel.right = new FormAttachment(lblDescValue, 0, SWT.RIGHT);
 		btnCancel.setLayoutData(fd_btnCancel);
@@ -221,6 +223,7 @@ public class EditBillItemWindow extends Dialog {
 		fd_btnSave.top = new FormAttachment(btnCancel, 0, SWT.TOP);
 		fd_btnSave.left = new FormAttachment(lblItem, 0, SWT.LEFT);
 		fd_btnSave.width = 80;
+		fd_btnSave.height = 30;
 		btnSave.setLayoutData(fd_btnSave);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
@@ -285,6 +288,9 @@ public class EditBillItemWindow extends Dialog {
 		});
 
 		setItem();
+		
+		Utility.setFont(shell);
+		Utility.centerScreen(shell);
 	}
 	
 	private void setItem()

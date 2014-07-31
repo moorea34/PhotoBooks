@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import photobooks.application.Utility;
 import photobooks.business.ClientManager;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
@@ -87,7 +88,7 @@ public class AddBillWindow extends Dialog {
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle() | SWT.APPLICATION_MODAL);
 		shell.setSize(470, 400);
-		shell.setMinimumSize(470, 400);
+		shell.setMinimumSize(600, 600);
 		shell.setText(getText());
 		shell.addListener(SWT.Resize, new Listener() {
 			
@@ -115,12 +116,13 @@ public class AddBillWindow extends Dialog {
 		fd.left = new FormAttachment(0);
 		fd.top = new FormAttachment(0);
 		fd.right = new FormAttachment(100);
-		fd.bottom = new FormAttachment(100, -35);
+		fd.bottom = new FormAttachment(100, -45);
 		billEditor.setLayoutData(fd);
 		
 		btnCancel = new Button(_composite, SWT.NONE);
 		FormData fd_btnCancel = new FormData();
-		fd_btnCancel.width = 120;
+		fd_btnCancel.width = 150;
+		fd_btnCancel.height = 30;
 		fd_btnCancel.bottom = new FormAttachment(100);
 		fd_btnCancel.right = new FormAttachment(100);
 		btnCancel.setLayoutData(fd_btnCancel);
@@ -136,6 +138,7 @@ public class AddBillWindow extends Dialog {
 		btnSaveAsInvoice = new Button(_composite, SWT.NONE);
 		FormData fd_btnSaveAsInvoice = new FormData();
 		fd_btnSaveAsInvoice.width = 150;
+		fd_btnSaveAsInvoice.height = 30;
 		fd_btnSaveAsInvoice.bottom = new FormAttachment(btnCancel, 0, SWT.BOTTOM);
 		fd_btnSaveAsInvoice.left = new FormAttachment(0, 0);
 		btnSaveAsInvoice.setLayoutData(fd_btnSaveAsInvoice);
@@ -168,6 +171,7 @@ public class AddBillWindow extends Dialog {
 		Button btnSaveAsQuote = new Button(_composite, SWT.NONE);
 		FormData fd_btnSaveAsQuote = new FormData();
 		fd_btnSaveAsQuote.width = 150;
+		fd_btnSaveAsQuote.height = 30;
 		fd_btnSaveAsQuote.bottom = new FormAttachment(btnCancel, 0, SWT.BOTTOM);
 		fd_btnSaveAsQuote.left = new FormAttachment(btnSaveAsInvoice, 6, SWT.RIGHT);
 		btnSaveAsQuote.setLayoutData(fd_btnSaveAsQuote);
@@ -196,5 +200,8 @@ public class AddBillWindow extends Dialog {
 				}
 			}
 		});
+		
+		Utility.setFont(shell);
+		Utility.centerScreen(shell);
 	}
 }

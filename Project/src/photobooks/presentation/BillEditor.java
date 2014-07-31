@@ -123,7 +123,7 @@ public class BillEditor extends Composite {
 		
 		lblBillType = new Label(this, SWT.NONE);
 		FormData fd_lblBillType = new FormData();
-		fd_lblBillType.width = 60;
+		fd_lblBillType.width = 70;
 		lblBillType.setLayoutData(fd_lblBillType);
 		//lblBillType.setLayoutData(fd_composite);
 		lblBillType.setText("Quote #:");
@@ -154,7 +154,7 @@ public class BillEditor extends Composite {
 		lblDateValue = new Label(this, SWT.NONE);
 		FormData fd_lblDateValue = new FormData();
 		fd_lblDateValue.right = new FormAttachment(100);
-		fd_lblDateValue.left = new FormAttachment(100, -80);
+		fd_lblDateValue.width = 120;
 		lblDateValue.setLayoutData(fd_lblDateValue);
 		lblDateValue.setAlignment(SWT.RIGHT);
 		
@@ -205,7 +205,7 @@ public class BillEditor extends Composite {
 		FormData fd_lblAmountDueValue = new FormData();
 		fd_lblAmountDueValue.bottom = new FormAttachment(100, 0);
 		fd_lblAmountDueValue.right = new FormAttachment(100, 0);
-		fd_lblAmountDueValue.width = 60;
+		fd_lblAmountDueValue.width = 100;
 		lblAmountDueValue.setLayoutData(fd_lblAmountDueValue);
 		lblAmountDueValue.setAlignment(SWT.RIGHT);
 		
@@ -327,7 +327,7 @@ public class BillEditor extends Composite {
 		    ColumnViewerEditor.KEYBOARD_ACTIVATION);
 		
 		TableViewerColumn tblclmnItem = new TableViewerColumn(tableViewer, SWT.NONE);
-		tblclmnItem.getColumn().setWidth(100);
+		tblclmnItem.getColumn().setWidth(150);
 		tblclmnItem.getColumn().setText("Item");
 		
 		tblclmnItem.setLabelProvider(new ColumnLabelProvider() {
@@ -358,7 +358,7 @@ public class BillEditor extends Composite {
 			});
 		
 		TableViewerColumn tblclmnDescription = new TableViewerColumn(tableViewer, SWT.NONE);
-		tblclmnDescription.getColumn().setWidth(150);
+		tblclmnDescription.getColumn().setWidth(200);
 		tblclmnDescription.getColumn().setText("Description");
 		tblclmnDescription.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -449,7 +449,8 @@ public class BillEditor extends Composite {
 		
 		btnAddItem = new Button(this, SWT.NONE);
 		FormData fd_btnAddProductpackage = new FormData();
-		fd_btnAddProductpackage.width = 110;
+		fd_btnAddProductpackage.height = 30;
+		fd_btnAddProductpackage.width = 120;
 		fd_btnAddProductpackage.top = new FormAttachment(tableViewer.getTable(), 6, SWT.BOTTOM);
 		fd_btnAddProductpackage.left = new FormAttachment(0, 0);
 		btnAddItem.setLayoutData(fd_btnAddProductpackage);
@@ -481,6 +482,7 @@ public class BillEditor extends Composite {
 		
 		btnEditItem = new Button(this, SWT.NONE);
 		FormData fd_btnRemoveProductpackage = new FormData();
+		fd_btnRemoveProductpackage.height = 30;
 		fd_btnRemoveProductpackage.left = new FormAttachment(0, 0);
 		fd_btnRemoveProductpackage.right = new FormAttachment(btnAddItem, 0, SWT.RIGHT);
 		fd_btnRemoveProductpackage.top = new FormAttachment(btnAddItem, 6, SWT.BOTTOM);
@@ -519,6 +521,7 @@ public class BillEditor extends Composite {
 		
 		btnRemoveItem = new Button(this, SWT.NONE);
 		FormData fd_btnNewButton = new FormData();
+		fd_btnNewButton.height = 30;
 		fd_btnNewButton.top = new FormAttachment(btnEditItem, 6, SWT.BOTTOM);
 		fd_btnNewButton.left = new FormAttachment(0, 0);
 		fd_btnNewButton.right = new FormAttachment(btnAddItem, 0, SWT.RIGHT);
@@ -545,7 +548,8 @@ public class BillEditor extends Composite {
 		
 		btnQuoteToInvoice = new Button(this, SWT.NONE);
 		FormData fd_btnQuoteToInvoice = new FormData();
-		fd_btnQuoteToInvoice.width = 110;
+		fd_btnQuoteToInvoice.height = 30;
+		fd_btnQuoteToInvoice.width = 120;
 		fd_btnQuoteToInvoice.left = new FormAttachment(btnAddItem, 6);
 		fd_btnQuoteToInvoice.bottom = new FormAttachment(btnAddItem, 0, SWT.BOTTOM);
 		btnQuoteToInvoice.setLayoutData(fd_btnQuoteToInvoice);
@@ -554,6 +558,7 @@ public class BillEditor extends Composite {
 		
 		btnAddPayment = new Button(this, SWT.NONE);
 		FormData fd_btnAddPayment = new FormData();
+		fd_btnAddPayment.height = 30;
 		fd_btnAddPayment.bottom = new FormAttachment(btnEditItem, 0, SWT.BOTTOM);
 		fd_btnAddPayment.left = new FormAttachment(btnEditItem, 6);
 		fd_btnAddPayment.right = new FormAttachment(btnQuoteToInvoice, 0, SWT.RIGHT);
@@ -563,6 +568,7 @@ public class BillEditor extends Composite {
 		
 		Button btnExportInvoice = new Button(this, SWT.NONE);
 		FormData fd_btnExportInvoice = new FormData();
+		fd_btnExportInvoice.height = 30;
 		fd_btnExportInvoice.bottom = new FormAttachment(btnRemoveItem, 0, SWT.BOTTOM);
 		fd_btnExportInvoice.left = new FormAttachment(btnRemoveItem, 6);
 		fd_btnExportInvoice.right = new FormAttachment(btnQuoteToInvoice, 0, SWT.RIGHT);
@@ -679,11 +685,11 @@ public class BillEditor extends Composite {
 				{
 					if (output.length() == 0)
 					{
-						output = number.getNumber();
+						output = Utility.formatPhoneNumber(number.getNumber());
 					}
 					else
 					{
-						output += ", " + number.getNumber();
+						output += ", " + Utility.formatPhoneNumber(number.getNumber());
 					}
 				}
 			}
@@ -753,7 +759,7 @@ public class BillEditor extends Composite {
 			}
 			
 			lblBillNumber.setText("" + bill.getID());
-			lblDateValue.setText(bill.getDate().get(Calendar.YEAR) + "/" + (bill.getDate().get(Calendar.MONTH) + 1) + "/" + bill.getDate().get(Calendar.DAY_OF_MONTH));
+			lblDateValue.setText(Utility.formatDate(bill.getDate()));
 			tbDescription.setText(bill.getDescription());
 
 			tableViewer.getTable().setItemCount(0);

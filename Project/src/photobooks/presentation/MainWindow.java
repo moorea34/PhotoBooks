@@ -8,19 +8,24 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
 import photobooks.application.Globals;
+import photobooks.application.Utility;
 import photobooks.business.*;
 import photobooks.gateways.IDao;
 import photobooks.gateways.StubDao;
 import photobooks.objects.Package;
 import photobooks.objects.Product;
 import acceptanceTests.Register; 
-import acceptanceTests.EventLoop; 
+import acceptanceTests.EventLoop;
 
 public class MainWindow {
 	protected Shell shell;
@@ -100,35 +105,12 @@ public class MainWindow {
 
 	protected void createContents() {
 		
-		shell = new Shell(SWT.SHELL_TRIM & (~SWT.RESIZE));
-		shell.setMinimumSize(new Point(585, 580));
-		shell.setSize(585, 590);
+		shell = new Shell(SWT.SHELL_TRIM | SWT.RESIZE);
+		shell.setMinimumSize(new Point(700, 700));
+		shell.setSize(600, 600);
 		shell.setText("PhotoBooks");
-		shell.setLayout(null);
-
-		tabLayout = new TabFolder(shell, SWT.NONE);
-		tabLayout.setBounds(0, 0, 584, 560);
-
-		clientTab = new TabItem(tabLayout, SWT.NONE);
-		clientTab.setText("Clients");
+		shell.setLayout(new FormLayout());
 		
-		billingPage = new BillsPage(tabLayout, SWT.NONE, shell, _clientManager, _billManager, _paymentManager, _productManager, _packageManager);
-
-		clientsPage = new ClientsPage(tabLayout, SWT.NONE, _clientManager, (BillsPage)billingPage);
-		clientTab.setControl(clientsPage);
-
-		packagesTab = new TabItem(tabLayout, SWT.NONE);
-		packagesTab.setText("Packages");
-		
-		packagesPage = new PackagesPage(tabLayout, SWT.NONE, _packageManager, _productManager);
-		packagesTab.setControl(packagesPage);
-
-		billTab = new TabItem(tabLayout, SWT.NONE);
-		billTab.setText("Billing");
-		
-		billTab.setControl(billingPage);
-
-
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
 
@@ -152,6 +134,36 @@ public class MainWindow {
 	    setupEventMenu( menuBar );
 	    setupProductMenu( menuBar );
 	    setupPackageMenu( menuBar );
+
+		tabLayout = new TabFolder(shell, SWT.NONE);
+		FormData fd = new FormData();
+		fd.left = new FormAttachment(0, 0);
+		fd.top = new FormAttachment(0, 0);
+		fd.right = new FormAttachment(100,  0);
+		fd.bottom = new FormAttachment(100,  0);
+		tabLayout.setLayoutData(fd);
+
+		clientTab = new TabItem(tabLayout, SWT.NONE);
+		clientTab.setText("Clients");
+		
+		billingPage = new BillsPage(tabLayout, SWT.NONE, shell, _clientManager, _billManager, _paymentManager, _productManager, _packageManager);
+
+		clientsPage = new ClientsPage(tabLayout, SWT.NONE, _clientManager, (BillsPage)billingPage);
+		clientTab.setControl(clientsPage);
+
+		packagesTab = new TabItem(tabLayout, SWT.NONE);
+		packagesTab.setText("Packages");
+		
+		packagesPage = new PackagesPage(tabLayout, SWT.NONE, _packageManager, _productManager);
+		packagesTab.setControl(packagesPage);
+
+		billTab = new TabItem(tabLayout, SWT.NONE);
+		billTab.setText("Billing");
+		
+		billTab.setControl(billingPage);
+		
+		Utility.setFont(shell);
+		Utility.centerScreen(shell);
 	}
 
 	private void setupEventMenu( Menu menuBar )

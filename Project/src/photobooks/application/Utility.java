@@ -3,15 +3,23 @@ package photobooks.application;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
 public class Utility {
+
+	private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 	
 	private static final int YEAR_CONST = 1940;
 	private static final String[] MONTHS = {
@@ -119,6 +127,54 @@ public class Utility {
 		
 		return years;
 	}
+	
+	public static DecimalFormat getMoneyFormatter() { return moneyFormat; }
+	
+	public static String formatDate(Calendar calendar)
+	{
+		return String.format("%d / %d / %d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+	}
+	
+	public static String formatMoney(double price)
+	{
+		if (Math.abs(price) < 0.01)
+			return "0.00";
+		else
+			return moneyFormat.format(price);
+	}
+	
+	public static String formatPhoneNumber(String number)
+	{
+		String result = "";
+		char c;
+		int numberCount = 0;
+		
+		if (number != null)
+		{
+			for (int i = number.length() - 1; i >= 0; --i)
+			{
+				c = number.charAt(i);
+				
+				if (c >= '0' && c <= '9')
+				{
+					if (numberCount == 4)
+						result = " - " + result;
+					else if (numberCount == 7)
+						result = ") " + result;
+					else if (numberCount == 10)
+						result = " (" + result;
+					
+					result = c + result;
+					numberCount++;
+				}
+			}
+			
+			if (numberCount == 10)
+				result = "(" + result;
+		}
+		
+		return result;
+	}
 
 	public static String getDir(Shell shell) 
 	{
@@ -163,5 +219,33 @@ public class Utility {
 		    }
 		}
 		
+	}
+	
+	public static void centerScreen(Shell shell)
+	{
+		Monitor primary = Display.getCurrent().getPrimaryMonitor();
+	    Rectangle bounds = primary.getBounds();
+	    Rectangle rect = shell.getBounds();
+	    
+	    int x = bounds.x + (bounds.width - rect.width) / 2;
+	    int y = bounds.y + (bounds.height - rect.height) / 2;
+	    
+	    shell.setLocation(x, y);
+	}
+	
+	public static void setFont(Control ctrl) {
+		if (ctrl != null) {
+			ctrl.setFont(Globals.getFont());
+			
+			if (ctrl instanceof Composite)
+			{
+				Composite comp = (Composite)ctrl;
+				
+				for (Control child : comp.getChildren())
+				{
+					setFont(child);
+				}
+			}
+		}
 	}
 }
