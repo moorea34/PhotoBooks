@@ -18,6 +18,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.custom.CCombo;
 
@@ -26,22 +29,9 @@ import acceptanceTests.Register;
 
 public class AddClientWindow extends Dialog 
 {
-
-	private Client result;
-	private Shell shell;
-	private Text firstNameBox;
-	private Text lastNameBox;
-	private Text numHomeBox;
-	private Text numCellularBox;
-	private Text numWorkBox;
-	private Text numAltBox;
-	private Text addrHomeBox;
-	private Text addrAlt1Box;
-	private Text addrAlt2Box;
-	private CCombo dobDay, dobMonth, dobYear, annDay, annMonth, annYear;
-	private Text emailBox;
-	private Button btnOkay;
-	private Button btnCancel;
+	private Client result = null;
+	private Shell shell = null;
+	private ClientEditor _editor;
 
 	public AddClientWindow(Shell parent, int style) 
 	{
@@ -54,9 +44,12 @@ public class AddClientWindow extends Dialog
 	public Client open() 
 	{
 		createContents();
+		
 		shell.open();
 		shell.layout();
+		
 		Display display = getParent().getDisplay();
+		
 		if(EventLoop.isEnabled())
 		{
 			while (!shell.isDisposed()) 
@@ -72,209 +65,58 @@ public class AddClientWindow extends Dialog
 
 	private void createContents() 
 	{
-		shell = new Shell(getParent(), getStyle());
+		shell = new Shell(getParent(), getStyle() | SWT.APPLICATION_MODAL);
 		shell.setSize(411, 451);
+		shell.setMinimumSize(500, 600);
 		shell.setText(getText());
+		shell.setLayout(new FormLayout());
 		
-		Group infoGroup = new Group(shell, SWT.NONE);
-		infoGroup.setText("Personal Information");
-		infoGroup.setBounds(10, 10, 390, 125);
-		
-		Label lblName = new Label(infoGroup, SWT.NONE);
-		lblName.setText("Name");
-		lblName.setBounds(10, 23, 93, 15);
-		
-		Label lblEmail = new Label(infoGroup, SWT.NONE);
-		lblEmail.setText("Email");
-		lblEmail.setBounds(10, 47, 93, 15);
-		
-		Label lblDOB = new Label(infoGroup, SWT.NONE);
-		lblDOB.setText("DOB");
-		lblDOB.setBounds(10, 71, 93, 15);
-		
-		Label lblAnniversary = new Label(infoGroup, SWT.NONE);
-		lblAnniversary.setText("Anniversary");
-		lblAnniversary.setBounds(10, 95, 93, 15);
-		
-		firstNameBox = new Text(infoGroup, SWT.BORDER);
-		firstNameBox.setBounds(109, 20, 132, 21);
-		
-		lastNameBox = new Text(infoGroup, SWT.BORDER);
-		lastNameBox.setBounds(248, 20, 132, 21);
-		
-		emailBox = new Text(infoGroup, SWT.BORDER);
-		emailBox.setBounds(109, 44, 271, 21);
-		
-		dobDay = new CCombo(infoGroup, SWT.BORDER);
-		dobDay.setText("Day");
-		dobDay.setEditable(false);
-		dobDay.setBounds(109, 68, 72, 21);
-		
-		dobMonth = new CCombo(infoGroup, SWT.BORDER);
-		dobMonth.setText("Month");
-		dobMonth.setEditable(false);
-		dobMonth.setBounds(187, 68, 107, 21);
-		
-		dobYear = new CCombo(infoGroup, SWT.BORDER);
-		dobYear.setText("Year");
-		dobYear.setEditable(false);
-		dobYear.setBounds(300, 68, 80, 21);
-		
-		annDay = new CCombo(infoGroup, SWT.BORDER);
-		annDay.setText("Day");
-		annDay.setEditable(false);
-		annDay.setBounds(109, 92, 72, 21);
-		
-		annMonth = new CCombo(infoGroup, SWT.BORDER);
-		annMonth.setText("Month");
-		annMonth.setEditable(false);
-		annMonth.setBounds(187, 92, 107, 21);
-		
-		annYear = new CCombo(infoGroup, SWT.BORDER);
-		annYear.setText("Year");
-		annYear.setEditable(false);
-		annYear.setBounds(300, 92, 80, 21);
-		
-		Group numberGroup = new Group(shell, SWT.NONE);
-		numberGroup.setText("Phone Numbers");
-		numberGroup.setBounds(10, 141, 390, 125);
-		
-		Label lblNumHome = new Label(numberGroup, SWT.NONE);
-		lblNumHome.setText("Home");
-		lblNumHome.setBounds(10, 23, 93, 15);
-		
-		Label lblNumCellular = new Label(numberGroup, SWT.NONE);
-		lblNumCellular.setText("Cellular");
-		lblNumCellular.setBounds(10, 47, 93, 15);
-		
-		Label lblNumWork = new Label(numberGroup, SWT.NONE);
-		lblNumWork.setText("Work");
-		lblNumWork.setBounds(10, 71, 93, 15);
-		
-		Label lblNumAlt = new Label(numberGroup, SWT.NONE);
-		lblNumAlt.setText("Alternative");
-		lblNumAlt.setBounds(10, 95, 93, 15);
-		
-		numHomeBox = new Text(numberGroup, SWT.BORDER);
-		numHomeBox.setBounds(109, 20, 271, 21);
-		
-		numCellularBox = new Text(numberGroup, SWT.BORDER);
-		numCellularBox.setBounds(109, 44, 271, 21);
-		
-		numWorkBox = new Text(numberGroup, SWT.BORDER);
-		numWorkBox.setBounds(109, 68, 271, 21);
-		
-		numAltBox = new Text(numberGroup, SWT.BORDER);
-		numAltBox.setBounds(109, 92, 271, 21);
-		
-		Group addressGroup = new Group(shell, SWT.NONE);
-		addressGroup.setText("Addresses");
-		addressGroup.setBounds(10, 272, 390, 114);
-		
-		Label lblAddrHome = new Label(addressGroup, SWT.NONE);
-		lblAddrHome.setText("Home");
-		lblAddrHome.setBounds(10, 24, 93, 15);
-		
-		Label lblAddrAlt1 = new Label(addressGroup, SWT.NONE);
-		lblAddrAlt1.setText("Alternative 1");
-		lblAddrAlt1.setBounds(10, 48, 93, 15);
-		
-		Label lblAddrAlt2 = new Label(addressGroup, SWT.NONE);
-		lblAddrAlt2.setText("Alternative 2");
-		lblAddrAlt2.setBounds(10, 72, 93, 15);
-		
-		addrHomeBox = new Text(addressGroup, SWT.BORDER);
-		addrHomeBox.setBounds(109, 21, 271, 21);
-		
-		addrAlt1Box = new Text(addressGroup, SWT.BORDER);
-		addrAlt1Box.setBounds(109, 45, 271, 21);
-		
-		addrAlt2Box = new Text(addressGroup, SWT.BORDER);
-		addrAlt2Box.setBounds(109, 69, 271, 21);
-		
-		btnOkay = new Button(shell, SWT.NONE);
-		btnOkay.addSelectionListener(new SelectionAdapter() 
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e) 
-			{
-				parseInput();
-				shell.dispose();
-			}
-		});
-		btnOkay.setBounds(325, 392, 75, 25);
-		btnOkay.setText("Okay");
-		
-		btnCancel = new Button(shell, SWT.NONE);
-		btnCancel.addSelectionListener(new SelectionAdapter() 
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e) 
-			{
-				shell.dispose();
-			}
-		});
+		Button btnCancel = new Button(shell, SWT.NONE);
+		FormData fd_btnCancel = new FormData();
+		fd_btnCancel.right = new FormAttachment(100, -10);
+		fd_btnCancel.width = 120;
+		fd_btnCancel.height = 30;
+		fd_btnCancel.bottom = new FormAttachment(100, -10);
+		btnCancel.setLayoutData(fd_btnCancel);
 		btnCancel.setText("Cancel");
-		btnCancel.setBounds(244, 392, 75, 25);
+		btnCancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				shell.dispose();
+			}
+		});
 		
-		initDateValues();
-
+		Button btnSave = new Button(shell, SWT.NONE);
+		FormData fd_btnSave = new FormData();
+		fd_btnSave.left = new FormAttachment(0, 10);
+		fd_btnSave.top = new FormAttachment(btnCancel, 0, SWT.TOP);
+		fd_btnSave.width = 120;
+		fd_btnSave.height = 30;
+		btnSave.setLayoutData(fd_btnSave);
+		btnSave.setText("Save");
+		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Client _client = new Client();
+				
+				_editor.getClientFromFields(_client);
+				result = _client;
+				
+				shell.dispose();
+			}
+		});
+		
+		_editor = new ClientEditor(shell, SWT.NONE);
+		FormData fd = new FormData();
+		fd.right = new FormAttachment(100, -10);
+		fd.top = new FormAttachment(0, 10);
+		fd.bottom = new FormAttachment(btnCancel, -6);
+		fd.left = new FormAttachment(0, 10);
+		_editor.setLayoutData(fd);
+		
+		Utility.setFont(shell);
+		Utility.centerScreen(shell);
 	}
-	
-	private void parseInput()
-	{
-		ArrayList<Address> addresses = new ArrayList<Address>();
-		ArrayList<PhoneNumber> numbers = new ArrayList<PhoneNumber>();
-		
-		if(!addrHomeBox.getText().equals(""))
-			addresses.add(new Address(AddressType.Home, addrHomeBox.getText()));
-		if(!addrAlt1Box.getText().equals(""))
-			addresses.add(new Address(AddressType.Alternative1, addrAlt1Box.getText()));
-		if(!addrAlt2Box.getText().equals(""))
-			addresses.add(new Address(AddressType.Alternative2, addrAlt2Box.getText()));
-		
-		if(!numHomeBox.getText().equals(""))
-			numbers.add(new PhoneNumber(PhoneNumberType.Home, numHomeBox.getText()));
-		if(!numCellularBox.getText().equals(""))
-			numbers.add(new PhoneNumber(PhoneNumberType.Cellular, numCellularBox.getText()));
-		if(!numWorkBox.getText().equals(""))
-			numbers.add(new PhoneNumber(PhoneNumberType.Work, numWorkBox.getText()));
-		if(!numAltBox.getText().equals(""))
-			numbers.add(new PhoneNumber(PhoneNumberType.Alternative, numAltBox.getText()));
-
-		Calendar newDob = null;
-		if(dobMonth.getSelectionIndex() != -1 && dobYear.getSelectionIndex() != -1 && dobDay.getSelectionIndex() != -1)
-		{
-			newDob = Calendar.getInstance();
-			newDob.set(Integer.parseInt(dobYear.getItem(dobYear.getSelectionIndex())), dobMonth.getSelectionIndex(), dobDay.getSelectionIndex() + 1);
-		}
-		
-		Calendar newAnn = null;
-		if(annMonth.getSelectionIndex() != -1 && annYear.getSelectionIndex() != -1 && annDay.getSelectionIndex() != -1)
-		{
-			newAnn = Calendar.getInstance();
-			newAnn.set(Integer.parseInt(annYear.getItem(annYear.getSelectionIndex())), annMonth.getSelectionIndex(), annDay.getSelectionIndex() + 1);
-		}
-		
-		result = new Client(
-				firstNameBox.getText(),
-				lastNameBox.getText(),
-				emailBox.getText(),
-				newDob,
-				newAnn,
-				numbers,
-				addresses);
-		
-	}
-	
-	private void initDateValues() 
-	{		
-		dobDay.setItems( Utility.getDays() );
-		annDay.setItems( Utility.getDays() );
-		dobMonth.setItems( Utility.getMonths() );
-		annMonth.setItems( Utility.getMonths() );
-		dobYear.setItems( Utility.getYears() );
-		annYear.setItems( Utility.getYears() );		
-	}
-	
 }

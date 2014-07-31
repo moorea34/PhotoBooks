@@ -21,7 +21,7 @@ public class Utility {
 
 	private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 	
-	private static final int YEAR_CONST = 1940;
+	public static final int YEAR_CONST = 1940;
 	private static final String[] MONTHS = {
 		"January",
 		"February",
