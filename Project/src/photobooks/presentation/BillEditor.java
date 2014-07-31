@@ -931,18 +931,30 @@ public class BillEditor extends Composite {
 			
 			if (out.getType() == ITransaction.TransactionType.Quote || out.getType() == ITransaction.TransactionType.Invoice)
 			{
-				Double gst = Double.parseDouble(tbGst.getText());
-				Double pst = Double.parseDouble(tbPst.getText());
+				double gst = 0;
+				double pst = 0;
 				
-				if (gst != null)
-					out.setGst(gst);
-				else
-					out.setGst(0);
+				try
+				{
+					gst = Double.parseDouble(tbGst.getText());
+				}
+				catch (Exception e)
+				{
+					
+				}
 				
-				if (pst != null)
-					out.setPst(pst);
-				else
-					out.setPst(0);
+				out.setGst(gst);
+				
+				try
+				{
+					pst = Double.parseDouble(tbPst.getText());
+				}
+				catch (Exception e)
+				{
+					
+				}
+				
+				out.setPst(pst);
 				
 				out.getPackages().clear();
 				out.getProducts().clear();

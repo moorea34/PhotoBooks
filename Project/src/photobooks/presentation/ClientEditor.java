@@ -368,16 +368,16 @@ public class ClientEditor extends Composite {
 			
 			if(client.getBirthday() != null)
 			{
-				dobDay.select(client.getBirthday().get(Calendar.DAY_OF_MONTH) - 1);
+				dobDay.setText("" + client.getBirthday().get(Calendar.DAY_OF_MONTH));
 				dobMonth.select(client.getBirthday().get(Calendar.MONTH));
-				dobYear.select(client.getBirthday().get(Calendar.YEAR) - Utility.YEAR_CONST);
+				dobYear.setText("" + client.getBirthday().get(Calendar.YEAR));
 			}
 			
 			if(client.getAnniversary() != null)
 			{
-				annDay.select(client.getAnniversary().get(Calendar.DAY_OF_MONTH) - 1);
+				annDay.setText("" + client.getAnniversary().get(Calendar.DAY_OF_MONTH));
 				annMonth.select(client.getAnniversary().get(Calendar.MONTH));
-				annYear.select(client.getAnniversary().get(Calendar.YEAR) - Utility.YEAR_CONST);
+				annYear.setText("" + client.getAnniversary().get(Calendar.YEAR));
 			}
 			
 			for(PhoneNumber num : client.getNumbers())
@@ -419,25 +419,50 @@ public class ClientEditor extends Composite {
 	
 	public void getClientFromFields(Client out)
 	{
+		int year, month, day;
+		
 		out.setFirstName(firstNameBox.getText());
 		out.setLastName(lastNameBox.getText());
 		out.setEmail(emailBox.getText());
-
-		if(dobMonth.getSelectionIndex() != -1 && dobYear.getSelectionIndex() != -1 && dobDay.getSelectionIndex() != -1)
+		
+		try
 		{
-			Calendar newDob = Calendar.getInstance();
-			newDob.set(Integer.parseInt(dobYear.getItem(dobYear.getSelectionIndex())), dobMonth.getSelectionIndex(), dobDay.getSelectionIndex() + 1);
-			out.setBirthday(newDob);
+			year = Integer.parseInt(dobYear.getText());
+			month = Utility.stringToMonth(dobMonth.getText());
+			day = Integer.parseInt(dobDay.getText());
+			
+			if (month >= 0)
+			{
+				Calendar newDob = Calendar.getInstance();
+				newDob.set(year, month, day);
+				out.setBirthday(newDob);
+			}
+		}
+		catch (Exception e)
+		{
+			
 		}
 		
-		if(annMonth.getSelectionIndex() != -1 && annYear.getSelectionIndex() != -1 && annDay.getSelectionIndex() != -1)
+		try
 		{
-			Calendar newAnn = Calendar.getInstance();
-			newAnn.set(Integer.parseInt(annYear.getItem(annYear.getSelectionIndex())), annMonth.getSelectionIndex(), annDay.getSelectionIndex() + 1);
-			out.setAnniversary(newAnn);
+			year = Integer.parseInt(annYear.getText());
+			month = Utility.stringToMonth(annMonth.getText());
+			day = Integer.parseInt(annDay.getText());
+			
+			if (month >= 0)
+			{
+				Calendar newAnn = Calendar.getInstance();
+				newAnn.set(year, month, day);
+				out.setAnniversary(newAnn);
+			}
+		}
+		catch (Exception e)
+		{
+			
 		}
 		
 		ArrayList<PhoneNumber> updatedNumbers = new ArrayList<PhoneNumber>();
+		
 		if(!numHomeBox.getText().equals(""))
 			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Home, numHomeBox.getText()));
 		if(!numCellularBox.getText().equals(""))
@@ -448,6 +473,7 @@ public class ClientEditor extends Composite {
 			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Alternative, numAltBox.getText()));
 		
 		ArrayList<Address> updatedAddresses = new ArrayList<Address>();
+		
 		if(!addrHomeBox.getText().equals(""))
 			updatedAddresses.add(new Address(AddressType.Home, addrHomeBox.getText()));
 		if(!addrAlt1Box.getText().equals(""))

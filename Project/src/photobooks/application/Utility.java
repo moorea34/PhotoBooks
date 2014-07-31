@@ -37,6 +37,41 @@ public class Utility {
 		"December"
 		};
 	
+	public static int stringToMonth(String month)
+	{
+		int result = -1;
+		
+		switch (month.toLowerCase().trim())
+		{
+			case "january": result = 0;
+				break;
+			case "february": result = 1;
+				break;
+			case "march": result = 2;
+				break;
+			case "april": result = 3;
+				break;
+			case "may": result = 4;
+				break;
+			case "june": result = 5;
+				break;
+			case "july": result = 6;
+				break;
+			case "august": result = 7;
+				break;
+			case "september": result = 8;
+				break;
+			case "october": result = 9;
+				break;
+			case "november": result = 10;
+				break;
+			case "december": result = 11;
+				break;
+		}
+		
+		return result;
+	}
+	
 	public static String monthToString( int dayOfMonth )
 	{
 		String result = "";

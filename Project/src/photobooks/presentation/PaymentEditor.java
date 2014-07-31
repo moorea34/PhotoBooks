@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Text;
 
+import photobooks.application.Utility;
 import photobooks.objects.Payment;
 import photobooks.objects.Payment.TenderType;
 
@@ -80,14 +81,30 @@ public class PaymentEditor extends Composite {
 		lblInvoiceRef.setLayoutData(fd_lblInvoiceRef);
 		lblInvoiceRef.setText("Invoice Ref #:");
 		
+		Label lblDescription = new Label(this, SWT.NONE);
+		FormData fd_lblDescription = new FormData();
+		fd_lblDescription.top = new FormAttachment(lblInvoiceRef, 15);
+		fd_lblDescription.left = new FormAttachment(lblDate, 0, SWT.LEFT);
+		lblDescription.setLayoutData(fd_lblDescription);
+		lblDescription.setText("Description:");
+		
+		tbAmount = new Text(this, SWT.BORDER);
+		tbAmount.setText("0");
+		FormData fd_tbAmount = new FormData();
+		fd_tbAmount.right = new FormAttachment(100, 0);
+		fd_tbAmount.bottom = new FormAttachment(lblAmount, 0, SWT.BOTTOM);
+		fd_tbAmount.left = new FormAttachment(lblFormOfPayment, 6);
+		tbAmount.setLayoutData(fd_tbAmount);
+		
 		cbFormOfPayment = new CCombo(this, SWT.BORDER);
 		cbFormOfPayment.setText("Cash");
 		FormData fd_cbFormOfPayment = new FormData();
 		fd_cbFormOfPayment.right = new FormAttachment(100, 0);
 		fd_cbFormOfPayment.bottom = new FormAttachment(lblFormOfPayment, 0, SWT.BOTTOM);
-		fd_cbFormOfPayment.left = new FormAttachment(lblFormOfPayment, 6);
+		fd_cbFormOfPayment.left = new FormAttachment(tbAmount, 0, SWT.LEFT);
 		cbFormOfPayment.setLayoutData(fd_cbFormOfPayment);
 		cbFormOfPayment.setItems(paymentTypes);
+		cbFormOfPayment.setEditable(false);
 		
 		lblDateValue = new Label(this, SWT.NONE);
 		FormData fd_lblDateValue = new FormData();
@@ -103,14 +120,6 @@ public class PaymentEditor extends Composite {
 		fd_lblUser.right = new FormAttachment(100, 0);
 		lblUser.setLayoutData(fd_lblUser);
 		
-		tbAmount = new Text(this, SWT.BORDER);
-		tbAmount.setText("0");
-		FormData fd_tbAmount = new FormData();
-		fd_tbAmount.right = new FormAttachment(100, 0);
-		fd_tbAmount.bottom = new FormAttachment(lblAmount, 0, SWT.BOTTOM);
-		fd_tbAmount.left = new FormAttachment(cbFormOfPayment, 0, SWT.LEFT);
-		tbAmount.setLayoutData(fd_tbAmount);
-		
 		lblInvoiceRefValue = new Label(this, SWT.NONE);
 		FormData fd_lblInvoiceRefValue = new FormData();
 		fd_lblInvoiceRefValue.bottom = new FormAttachment(lblInvoiceRef, 0, SWT.BOTTOM);
@@ -118,18 +127,11 @@ public class PaymentEditor extends Composite {
 		fd_lblInvoiceRefValue.right = new FormAttachment(100, 0);
 		lblInvoiceRefValue.setLayoutData(fd_lblInvoiceRefValue);
 		
-		Label lblDescription = new Label(this, SWT.NONE);
-		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.top = new FormAttachment(lblInvoiceRef, 15);
-		fd_lblDescription.left = new FormAttachment(lblDate, 0, SWT.LEFT);
-		lblDescription.setLayoutData(fd_lblDescription);
-		lblDescription.setText("Description:");
-		
 		tbDescription = new Text(this, SWT.BORDER);
 		FormData fd_tbDescription = new FormData();
-		fd_tbDescription.bottom = new FormAttachment(lblDescription, 0, SWT.BOTTOM);
 		fd_tbDescription.left = new FormAttachment(cbFormOfPayment, 0, SWT.LEFT);
 		fd_tbDescription.right = new FormAttachment(100, 0);
+		fd_tbDescription.bottom = new FormAttachment(lblDescription, 0, SWT.BOTTOM);
 		tbDescription.setLayoutData(fd_tbDescription);
 		
 		lblPaymentValue = new Label(this, SWT.NONE);
@@ -164,7 +166,7 @@ public class PaymentEditor extends Composite {
 			
 			lblInvoiceRefValue.setText("" + payment.getInvoiceId());
 			lblUser.setText(payment.getClient().getFormattedName());
-			lblDateValue.setText(payment.getDate().get(Calendar.YEAR) + " " + (payment.getDate().get(Calendar.MONTH) + 1) + " " + payment.getDate().get(Calendar.DAY_OF_MONTH));
+			lblDateValue.setText(Utility.formatDate(payment.getDate()));
 			
 			lblPaymentValue.setText("" + payment.getID());
 		}
@@ -176,11 +178,17 @@ public class PaymentEditor extends Composite {
 	{
 		if (payment != null)
 		{
-			Double amount = Double.valueOf(tbAmount.getText());
+			double amount = 0;
 			TenderType tenderType = TenderType.valueOf(cbFormOfPayment.getText());
 			
-			if (amount == null)
-				amount = Double.valueOf(0);
+			try
+			{
+				amount = Double.parseDouble(tbAmount.getText());
+			}
+			catch (Exception e)
+			{
+				
+			}
 			
 			payment.setDescription(tbDescription.getText());
 			payment.setAmount(amount);

@@ -58,15 +58,6 @@ public class ClientsPage extends Composite
 		
 		setupUI();
 		
-		_clientEditor = new ClientEditor(this, SWT.NONE);
-		_clientEditor.setModify(false);
-		FormData fd = new FormData();
-		fd.left = new FormAttachment(listViewer.getList(), 6, SWT.RIGHT);
-		fd.top = new FormAttachment(listViewer.getList(), 0, SWT.TOP);
-		fd.right = new FormAttachment(100, -6);
-		fd.bottom = new FormAttachment(listViewer.getList(), -20, SWT.BOTTOM);
-		_clientEditor.setLayoutData(fd);
-		
 		selectFirstClient();
 		
 	}
@@ -77,7 +68,7 @@ public class ClientsPage extends Composite
 		listViewer = new ListViewer(this, SWT.BORDER | SWT.V_SCROLL);
 		List list = listViewer.getList();
 		FormData fd_list = new FormData();
-		fd_list.width = 140;
+		fd_list.width = 160;
 		fd_list.bottom = new FormAttachment(100, -37);
 		fd_list.top = new FormAttachment(0, 10);
 		fd_list.left = new FormAttachment(0, 10);
@@ -157,6 +148,15 @@ public class ClientsPage extends Composite
 							}
 							
 						});
+				
+				_clientEditor = new ClientEditor(this, SWT.NONE);
+				_clientEditor.setModify(false);
+				FormData fd = new FormData();
+				fd.bottom = new FormAttachment(list, -40, SWT.BOTTOM);
+				fd.left = new FormAttachment(listViewer.getList(), 6, SWT.RIGHT);
+				fd.top = new FormAttachment(listViewer.getList(), 0, SWT.TOP);
+				fd.right = new FormAttachment(100, -6);
+				_clientEditor.setLayoutData(fd);
 						
 				btnRemoveClient = new Button(this, SWT.NONE);
 				FormData fd_btnRemoveClient = new FormData();
@@ -269,7 +269,11 @@ public class ClientsPage extends Composite
 			        	selected.setDirectory(selectedDir);
 			        	_clientManager.updateClient(selected);
 			        	updateList();
+			        	
+						btnViewPhotos.setEnabled(true);
 			        }
+			        else
+			        	btnViewPhotos.setEnabled(false);
 				}
 			}
 		});
@@ -343,6 +347,12 @@ public class ClientsPage extends Composite
 		{
 			currClientID = client.getID();
 			_clientEditor.setClient(client);
+			
+			if (client.getDirectory() != null && client.getDirectory().length() > 0) {
+				btnViewPhotos.setEnabled(true);
+			}
+			else
+				btnViewPhotos.setEnabled(false);
 		}
 	}
 

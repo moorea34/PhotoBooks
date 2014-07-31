@@ -327,7 +327,7 @@ public class BillsPage extends Composite {
 		fd_composite.top = new FormAttachment(0, 10);
 		fd_composite.left = new FormAttachment(0, 10);
 		fd_composite.bottom = new FormAttachment(100, -37);
-		fd_composite.width = 164;
+		fd_composite.width = 184;
 		composite.setLayoutData(fd_composite);
 		composite.setLayout(new TreeColumnLayout());
 

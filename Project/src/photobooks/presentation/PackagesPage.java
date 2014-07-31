@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 import photobooks.application.Globals;
+import photobooks.application.Utility;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
 import photobooks.gateways.IDao;
@@ -25,6 +26,7 @@ import photobooks.objects.Product;
 import photobooks.objects.ProductBase;
 import photobooks.objects.Package;
 
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -32,11 +34,20 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+
 import acceptanceTests.Register;
+
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 public class PackagesPage extends Composite
 {
@@ -80,9 +91,10 @@ public class PackagesPage extends Composite
 
 	}
 	
-	private void selectFirstPackage() 
+	private void selectFirstPackage()
 	{
 		ArrayList<Package> packs = new ArrayList<Package>( _packageManager.getProductPackageList() );
+		
 		if (packs != null && packs.size() > 0)
 		{
 			Object selected = packs.get(0);
@@ -97,93 +109,180 @@ public class PackagesPage extends Composite
 
 	private void setupPackageList() 
 	{
+		int groupHeight = 130;
+		int labelDistance = 10;
+		
+		int labelWidth = 80;
+		int labelHeight = 20;
+		
+		int boxOffsetX = 3;
+		int boxOffsetY = -2;
+		int boxHeight = 22;
+		
+		int nudHeight = boxHeight + 2;
+		
+		setLayout(new FormLayout());
 		treeViewer = new TreeViewer(this, SWT.BORDER);
 		tree = treeViewer.getTree();
-		tree.setBounds(10, 10, 160, 200);
+		FormData fd_tree = new FormData();
+		fd_tree.width = 163;
+		fd_tree.bottom = new FormAttachment(50, -28);
+		fd_tree.top = new FormAttachment(0, 10);
+		fd_tree.left = new FormAttachment(0, 10);
+		tree.setLayoutData(fd_tree);
 		tree.setFont( Globals.getFont() );
 		
+		viewProdListViewer = new ListViewer(this, SWT.BORDER | SWT.V_SCROLL);
+		viewProdList = viewProdListViewer.getList();
+		FormData fd_viewProdList = new FormData();
+		fd_viewProdList.right = new FormAttachment(tree, 0, SWT.RIGHT);
+		fd_viewProdList.left = new FormAttachment(tree, 0, SWT.LEFT);
+		fd_viewProdList.top = new FormAttachment(tree, 6);
+		fd_viewProdList.bottom = new FormAttachment(100, -37);
+		viewProdList.setLayoutData(fd_viewProdList);
+		viewProdList.setFont(Globals.getFont());
+		
+		packageSearch = new Text(this, SWT.BORDER | SWT.SEARCH);
+		FormData fd_packageSearch = new FormData();
+		fd_packageSearch.height = 18;
+		fd_packageSearch.right = new FormAttachment(tree, 0, SWT.RIGHT);
+		fd_packageSearch.left = new FormAttachment(tree, 0, SWT.LEFT);
+		fd_packageSearch.top = new FormAttachment(viewProdList, 6);
+		packageSearch.setLayoutData(fd_packageSearch);
+		
+		packageSearch.addModifyListener(new ModifyListener()
+		{
+
+			@Override
+			public void modifyText(ModifyEvent arg0) 
+			{
+				treeViewer.refresh();
+				viewProdListViewer.refresh();
+			}
+			
+		});
+		
 		infoBox = new Group(this, SWT.NONE);
+		infoBox.setLayout(new FormLayout());
+		FormData fd_infoBox = new FormData();
+		fd_infoBox.left = new FormAttachment(tree, 6);
+		fd_infoBox.right = new FormAttachment(100, -6);
+		fd_infoBox.top = new FormAttachment(tree, 0, SWT.TOP);
+		fd_infoBox.bottom = new FormAttachment(35, 0);
+		infoBox.setLayoutData(fd_infoBox);
 		infoBox.setText("Package Information");
-		infoBox.setBounds(176, 10, 388, 200);
 		
 		nameLbl = new Label(infoBox, SWT.NONE);
+		FormData fd_nameLbl = new FormData();
+		fd_nameLbl.top = new FormAttachment(0, 6);
+		fd_nameLbl.left = new FormAttachment(0, 6);
+		fd_nameLbl.width = labelWidth;
+		fd_nameLbl.height = labelHeight;
+		nameLbl.setLayoutData(fd_nameLbl);
 		nameLbl.setText("Name");
-		nameLbl.setBounds(10, 23, 93, 15);
-		
-		nameBox = new Text(infoBox, SWT.BORDER);
-		nameBox.setEditable(false);
-		nameBox.setBounds(109, 20, 269, 21);
-		
-		descripLbl = new Label(infoBox, SWT.NONE);
-		descripLbl.setText("Description");
-		descripLbl.setBounds(10, 78, 93, 15);
-		
-		descripBox = new Text(infoBox, SWT.BORDER);
-		descripBox.setEditable(false);
-		descripBox.setBounds(10, 99, 368, 81);
 		
 		priceLbl = new Label(infoBox, SWT.NONE);
+		FormData fd_priceLbl = new FormData();
+		fd_priceLbl.top = new FormAttachment(nameLbl, labelDistance);
+		fd_priceLbl.left = new FormAttachment(nameLbl, 0, SWT.LEFT);
+		fd_priceLbl.width = labelWidth;
+		fd_priceLbl.height = labelHeight;
+		priceLbl.setLayoutData(fd_priceLbl);
 		priceLbl.setText("Price");
-		priceLbl.setBounds(10, 47, 93, 15);
+		
+		descripLbl = new Label(infoBox, SWT.NONE);
+		FormData fd_descripLbl = new FormData();
+		fd_descripLbl.top = new FormAttachment(priceLbl, labelDistance);
+		fd_descripLbl.left = new FormAttachment(nameLbl, 0, SWT.LEFT);
+		fd_descripLbl.width = labelWidth;
+		fd_descripLbl.height = labelHeight;
+		descripLbl.setLayoutData(fd_descripLbl);
+		descripLbl.setText("Description");
+		
+		nameBox = new Text(infoBox, SWT.BORDER);
+		FormData fd_nameBox = new FormData();
+		fd_nameBox.right = new FormAttachment(100, -6);
+		fd_nameBox.top = new FormAttachment(nameLbl, boxOffsetY, SWT.TOP);
+		fd_nameBox.left = new FormAttachment(nameLbl, 6);
+		fd_nameBox.height = boxHeight;
+		nameBox.setLayoutData(fd_nameBox);
+		nameBox.setEditable(false);
 		
 		priceBox = new Text(infoBox, SWT.BORDER);
+		FormData fd_priceBox = new FormData();
+		fd_priceBox.left = new FormAttachment(nameBox, 0, SWT.LEFT);
+		fd_priceBox.right = new FormAttachment(nameBox, 0, SWT.RIGHT);
+		fd_priceBox.top = new FormAttachment(priceLbl, boxOffsetY, SWT.TOP);
+		fd_priceBox.height = boxHeight;
+		priceBox.setLayoutData(fd_priceBox);
 		priceBox.setEditable(false);
-		priceBox.setBounds(109, 44, 269, 21);
 		
-		removeButton = new Button(this, SWT.NONE);
-		removeButton.addSelectionListener(new SelectionAdapter() 
-		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0) 
-			{
-				removeSelected();
-			}
-		});
-		removeButton.setBounds(424, 481, 140, 25);
-		removeButton.setText("Remove Package");
-		
-		modifyButton = new Button(this, SWT.NONE);
-		modifyButton.addSelectionListener(new SelectionAdapter() 
-		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0) 
-			{
-				toggleModify();
-			}
-		});
-		modifyButton.setText("Modify Package");
-		modifyButton.setBounds(278, 481, 140, 25);
-		
-		newPackageButton = new Button(this, SWT.NONE);
-		newPackageButton.addSelectionListener(new SelectionAdapter() 
-		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0) 
-			{
-				if(modifying)
-				{
-					toggleModify();
-				}
-				
-				AddProductWindow addItem = new AddProductWindow(_parent.getShell(), SWT.SHELL_TRIM & (~SWT.RESIZE), "Package");
-				Object newItem = addItem.open();
-				
-				if(newItem != null)
-						_packageManager.insertProductPackage((Package)newItem);
-				
-				refreshList();
-				
-			}
-		});
-		
-		newPackageButton.setText("New Package");
-		newPackageButton.setBounds(424, 450, 140, 25);
+		descripBox = new Text(infoBox, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		FormData fd_descripBox = new FormData();
+		fd_descripBox.top = new FormAttachment(descripLbl, 6);
+		fd_descripBox.right = new FormAttachment(nameBox, 0, SWT.RIGHT);
+		fd_descripBox.left = new FormAttachment(nameLbl, 0, SWT.LEFT);
+		fd_descripBox.bottom = new FormAttachment(100, -6);
+		descripBox.setLayoutData(fd_descripBox);
+		descripBox.setEditable(false);
 		
 		addProductBox = new Group(this, SWT.NONE);
+		addProductBox.setLayout(new FormLayout());
+		FormData fd_addProductBox = new FormData();
+		fd_addProductBox.left = new FormAttachment(infoBox, 0, SWT.LEFT);
+		fd_addProductBox.right = new FormAttachment(infoBox, 0, SWT.RIGHT);
+		fd_addProductBox.top = new FormAttachment(infoBox, 6);
+		fd_addProductBox.bottom = new FormAttachment(60, 0);
+		addProductBox.setLayoutData(fd_addProductBox);
 		addProductBox.setText("Add Products to Package");
-		addProductBox.setBounds(176, 216, 388, 111);
+		
+		addProdListViewer = new ListViewer(addProductBox, SWT.BORDER | SWT.V_SCROLL);
+		addProdList = addProdListViewer.getList();
+		FormData fd_addProdList = new FormData();
+		fd_addProdList.bottom = new FormAttachment(100, -6);
+		fd_addProdList.right = new FormAttachment(60, 0);
+		fd_addProdList.top = new FormAttachment(0, 6);
+		fd_addProdList.left = new FormAttachment(0, 6);
+		addProdList.setLayoutData(fd_addProdList);
+		addProdListViewer.getList().addKeyListener(new KeyListener()
+		{
+			public void keyPressed(KeyEvent evt)
+			{
+				if (evt.keyCode == SWT.TRAVERSE_RETURN || evt.keyCode == SWT.CR || evt.keyCode == SWT.LF || evt.character == '\r' || evt.character == '\n')
+				{
+					if (modifying) {
+						addProdButton.notifyListeners(SWT.Selection, new Event());
+					}
+				}
+			}
+
+			public void keyReleased(KeyEvent evt) {}
+		});
+		addProdListViewer.getList().addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+			}
+			
+			@Override
+			public void mouseDown(MouseEvent arg0) {
+			}
+			
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+				if (modifying) {
+					addProdButton.notifyListeners(SWT.Selection, new Event());
+				}
+			}
+		});
 		
 		addProdButton = new Button(addProductBox, SWT.NONE);
+		FormData fd_addProdButton = new FormData();
+		fd_addProdButton.width = 150;
+		fd_addProdButton.height = 30;
+		fd_addProdButton.bottom = new FormAttachment(addProdList, 0, SWT.BOTTOM);
+		fd_addProdButton.left = new FormAttachment(addProdList, 6);
+		addProdButton.setLayoutData(fd_addProdButton);
 		addProdButton.addSelectionListener(new SelectionAdapter() 
 		{
 			@Override
@@ -195,6 +294,7 @@ public class PackagesPage extends Composite
 					{
 						IStructuredSelection selection = (IStructuredSelection)addProdListViewer.getSelection();
 						Product selectedProduct = (Product)selection.getFirstElement();
+						
 						if(selectedProduct != null)
 						{
 							Package p = _packageManager.getProductPackage(currSelectedID);
@@ -210,13 +310,33 @@ public class PackagesPage extends Composite
 		});
 		addProdButton.setEnabled(false);
 		addProdButton.setText("Add Selected");
-		addProdButton.setBounds(238, 63, 140, 25);
 		
 		removeProductBox = new Group(this, SWT.NONE);
+		removeProductBox.setLayout(new FormLayout());
+		FormData fd_removeProductBox = new FormData();
+		fd_removeProductBox.right = new FormAttachment(infoBox, 0, SWT.RIGHT);
+		fd_removeProductBox.left = new FormAttachment(infoBox, 0, SWT.LEFT);
+		fd_removeProductBox.top = new FormAttachment(addProductBox, 6);
+		fd_removeProductBox.bottom = new FormAttachment(87, 0);
+		removeProductBox.setLayoutData(fd_removeProductBox);
 		removeProductBox.setText("Remove Products from Package");
-		removeProductBox.setBounds(176, 333, 388, 111);
+		
+		rmProdListViewer = new ListViewer(removeProductBox, SWT.BORDER | SWT.V_SCROLL);
+		removeProdList = rmProdListViewer.getList();
+		FormData fd_removeProdList = new FormData();
+		fd_removeProdList.bottom = new FormAttachment(100, -6);
+		fd_removeProdList.right = new FormAttachment(60);
+		fd_removeProdList.top = new FormAttachment(0, 6);
+		fd_removeProdList.left = new FormAttachment(0, 6);
+		removeProdList.setLayoutData(fd_removeProdList);
 		
 		rmProdButton = new Button(removeProductBox, SWT.NONE);
+		FormData fd_rmProdButton = new FormData();
+		fd_rmProdButton.bottom = new FormAttachment(removeProdList, 0, SWT.BOTTOM);
+		fd_rmProdButton.left = new FormAttachment(removeProdList, 6);
+		fd_rmProdButton.height = 30;
+		fd_rmProdButton.width = 150;
+		rmProdButton.setLayoutData(fd_rmProdButton);
 		rmProdButton.addSelectionListener(new SelectionAdapter() 
 		{
 			@Override
@@ -243,22 +363,78 @@ public class PackagesPage extends Composite
 		
 		rmProdButton.setEnabled(false);
 		rmProdButton.setText("Remove Selected");
-		rmProdButton.setBounds(238, 63, 140, 25);
 		
-		rmProdListViewer = new ListViewer(removeProductBox, SWT.BORDER | SWT.V_SCROLL);
-		removeProdList = rmProdListViewer.getList();
-		removeProdList.setBounds(10, 20, 200, 68);
+		removeButton = new Button(this, SWT.NONE);
+		FormData fd_removeButton = new FormData();
+		fd_removeButton.right = new FormAttachment(infoBox, 0, SWT.RIGHT);
+		fd_removeButton.width = 150;
+		fd_removeButton.height = 30;
+		fd_removeButton.bottom = new FormAttachment(100, -6);
+		removeButton.setLayoutData(fd_removeButton);
+		removeButton.addSelectionListener(new SelectionAdapter() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0) 
+			{
+				removeSelected();
+			}
+		});
+		removeButton.setText("Remove Package");
 		
-		addProdListViewer = new ListViewer(addProductBox, SWT.BORDER | SWT.V_SCROLL);
-		addProdList = addProdListViewer.getList();
-		addProdList.setBounds(10, 20, 200, 68);
+		modifyButton = new Button(this, SWT.NONE);
+		FormData fd_modifyButton = new FormData();
+		fd_modifyButton.width = 150;
+		fd_modifyButton.top = new FormAttachment(removeButton, 0, SWT.TOP);
+		fd_modifyButton.bottom = new FormAttachment(removeButton, 0, SWT.BOTTOM);
+		fd_modifyButton.right = new FormAttachment(removeButton, -6);
+		modifyButton.setLayoutData(fd_modifyButton);
+		modifyButton.addSelectionListener(new SelectionAdapter() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0) 
+			{
+				toggleModify();
+			}
+		});
+		modifyButton.setText("Modify Package");
 		
-		viewProdListViewer = new ListViewer(this, SWT.BORDER | SWT.V_SCROLL);
-		viewProdList = viewProdListViewer.getList();
-		viewProdList.setFont(Globals.getFont());
-		viewProdList.setBounds(10, 216, 160, 257);
+		newPackageButton = new Button(this, SWT.NONE);
+		FormData fd_newPackageButton = new FormData();
+		fd_newPackageButton.bottom = new FormAttachment(removeButton, -6, SWT.TOP);
+		fd_newPackageButton.right = new FormAttachment(removeButton, 0, SWT.RIGHT);
+		fd_newPackageButton.left = new FormAttachment(removeButton, 0, SWT.LEFT);
+		fd_newPackageButton.height = 30;
+		newPackageButton.setLayoutData(fd_newPackageButton);
+		newPackageButton.addSelectionListener(new SelectionAdapter() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0) 
+			{
+				if(modifying)
+				{
+					toggleModify();
+				}
+				
+				AddProductWindow addItem = new AddProductWindow(_parent.getShell(), SWT.SHELL_TRIM & (~SWT.RESIZE), "Package");
+				Object newItem = addItem.open();
+				
+				if(newItem != null)
+						_packageManager.insertProductPackage((Package)newItem);
+				
+				refreshList();
+				
+			}
+		});
+		
+		newPackageButton.setText("New Package");
 		
 		btnNewProduct = new Button(this, SWT.NONE);
+		FormData fd_btnNewProduct = new FormData();
+		fd_btnNewProduct.top = new FormAttachment(newPackageButton, 0, SWT.TOP);
+		fd_btnNewProduct.left = new FormAttachment(modifyButton, 0, SWT.LEFT);
+		fd_btnNewProduct.bottom = new FormAttachment(newPackageButton, 0, SWT.BOTTOM);
+		fd_btnNewProduct.right = new FormAttachment(modifyButton, 0, SWT.RIGHT);
+		btnNewProduct.setLayoutData(fd_btnNewProduct);
 		btnNewProduct.addSelectionListener(new SelectionAdapter() 
 		{
 			@Override
@@ -279,25 +455,9 @@ public class PackagesPage extends Composite
 			}
 		});
 		btnNewProduct.setText("New Product");
-		btnNewProduct.setBounds(278, 450, 140, 25);
-		
-		packageSearch = new Text(this, SWT.BORDER | SWT.SEARCH);
-		packageSearch.setBounds(10, 481, 160, 23);
 		
 		setupTree();
 		setupListViewers();
-		
-		packageSearch.addModifyListener(new ModifyListener()
-		{
-
-			@Override
-			public void modifyText(ModifyEvent arg0) 
-			{
-				treeViewer.refresh();
-				viewProdListViewer.refresh();
-			}
-			
-		});
 	}
 	
 	private void setupTree() 
@@ -544,12 +704,13 @@ public class PackagesPage extends Composite
 		}
 		
 		clearValues();
+		
 		if(selected != null)
 		{
 			System.out.println("Selected " + selected.getClass().getSimpleName() + " id: " + ((ProductBase)selected).getID());
 			nameBox.setText(((ProductBase)selected).getName());
 			descripBox.setText(((ProductBase)selected).getDescription());
-			priceBox.setText(String.valueOf(((ProductBase)selected).getPrice()));
+			priceBox.setText(Utility.formatMoney(((ProductBase)selected).getPrice()));
 			currSelectedType = selected.getClass().getSimpleName();
 			currSelectedID = ((ProductBase)selected).getID();
 			
@@ -568,7 +729,7 @@ public class PackagesPage extends Composite
 	{
 		nameBox.setText("");
 		descripBox.setText("");
-		priceBox.setText("");
+		priceBox.setText("0.00");
 
 		if(rmProdListViewer.getContentProvider() != null)
 			rmProdListViewer.setInput(null);
