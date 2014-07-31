@@ -14,6 +14,9 @@ public class Client extends DBObject
 	private ArrayList<PhoneNumber> _phoneNumbers;
 	private ArrayList<Address> _addresses;
 	
+	private double _accountBalance;
+	private String _address, _city, _province, _postalCode;
+	
 	public Client()
 	{		
 		this("", "", "", null, null, new ArrayList<PhoneNumber>(), new ArrayList<Address>(), "");
@@ -31,6 +34,26 @@ public class Client extends DBObject
 	
 	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, ArrayList<Address> addresses, String directory)
 	{
+		_accountBalance = 0;
+		_firstName = firstName;
+		_lastName = lastName;
+		_email = email;
+		_directory = directory;
+		_birthday = birthday;
+		_anniversary = anniversary;
+		_phoneNumbers = phoneNumbers;
+		_addresses = addresses;
+	}
+	
+	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String address, String city, String province, String postalCode, String directory, double accountBalance, ArrayList<Address> addresses)
+	{
+		_accountBalance = accountBalance;
+		
+		_address = address;
+		_city = city;
+		_province = province;
+		_postalCode = postalCode;
+		
 		_firstName = firstName;
 		_lastName = lastName;
 		_email = email;
@@ -77,6 +100,13 @@ public class Client extends DBObject
 		return _phoneNumbers;
 	}
 	
+	public double getAccountBalance() { return _accountBalance; }
+	
+	public String getAddress() { return _address; }
+	public String getCity() { return _city; }
+	public String getProvince() { return _province; }
+	public String getPostalCode() { return _postalCode; }
+	
 	public ArrayList<Address> getAddresses()
 	{
 		return _addresses;
@@ -106,6 +136,13 @@ public class Client extends DBObject
 	{
 		_phoneNumbers = numbers;
 	}
+	
+	public void setAccountBalance(double accountBalance) { _accountBalance = accountBalance; }
+	
+	public void setAddress(String address) { _address = address; }
+	public void setCity(String city) { _city = city; }
+	public void setProvince(String province) { _province = province; }
+	public void setPostalCode(String postalCode) { _postalCode = postalCode; }
 	
 	public void setAddresses(ArrayList<Address> addresses)
 	{

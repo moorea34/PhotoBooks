@@ -240,20 +240,32 @@ public class EditBillItemWindow extends Dialog {
 				else
 				{
 					Object obj = objects.get(cbItem.getSelectionIndex());
-					Double price = Double.parseDouble(tbPrice.getText());
-					Double amount = Double.parseDouble(tbAmount.getText());
+					double price = 0;
+					int amount = 1;
 					
-					if (price == null)
-						price = Double.valueOf(0);
+					try
+					{
+						price = Double.parseDouble(tbPrice.getText());
+					}
+					catch (Exception ex)
+					{
+						
+					}
 					
-					if (amount == null)
-						amount = Double.valueOf(1);
+					try
+					{
+						amount = Integer.parseInt(tbAmount.getText());
+					}
+					catch (Exception ex)
+					{
+						
+					}
 					
 					if (obj instanceof Product)
 					{
 						BillProduct prod = new BillProduct();
 						
-						prod.setAmount(amount.intValue());
+						prod.setAmount(amount);
 						prod.setPrice(price);
 						prod.setProduct((Product)obj);
 						
@@ -269,7 +281,7 @@ public class EditBillItemWindow extends Dialog {
 					{
 						BillPackage prod = new BillPackage();
 						
-						prod.setAmount(amount.intValue());
+						prod.setAmount(amount);
 						prod.setPrice(price);
 						prod.setPackage((Package)obj);
 						

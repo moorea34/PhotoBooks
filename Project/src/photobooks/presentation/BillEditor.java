@@ -293,7 +293,7 @@ public class BillEditor extends Composite {
 		fd_lblAddress.top = new FormAttachment(lblClientAddress, 0, SWT.TOP);
 		lblAddress.setLayoutData(fd_lblAddress);
 		
-		tableViewer = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION);
+		tableViewer = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
 		FormData fd_table = new FormData();
 		fd_table.bottom = new FormAttachment(lblSubtotal, -6);
 		fd_table.top = new FormAttachment(tbDescription, 6);
@@ -509,8 +509,8 @@ public class BillEditor extends Composite {
 								((BillPackage)result).setBillID(_bill.getID());
 						}
 						
-						tableViewer.remove(items[0].getData());
-						tableViewer.add(result);
+						items[0].setData(result);
+						tableViewer.refresh(items[0].getData());
 					}
 
 					updateTotals();
