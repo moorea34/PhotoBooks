@@ -21,11 +21,16 @@ public class ClientEditor extends Composite {
 	private Text numCellularBox;
 	private Text numWorkBox;
 	private Text numAltBox;
-	private Text addrHomeBox;
-	private Text addrAlt1Box;
-	private Text addrAlt2Box;
 	private CCombo dobDay, dobMonth, dobYear, annDay, annMonth, annYear;
 	private Text emailBox;
+	private Label lblAddress;
+	private Text tbAddress;
+	private Label lblCity;
+	private Text tbCity;
+	private Label lblProvince;
+	private Text tbProvince;
+	private Label lblPostalCode;
+	private Text tbPostalCode;
 
 	public ClientEditor(Composite parent, int style) {
 		super(parent, style);
@@ -258,58 +263,79 @@ public class ClientEditor extends Composite {
 		fd_grpAddresses.top = new FormAttachment(grpPhoneNumbers, 6, SWT.BOTTOM);
 		fd_grpAddresses.height = groupHeight;
 		grpAddresses.setLayoutData(fd_grpAddresses);
-		grpAddresses.setText("Addresses");
-				
-						Label addrHomeLbl = new Label(grpAddresses, SWT.NONE);
-						FormData fd_addrHomeLbl = new FormData();
-						fd_addrHomeLbl.left = new FormAttachment(0, 6);
-						fd_addrHomeLbl.top = new FormAttachment(0, 6);
-						fd_addrHomeLbl.width = labelWidth;
-						fd_addrHomeLbl.height = labelHeight;
-						addrHomeLbl.setLayoutData(fd_addrHomeLbl);
-						addrHomeLbl.setText("Home");
-		
-				Label lblAlternative_1 = new Label(grpAddresses, SWT.NONE);
-				FormData fd_lblAlternative_1 = new FormData();
-				fd_lblAlternative_1.top = new FormAttachment(addrHomeLbl, labelDistance, SWT.BOTTOM);
-				fd_lblAlternative_1.left = new FormAttachment(addrHomeLbl, 0, SWT.LEFT);
-				fd_lblAlternative_1.width = labelWidth;
-				fd_lblAlternative_1.height = labelHeight;
-				lblAlternative_1.setLayoutData(fd_lblAlternative_1);
-				lblAlternative_1.setText("Alternative 1");
-						
-								Label lblAlternative_2 = new Label(grpAddresses, SWT.NONE);
-								FormData fd_lblAlternative_2 = new FormData();
-								fd_lblAlternative_2.top = new FormAttachment(lblAlternative_1, labelDistance, SWT.BOTTOM);
-								fd_lblAlternative_2.left = new FormAttachment(addrHomeLbl, 0, SWT.LEFT);
-								fd_lblAlternative_2.width = labelWidth;
-								fd_lblAlternative_2.height = labelHeight;
-								lblAlternative_2.setLayoutData(fd_lblAlternative_2);
-								lblAlternative_2.setText("Alternative 2");
-								
-										addrHomeBox = new Text(grpAddresses, SWT.BORDER);
-										FormData fd_addrHomeBox = new FormData();
-										fd_addrHomeBox.top = new FormAttachment(addrHomeLbl, boxOffsetY, SWT.TOP);
-										fd_addrHomeBox.left = new FormAttachment(addrHomeLbl, 6, SWT.RIGHT);
-										fd_addrHomeBox.right = new FormAttachment(100, -6);
-										fd_addrHomeBox.height = boxHeight;
-										addrHomeBox.setLayoutData(fd_addrHomeBox);
+		grpAddresses.setText("Address");
 										
-												addrAlt1Box = new Text(grpAddresses, SWT.BORDER);
-												FormData fd_addrAlt1Box = new FormData();
-												fd_addrAlt1Box.top = new FormAttachment(lblAlternative_1, boxOffsetY, SWT.TOP);
-												fd_addrAlt1Box.left = new FormAttachment(addrHomeBox, 0, SWT.LEFT);
-												fd_addrAlt1Box.right = new FormAttachment(100, -6);
-												fd_addrAlt1Box.height = boxHeight;
-												addrAlt1Box.setLayoutData(fd_addrAlt1Box);
-												
-														addrAlt2Box = new Text(grpAddresses, SWT.BORDER);
-														FormData fd_addrAlt2Box = new FormData();
-														fd_addrAlt2Box.top = new FormAttachment(lblAlternative_2, boxOffsetY, SWT.TOP);
-														fd_addrAlt2Box.left = new FormAttachment(addrHomeBox, 0, SWT.LEFT);
-														fd_addrAlt2Box.right = new FormAttachment(100, -6);
-														fd_addrAlt2Box.height = boxHeight;
-														addrAlt2Box.setLayoutData(fd_addrAlt2Box);
+										lblAddress = new Label(grpAddresses, SWT.NONE);
+										lblAddress.setText("Address");
+										FormData fd_lblAddress = new FormData();
+										fd_lblAddress.top = new FormAttachment(0, 6);
+										fd_lblAddress.left = new FormAttachment(0, 6);
+										fd_lblAddress.width = labelWidth;
+										fd_lblAddress.height = labelHeight;
+										lblAddress.setLayoutData(fd_lblAddress);
+										
+										lblCity = new Label(grpAddresses, SWT.NONE);
+										lblCity.setText("City");
+										FormData fd_lblCity = new FormData();
+										fd_lblCity.top = new FormAttachment(lblAddress, 10);
+										fd_lblCity.left = new FormAttachment(lblAddress, 0, SWT.LEFT);
+										fd_lblCity.width = labelWidth;
+										fd_lblCity.height = labelHeight;
+										lblCity.setLayoutData(fd_lblCity);
+										
+										lblProvince = new Label(grpAddresses, SWT.NONE);
+										lblProvince.setText("Province");
+										FormData fd_lblProvince = new FormData();
+										fd_lblProvince.top = new FormAttachment(lblCity, 10);
+										fd_lblProvince.left = new FormAttachment(lblAddress, 0, SWT.LEFT);
+										fd_lblProvince.width = labelWidth;
+										fd_lblProvince.height = labelHeight;
+										lblProvince.setLayoutData(fd_lblProvince);
+										
+										lblPostalCode = new Label(grpAddresses, SWT.NONE);
+										lblPostalCode.setText("Postal Code");
+										FormData fd_lblPostalCode = new FormData();
+										fd_lblPostalCode.top = new FormAttachment(lblProvince, 10);
+										fd_lblPostalCode.left = new FormAttachment(lblAddress, 0, SWT.LEFT);
+										fd_lblPostalCode.width = labelWidth;
+										fd_lblPostalCode.height = labelHeight;
+										lblPostalCode.setLayoutData(fd_lblPostalCode);
+														
+														tbAddress = new Text(grpAddresses, SWT.BORDER);
+														tbAddress.setText("");
+														FormData fd_tbAddress = new FormData();
+														fd_tbAddress.top = new FormAttachment(lblAddress, boxOffsetY, SWT.TOP);
+														fd_tbAddress.left = new FormAttachment(lblAddress, 6);
+														fd_tbAddress.right = new FormAttachment(100, -6);
+														fd_tbAddress.height = boxHeight;
+														tbAddress.setLayoutData(fd_tbAddress);
+														
+														tbCity = new Text(grpAddresses, SWT.BORDER);
+														tbCity.setText("");
+														FormData fd_tbCity = new FormData();
+														fd_tbCity.top = new FormAttachment(lblCity, boxOffsetY, SWT.TOP);
+														fd_tbCity.left = new FormAttachment(tbAddress, 0, SWT.LEFT);
+														fd_tbCity.right = new FormAttachment(tbAddress, 0, SWT.RIGHT);
+														fd_tbCity.height = boxHeight;
+														tbCity.setLayoutData(fd_tbCity);
+														
+														tbProvince = new Text(grpAddresses, SWT.BORDER);
+														tbProvince.setText("");
+														FormData fd_tbProvince = new FormData();
+														fd_tbProvince.top = new FormAttachment(lblProvince, boxOffsetY, SWT.TOP);
+														fd_tbProvince.left = new FormAttachment(tbAddress, 0, SWT.LEFT);
+														fd_tbProvince.right = new FormAttachment(tbAddress, 0, SWT.RIGHT);
+														fd_tbProvince.height = boxHeight;
+														tbProvince.setLayoutData(fd_tbProvince);
+														
+														tbPostalCode = new Text(grpAddresses, SWT.BORDER);
+														tbPostalCode.setText("");
+														FormData fd_tbPostalCode = new FormData();
+														fd_tbPostalCode.top = new FormAttachment(lblPostalCode, boxOffsetY, SWT.TOP);
+														fd_tbPostalCode.left = new FormAttachment(tbAddress, 0, SWT.LEFT);
+														fd_tbPostalCode.right = new FormAttachment(tbAddress, 0, SWT.RIGHT);
+														fd_tbPostalCode.height = boxHeight;
+														tbPostalCode.setLayoutData(fd_tbPostalCode);
 														
 		initDateValues();
 		clearValues();
@@ -337,11 +363,6 @@ public class ClientEditor extends Composite {
 		numCellularBox.setText("");
 		numWorkBox.setText("");
 		numAltBox.setText("");
-
-		/* Address group */
-		addrHomeBox.setText("");
-		addrAlt1Box.setText("");
-		addrAlt2Box.setText("");
 		
 		dobDay.select(-1);
 		dobMonth.select(-1);
@@ -399,21 +420,10 @@ public class ClientEditor extends Composite {
 				}
 			}
 			
-			for(Address addr : client.getAddresses())
-			{
-				switch(addr.getType())
-				{
-					case Home:
-						addrHomeBox.setText(addr.getAddress());
-						break;
-					case Alternative1:
-						addrAlt1Box.setText(addr.getAddress());
-						break;
-					case Alternative2:
-						addrAlt2Box.setText(addr.getAddress());
-						break;
-				}
-			}
+			tbAddress.setText(client.getAddress());
+			tbCity.setText(client.getCity());
+			tbProvince.setText(client.getProvince());
+			tbPostalCode.setText(client.getPostalCode());
 		}
 	}
 	
@@ -440,7 +450,9 @@ public class ClientEditor extends Composite {
 		}
 		catch (Exception e)
 		{
-			
+			if (dobYear.getText().length() == 0 && dobMonth.getText().length() == 0 && dobDay.getText().length() == 0) {
+				out.setBirthday(null);
+			}
 		}
 		
 		try
@@ -458,7 +470,9 @@ public class ClientEditor extends Composite {
 		}
 		catch (Exception e)
 		{
-			
+			if (annYear.getText().length() == 0 && annMonth.getText().length() == 0 && annDay.getText().length() == 0) {
+				out.setAnniversary(null);
+			}
 		}
 		
 		ArrayList<PhoneNumber> updatedNumbers = new ArrayList<PhoneNumber>();
@@ -472,16 +486,11 @@ public class ClientEditor extends Composite {
 		if(!numAltBox.getText().equals(""))
 			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Alternative, numAltBox.getText()));
 		
-		ArrayList<Address> updatedAddresses = new ArrayList<Address>();
+		out.setAddress(tbAddress.getText());
+		out.setCity(tbCity.getText());
+		out.setProvince(tbProvince.getText());
+		out.setPostalCode(tbPostalCode.getText());
 		
-		if(!addrHomeBox.getText().equals(""))
-			updatedAddresses.add(new Address(AddressType.Home, addrHomeBox.getText()));
-		if(!addrAlt1Box.getText().equals(""))
-			updatedAddresses.add(new Address(AddressType.Alternative1, addrAlt1Box.getText()));
-		if(!addrAlt2Box.getText().equals(""))
-			updatedAddresses.add(new Address(AddressType.Alternative2, addrAlt2Box.getText()));
-		
-		out.setAddresses(updatedAddresses);
 		out.setNumbers(updatedNumbers);
 	}
 	
@@ -504,9 +513,10 @@ public class ClientEditor extends Composite {
 		numWorkBox.setEnabled(modify);
 		numAltBox.setEnabled(modify);
 		
-		addrHomeBox.setEnabled(modify);
-		addrAlt1Box.setEnabled(modify);
-		addrAlt2Box.setEnabled(modify);
+		tbAddress.setEnabled(modify);
+		tbCity.setEnabled(modify);
+		tbProvince.setEnabled(modify);
+		tbPostalCode.setEnabled(modify);
 	}
 
 	/*@Override

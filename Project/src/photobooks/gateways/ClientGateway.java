@@ -16,6 +16,7 @@ public class ClientGateway<T> implements IGateway<Client>
 {
 	// table
 	private static final String CLIENT_TABLE = "CLIENT";
+	
 	// columns	
 	private static final String ID = "ID";
 	private static final String FIRST_NAME = "FIRSTNAME";
@@ -24,6 +25,12 @@ public class ClientGateway<T> implements IGateway<Client>
 	private static final String DIRECTORY = "DIRECTORY";
 	private static final String BIRTHDAY = "BIRTHDAY";
 	private static final String ANNIVERSARY = "ANNIVERSARY";
+	
+	private static final String ADDRESS = "ADDRESS";
+	private static final String CITY = "CITY";
+	private static final String PROVINCE = "PROVINCE";
+	private static final String POSTALCODE = "POSTALCODE";
+	private static final String ACCOUNTBALANCE = "ACCOUNTBALANCE";
 	
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
@@ -38,16 +45,66 @@ public class ClientGateway<T> implements IGateway<Client>
 		_statement = dao.getStatement();
 	}
 	
-	public Collection<Client> getAll() 
-	{
+	private Client resultSetToClient(ResultSet results) {
 		Client client = null;
-		ArrayList<Client> clients = new ArrayList<Client>();
 		int id = 0;
 		String firstName = EOF, lastName = EOF, email = EOF, directory = EOF;
 		Calendar birthday = null, anniversary = null;
 		Timestamp tempDate;
 		ArrayList<PhoneNumber> phoneNumbers = null;
 		ArrayList<Address> addresses = null;
+		String address = "", city = "", province = "", postalCode = "";
+		double accountBalance;
+		
+		try
+		{
+			id = results.getInt(ID);
+			firstName = results.getString(FIRST_NAME);
+			lastName = results.getString(LAST_NAME);
+			email = results.getString(EMAIL);
+			directory = results.getString(DIRECTORY);
+			
+			address = results.getString(ADDRESS);
+			city = results.getString(CITY);
+			province = results.getString(PROVINCE);
+			postalCode = results.getString(POSTALCODE);
+			accountBalance = results.getDouble(ACCOUNTBALANCE);
+			
+			tempDate = results.getTimestamp(BIRTHDAY);
+			
+			if (tempDate != null) {
+				birthday = Calendar.getInstance();
+				birthday.setTimeInMillis(tempDate.getTime());
+			}
+			
+			tempDate = _resultSet.getTimestamp(ANNIVERSARY);
+			
+			if (tempDate != null) {
+				anniversary = Calendar.getInstance();
+				anniversary.setTimeInMillis(tempDate.getTime());
+			}
+			
+			phoneNumbers = new ArrayList<PhoneNumber>(_dao.phoneNumberGateway().getAllWithId(id));
+			addresses = new ArrayList<Address>(_dao.addressGateway().getAllWithId(id));		
+			
+			client = new Client(firstName, lastName, email, (birthday != null) ? (Calendar) birthday.clone() : null, 
+					(anniversary != null) ? (Calendar) anniversary.clone() : null, phoneNumbers, address, city,
+							province, postalCode, accountBalance, directory, addresses);
+			
+			client.setID(id);
+		}
+		catch (Exception e)
+		{
+			_dao.processSQLError(e);
+		}
+		
+		return client;
+	}
+	
+	public Collection<Client> getAll() 
+	{
+		Client client = null;
+		ArrayList<Client> clients = new ArrayList<Client>();
 		
 		try
 		{
@@ -62,32 +119,10 @@ public class ClientGateway<T> implements IGateway<Client>
 		{
 			while (_resultSet.next())
 			{
-				id = _resultSet.getInt(ID);
-				firstName = _resultSet.getString(FIRST_NAME);
-				lastName = _resultSet.getString(LAST_NAME);
-				email = _resultSet.getString(EMAIL);
-				directory = _resultSet.getString(DIRECTORY);
-				tempDate = _resultSet.getTimestamp(BIRTHDAY);
-				if (tempDate != null) {
-					birthday = Calendar.getInstance();
-					birthday.setTimeInMillis(tempDate.getTime());
-				}
-				tempDate = _resultSet.getTimestamp(ANNIVERSARY);
-				if (tempDate != null) {
-					anniversary = Calendar.getInstance();
-					anniversary.setTimeInMillis(tempDate.getTime());
-				}
-				phoneNumbers = new ArrayList<PhoneNumber>(_dao.phoneNumberGateway().getAllWithId(id));
-				addresses = new ArrayList<Address>(_dao.addressGateway().getAllWithId(id));		
-				
-				client = new Client(firstName, lastName, email, (birthday != null) ? (Calendar) birthday.clone() : null, 
-						(anniversary != null) ? (Calendar) anniversary.clone() : null, phoneNumbers, addresses, directory);
-				client.setID(id);
+				client = resultSetToClient(_resultSet);
 				clients.add(client);
-				
-				birthday = null;
-				anniversary = null;
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -101,11 +136,6 @@ public class ClientGateway<T> implements IGateway<Client>
 	public Client getByID(int id) 
 	{
 		Client client = null;
-		String firstName = EOF, lastName = EOF, email = EOF, directory = EOF;
-		Calendar birthday = null, anniversary = null;
-		Timestamp tempDate;
-		ArrayList<PhoneNumber> phoneNumbers = null;
-		ArrayList<Address> addresses = null;
 		
 		try
 		{
@@ -114,30 +144,9 @@ public class ClientGateway<T> implements IGateway<Client>
 			
 			while (_resultSet.next())
 			{
-				firstName = _resultSet.getString(FIRST_NAME);
-				lastName = _resultSet.getString(LAST_NAME);
-				email = _resultSet.getString(EMAIL);
-				directory = _resultSet.getString(DIRECTORY);
-				tempDate = _resultSet.getTimestamp(BIRTHDAY);
-				if (tempDate != null) {
-					birthday = Calendar.getInstance();
-					birthday.setTimeInMillis(tempDate.getTime());
-				}
-				tempDate = _resultSet.getTimestamp(ANNIVERSARY);
-				if (tempDate != null) {
-					anniversary = Calendar.getInstance();
-					anniversary.setTimeInMillis(tempDate.getTime());
-				}
-				phoneNumbers = new ArrayList<PhoneNumber>(_dao.phoneNumberGateway().getAllWithId(id));
-				addresses = new ArrayList<Address>(_dao.addressGateway().getAllWithId(id));		
-				
-				client = new Client(firstName, lastName, email, (birthday != null) ? (Calendar) birthday.clone() : null, 
-						(anniversary != null) ? (Calendar) anniversary.clone() : null, phoneNumbers, addresses, directory);
-				client.setID(id);				
-
-				birthday = null;
-				anniversary = null;
+				client = resultSetToClient(_resultSet);
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -166,17 +175,22 @@ public class ClientGateway<T> implements IGateway<Client>
 			values = "NULL, '" + newObj.getFirstName() 
 					+ "', '" + newObj.getLastName()
 					+ "'";
+			
 			if (birthday != null)
 				values += ", '" + birthday.toString() + "'";
 			else
 				values += ", NULL";
+			
 			if (anniversary != null)
 				values += ", '" + anniversary.toString() + "'";
 			else
 				values += ", NULL";
+			
 			values += ", '" + newObj.getEmail()
 					+ "', '" + newObj.getDirectory() 
 					+ "'";
+			
+			values += String.format(", '%s', '%s', '%s', '%s', %.6f", newObj.getAddress(), newObj.getCity(), newObj.getProvince(), newObj.getPostalCode(), newObj.getAccountBalance());
 			
 			_commandString = "INSERT INTO " + CLIENT_TABLE + " VALUES(" + values + ")";
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -191,6 +205,7 @@ public class ClientGateway<T> implements IGateway<Client>
 				{
 					id = _resultSet.getInt(1);
 				}
+				
 				newObj.setID(id);
 								
 				phoneNumbers = newObj.getNumbers();
@@ -208,6 +223,7 @@ public class ClientGateway<T> implements IGateway<Client>
 					_dao.addressGateway().add(address);
 				}
 			}
+			
 			_resultSet.close();
 				
 		}
@@ -238,17 +254,23 @@ public class ClientGateway<T> implements IGateway<Client>
 			values = FIRST_NAME + " = '" + obj.getFirstName() 
 					+ "', " + LAST_NAME + " = '" + obj.getLastName()
 					+ "'";
+			
 			if (birthday != null)
 				values += ", " + BIRTHDAY + " = '" + birthday.toString() + "'";
 			else
 				values += ", " + BIRTHDAY + " = NULL";
+			
 			if (anniversary != null)
 				values += ", " + ANNIVERSARY + " = '" + anniversary.toString() + "'";
 			else
 				values += ", " + ANNIVERSARY + " = NULL";
+			
 			values += ", " + EMAIL + " = '" + obj.getEmail()
 					+ "', " + DIRECTORY + " = '" + obj.getDirectory()
 					+ "'";
+			
+			values += String.format(", %s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = %.6f", ADDRESS, obj.getAddress(), CITY, obj.getCity(),
+					PROVINCE, obj.getProvince(), POSTALCODE, obj.getPostalCode(), ACCOUNTBALANCE, obj.getAccountBalance());
 			
 			where = "WHERE " + ID + " = " + obj.getID();
 			_commandString = "UPDATE " + CLIENT_TABLE + " SET " + values + " " + where;

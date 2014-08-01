@@ -34,18 +34,10 @@ public class Client extends DBObject
 	
 	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, ArrayList<Address> addresses, String directory)
 	{
-		_accountBalance = 0;
-		_firstName = firstName;
-		_lastName = lastName;
-		_email = email;
-		_directory = directory;
-		_birthday = birthday;
-		_anniversary = anniversary;
-		_phoneNumbers = phoneNumbers;
-		_addresses = addresses;
+		this(firstName, lastName, email, birthday, anniversary, phoneNumbers, "", "", "", "", 0, directory, addresses);
 	}
 	
-	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String address, String city, String province, String postalCode, String directory, double accountBalance, ArrayList<Address> addresses)
+	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String address, String city, String province, String postalCode, double accountBalance, String directory, ArrayList<Address> addresses)
 	{
 		_accountBalance = accountBalance;
 		
