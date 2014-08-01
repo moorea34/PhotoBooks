@@ -22,17 +22,13 @@ public class PackageInfoEditor extends Composite {
 		super(parent, style);
 		setLayout(new FormLayout());
 		
-		int groupHeight = 130;
 		int labelDistance = 10;
 		
 		int labelWidth = 80;
 		int labelHeight = 20;
 		
-		int boxOffsetX = 3;
 		int boxOffsetY = -2;
 		int boxHeight = 22;
-		
-		int nudHeight = boxHeight + 2;
 
 		infoBox = new Group(this, SWT.NONE);
 		infoBox.setLayout(new FormLayout());

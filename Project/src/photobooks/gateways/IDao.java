@@ -21,7 +21,6 @@ public interface IDao
 	public IGateway<Bill> billGateway();
 	public IGateway<Event> eventGateway();
 	public IConditionalGateway<Payment> paymentGateway();
-	public IConditionalGateway<Address> addressGateway();
 	public IConditionalGateway<PhoneNumber> phoneNumberGateway();
 	public IConditionalGateway<BillProduct> billProductGateway();
 	public IConditionalGateway<BillPackage> billPackageGateway();

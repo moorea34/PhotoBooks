@@ -5,8 +5,6 @@ import photobooks.gateways.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
-import photobooks.objects.Address.AddressType;
-import photobooks.objects.Address;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
 
@@ -38,13 +36,8 @@ public class ClientManager
 		numbers.add(new PhoneNumber(PhoneNumberType.Home, "1-204-222-2222"));
 		numbers.add(new PhoneNumber(PhoneNumberType.Work, "1-204-333-3333"));
 		numbers.add(new PhoneNumber(PhoneNumberType.Alternative, "1-204-444-4444"));
-		
-		ArrayList<Address> addresses = new ArrayList<Address>();
-		addresses.add(new Address(AddressType.Home, "Home Address"));
-		addresses.add(new Address(AddressType.Alternative1, "Alt1 Address"));
-		addresses.add(new Address(AddressType.Alternative2, "Alt2 Address"));
 
-		newClient = new Client("Steven", "Morrison", "smore@fire.com", dob, ann, numbers, addresses);
+		newClient = new Client("Steven", "Morrison", "smore@fire.com", dob, ann, numbers);
 		_gateway.add(newClient);
 	}
 

@@ -12,32 +12,31 @@ public class Client extends DBObject
 	private Calendar _birthday;
 	private Calendar _anniversary;
 	private ArrayList<PhoneNumber> _phoneNumbers;
-	private ArrayList<Address> _addresses;
 	
 	private double _accountBalance;
 	private String _address, _city, _province, _postalCode;
 	
 	public Client()
 	{		
-		this("", "", "", null, null, new ArrayList<PhoneNumber>(), new ArrayList<Address>(), "");
+		this("", "", "", null, null, new ArrayList<PhoneNumber>(), "");
 	}
 	
 	public Client(String firstName, String lastName)
 	{		
-		this( firstName, lastName, "", null, null, new ArrayList<PhoneNumber>(), new ArrayList<Address>(), "");
+		this( firstName, lastName, "", null, null, new ArrayList<PhoneNumber>(), "");
 	}
 	
-	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, ArrayList<Address> addresses)
+	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers)
 	{
-		this( firstName, lastName, email, birthday, anniversary, phoneNumbers, addresses, "");
+		this( firstName, lastName, email, birthday, anniversary, phoneNumbers, "");
 	}
 	
-	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, ArrayList<Address> addresses, String directory)
+	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String directory)
 	{
-		this(firstName, lastName, email, birthday, anniversary, phoneNumbers, "", "", "", "", 0, directory, addresses);
+		this(firstName, lastName, email, birthday, anniversary, phoneNumbers, "", "", "", "", 0, directory);
 	}
 	
-	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String address, String city, String province, String postalCode, double accountBalance, String directory, ArrayList<Address> addresses)
+	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String address, String city, String province, String postalCode, double accountBalance, String directory)
 	{
 		_accountBalance = accountBalance;
 		
@@ -53,7 +52,6 @@ public class Client extends DBObject
 		_birthday = birthday;
 		_anniversary = anniversary;
 		_phoneNumbers = phoneNumbers;
-		_addresses = addresses;
 	}
 	
 	
@@ -99,11 +97,6 @@ public class Client extends DBObject
 	public String getProvince() { return _province; }
 	public String getPostalCode() { return _postalCode; }
 	
-	public ArrayList<Address> getAddresses()
-	{
-		return _addresses;
-	}
-	
 	public void setFirstName(String firstName)
 	{
 		_firstName = firstName;
@@ -135,11 +128,6 @@ public class Client extends DBObject
 	public void setCity(String city) { _city = city; }
 	public void setProvince(String province) { _province = province; }
 	public void setPostalCode(String postalCode) { _postalCode = postalCode; }
-	
-	public void setAddresses(ArrayList<Address> addresses)
-	{
-		_addresses = addresses;
-	}
 
 	public boolean searchAll(String text) 
 	{
@@ -155,11 +143,17 @@ public class Client extends DBObject
 				return true;
 		}
 		
-		for(Address a : _addresses)
-		{
-			if(a.getAddress().toLowerCase().contains(text))
-				return true;
-		}
+		if (_address.toLowerCase().contains(text))
+			return true;
+		
+		if (_city.toLowerCase().contains(text))
+			return true;
+		
+		if (_province.toLowerCase().contains(text))
+			return true;
+		
+		if (_postalCode.toLowerCase().contains(text))
+			return true;
 		
 		return false;
 	}

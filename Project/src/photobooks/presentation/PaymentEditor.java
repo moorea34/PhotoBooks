@@ -1,7 +1,6 @@
 package photobooks.presentation;
 
 import java.text.DecimalFormat;
-import java.util.Calendar;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.FormLayout;
@@ -127,11 +126,12 @@ public class PaymentEditor extends Composite {
 		fd_lblInvoiceRefValue.right = new FormAttachment(100, 0);
 		lblInvoiceRefValue.setLayoutData(fd_lblInvoiceRefValue);
 		
-		tbDescription = new Text(this, SWT.BORDER);
+		tbDescription = new Text(this, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		FormData fd_tbDescription = new FormData();
+		fd_tbDescription.height = 90;
 		fd_tbDescription.left = new FormAttachment(cbFormOfPayment, 0, SWT.LEFT);
 		fd_tbDescription.right = new FormAttachment(100, 0);
-		fd_tbDescription.bottom = new FormAttachment(lblDescription, 0, SWT.BOTTOM);
+		fd_tbDescription.top = new FormAttachment(lblDescription, -3, SWT.TOP);
 		tbDescription.setLayoutData(fd_tbDescription);
 		
 		lblPaymentValue = new Label(this, SWT.NONE);

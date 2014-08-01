@@ -33,8 +33,8 @@ public class EditBillItemWindow extends Dialog {
 	protected Object result = null;
 	protected Shell shell;
 	private Text tbAmount;
-	private Text tbPrice;
-	private Label lblDescValue;
+	private Text tbPrice = null;
+	private Text tbDescValue = null;
 	private CCombo cbItem;
 	
 	private ProductManager _productManager;
@@ -89,81 +89,9 @@ public class EditBillItemWindow extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		shell.setSize(700, 230);
+		shell.setSize(700, 287);
 		shell.setText("Edit Item");
 		shell.setLayout(new FormLayout());
-		
-		Label lblItem = new Label(shell, SWT.NONE);
-		FormData fd_lblItem = new FormData();
-		fd_lblItem.top = new FormAttachment(0, 10);
-		fd_lblItem.left = new FormAttachment(0, 10);
-		lblItem.setLayoutData(fd_lblItem);
-		lblItem.setText("Item:");
-		
-		Label lblDescription = new Label(shell, SWT.NONE);
-		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.width = 85;
-		fd_lblDescription.top = new FormAttachment(lblItem, 15);
-		fd_lblDescription.left = new FormAttachment(0, 10);
-		lblDescription.setLayoutData(fd_lblDescription);
-		lblDescription.setText("Description:");
-		
-		Label lblAmount = new Label(shell, SWT.NONE);
-		FormData fd_lblAmount = new FormData();
-		fd_lblAmount.top = new FormAttachment(lblDescription, 15);
-		fd_lblAmount.left = new FormAttachment(0, 10);
-		lblAmount.setLayoutData(fd_lblAmount);
-		lblAmount.setText("Amount:");
-		
-		Label lblNewLabel = new Label(shell, SWT.NONE);
-		FormData fd_lblNewLabel = new FormData();
-		fd_lblNewLabel.top = new FormAttachment(lblAmount, 15);
-		fd_lblNewLabel.left = new FormAttachment(lblItem, 0, SWT.LEFT);
-		lblNewLabel.setLayoutData(fd_lblNewLabel);
-		lblNewLabel.setText("Price:");
-		
-		lblDescValue = new Label(shell, SWT.NONE);
-		FormData fd_lblDescValue = new FormData();
-		fd_lblDescValue.right = new FormAttachment(100, -10);
-		fd_lblDescValue.bottom = new FormAttachment(lblDescription, 0, SWT.BOTTOM);
-		fd_lblDescValue.left = new FormAttachment(lblDescription, 6);
-		lblDescValue.setLayoutData(fd_lblDescValue);
-		
-		cbItem = new CCombo(shell, SWT.BORDER);
-		FormData fd_cbItem = new FormData();
-		fd_cbItem.bottom = new FormAttachment(lblItem, 0, SWT.BOTTOM);
-		fd_cbItem.left = new FormAttachment(lblDescValue, 0, SWT.LEFT);
-		fd_cbItem.right = new FormAttachment(lblDescValue, 0, SWT.RIGHT);
-		cbItem.setLayoutData(fd_cbItem);
-		cbItem.addSelectionListener(new SelectionListener() {
-			
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
-				Object item = objects.get(cbItem.getSelectionIndex());
-				
-				if (item instanceof Product)
-				{
-					Product prod = (Product)item;
-					
-					lblDescValue.setText(prod.getDescription());
-					tbPrice.setText("" + prod.getPrice());
-				}
-				else if (item instanceof Package)
-				{
-					Package pack = (Package)item;
-					
-					lblDescValue.setText(pack.getDescription());
-					tbPrice.setText("" + pack.getPrice());
-				}
-			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 		
 		objects = new ArrayList<Object>(_packageManager.getProductPackageList());
 		objects.addAll(_productManager.getProductList());
@@ -185,21 +113,98 @@ public class EditBillItemWindow extends Dialog {
 			++i;
 		}
 		
+		Label lblItem = new Label(shell, SWT.NONE);
+		FormData fd_lblItem = new FormData();
+		fd_lblItem.top = new FormAttachment(0, 10);
+		fd_lblItem.left = new FormAttachment(0, 10);
+		lblItem.setLayoutData(fd_lblItem);
+		lblItem.setText("Item:");
+		
+		Label lblDescription = new Label(shell, SWT.NONE);
+		FormData fd_lblDescription = new FormData();
+		fd_lblDescription.width = 85;
+		fd_lblDescription.top = new FormAttachment(lblItem, 15);
+		fd_lblDescription.left = new FormAttachment(0, 10);
+		lblDescription.setLayoutData(fd_lblDescription);
+		lblDescription.setText("Description:");
+		
+		cbItem = new CCombo(shell, SWT.BORDER);
+		FormData fd_cbItem = new FormData();
+		fd_cbItem.bottom = new FormAttachment(lblItem, 0, SWT.BOTTOM);
+		fd_cbItem.left = new FormAttachment(lblDescription, 6, SWT.RIGHT);
+		fd_cbItem.right = new FormAttachment(100, -10);
+		cbItem.setLayoutData(fd_cbItem);
+		cbItem.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				Object item = objects.get(cbItem.getSelectionIndex());
+				
+				if (tbDescValue != null && tbPrice != null)
+				{
+					if (item instanceof Product)
+					{
+						Product prod = (Product)item;
+					
+						tbDescValue.setText(prod.getDescription());
+						tbPrice.setText("" + prod.getPrice());
+					}
+					else if (item instanceof Package)
+					{
+						Package pack = (Package)item;
+					
+						tbDescValue.setText(pack.getDescription());
+						tbPrice.setText("" + pack.getPrice());
+					}
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		cbItem.setItems(items);
+		
+		tbDescValue = new Text(shell, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+		FormData fd_tbDescValue = new FormData();
+		fd_tbDescValue.height = 90;
+		fd_tbDescValue.top = new FormAttachment(lblDescription, -3, SWT.TOP);
+		fd_tbDescValue.right = new FormAttachment(cbItem, 0, SWT.RIGHT);
+		fd_tbDescValue.left = new FormAttachment(cbItem, 0, SWT.LEFT);
+		tbDescValue.setLayoutData(fd_tbDescValue);
 		
 		tbAmount = new Text(shell, SWT.BORDER | SWT.RIGHT);
 		FormData fd_tbAmount = new FormData();
-		fd_tbAmount.left = new FormAttachment(lblDescValue, 0, SWT.LEFT);
-		fd_tbAmount.right = new FormAttachment(lblDescValue, 0, SWT.RIGHT);
-		fd_tbAmount.top = new FormAttachment(lblDescValue, 9);
+		fd_tbAmount.left = new FormAttachment(tbDescValue, 0, SWT.LEFT);
+		fd_tbAmount.right = new FormAttachment(tbDescValue, 0, SWT.RIGHT);
+		fd_tbAmount.top = new FormAttachment(tbDescValue, 6, SWT.BOTTOM);
 		tbAmount.setLayoutData(fd_tbAmount);
 		tbAmount.setText("1");
 		
+		Label lblAmount = new Label(shell, SWT.NONE);
+		FormData fd_lblAmount = new FormData();
+		fd_lblAmount.bottom = new FormAttachment(tbAmount, 0, SWT.BOTTOM);
+		fd_lblAmount.left = new FormAttachment(0, 10);
+		lblAmount.setLayoutData(fd_lblAmount);
+		lblAmount.setText("Amount:");
+		
+		Label lblPrice = new Label(shell, SWT.NONE);
+		FormData fd_lblPrice = new FormData();
+		fd_lblPrice.left = new FormAttachment(lblItem, 0, SWT.LEFT);
+		fd_lblPrice.top = new FormAttachment(lblAmount, 15);
+		lblPrice.setLayoutData(fd_lblPrice);
+		lblPrice.setText("Price:");
+		
 		tbPrice = new Text(shell, SWT.BORDER | SWT.RIGHT);
+		tbPrice.setText("0.00");
 		FormData fd_tbPrice = new FormData();
-		fd_tbPrice.bottom = new FormAttachment(lblNewLabel, 0, SWT.BOTTOM);
-		fd_tbPrice.left = new FormAttachment(lblDescValue, 0, SWT.LEFT);
-		fd_tbPrice.right = new FormAttachment(lblDescValue, 0, SWT.RIGHT);
+		fd_tbPrice.left = new FormAttachment(tbDescValue, 0, SWT.LEFT);
+		fd_tbPrice.right = new FormAttachment(tbDescValue, 0, SWT.RIGHT);
+		fd_tbPrice.bottom = new FormAttachment(lblPrice, 0, SWT.BOTTOM);
 		tbPrice.setLayoutData(fd_tbPrice);
 		
 		Button btnCancel = new Button(shell, SWT.NONE);
@@ -207,7 +212,7 @@ public class EditBillItemWindow extends Dialog {
 		fd_btnCancel.width = 80;
 		fd_btnCancel.height = 30;
 		fd_btnCancel.bottom = new FormAttachment(100, -10);
-		fd_btnCancel.right = new FormAttachment(lblDescValue, 0, SWT.RIGHT);
+		fd_btnCancel.right = new FormAttachment(tbDescValue, 0, SWT.RIGHT);
 		btnCancel.setLayoutData(fd_btnCancel);
 		btnCancel.setText("Cancel");
 		btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -315,7 +320,7 @@ public class EditBillItemWindow extends Dialog {
 				
 				if (pack.getPackage() != null)
 				{
-					lblDescValue.setText(pack.getPackage().getDescription());
+					tbDescValue.setText(pack.getPackage().getDescription());
 					
 					for (int i = 0; i < items.length; ++i)
 					{
@@ -336,7 +341,7 @@ public class EditBillItemWindow extends Dialog {
 				
 				if (prod.getProduct() != null)
 				{
-					lblDescValue.setText(prod.getProduct().getDescription());
+					tbDescValue.setText(prod.getProduct().getDescription());
 					
 					for (int i = 0; i < items.length; ++i)
 					{

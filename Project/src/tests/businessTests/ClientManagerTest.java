@@ -6,7 +6,6 @@ import java.util.Calendar;
 import photobooks.business.*;
 import photobooks.gateways.*;
 import photobooks.objects.*;
-import photobooks.objects.Address.AddressType;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 import junit.framework.TestCase;
 import static org.mockito.Mockito.*;
@@ -61,13 +60,8 @@ public class ClientManagerTest extends TestCase
 		numbers.add(new PhoneNumber(PhoneNumberType.Home, "1-204-222-2222"));
 		numbers.add(new PhoneNumber(PhoneNumberType.Work, "1-204-333-3333"));
 		numbers.add(new PhoneNumber(PhoneNumberType.Alternative, "1-204-444-4444"));
-		
-		ArrayList<Address> addresses = new ArrayList<Address>();
-		addresses.add(new Address(AddressType.Home, "Home Address"));
-		addresses.add(new Address(AddressType.Alternative1, "Alt1 Address"));
-		addresses.add(new Address(AddressType.Alternative2, "Alt2 Address"));
 
-		newClient = new Client("Steven", "Morrison", "smore@fire.com", dob, ann, numbers, addresses);
+		newClient = new Client("Steven", "Morrison", "smore@fire.com", dob, ann, numbers);
 		_clientManager.insertClient(newClient);
 		
 		assertEquals(_clientManager.getClientList().get(0).getFirstName(),"Ryan");
@@ -75,8 +69,6 @@ public class ClientManagerTest extends TestCase
 		
 		assertEquals(_clientManager.getClientList().get(1).getFirstName(),"Steven");
 		assertEquals(_clientManager.getClientList().get(1).getLastName(),"Morrison");
-		
-		assertEquals(_clientManager.getClientList().get(1).getAddresses().get(0).getAddress(),"Home Address");
 		
 		assertEquals(_clientManager.getClientList().get(1).getNumbers().get(0).getNumber(),"1-204-111-1111");
 		

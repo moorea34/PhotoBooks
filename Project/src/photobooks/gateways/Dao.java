@@ -20,7 +20,6 @@ public class Dao implements IDao
 	private IGateway<Event> _eventGateway;
 	private IConditionalGateway<Payment> _paymentGateway;
 	private IConditionalGateway<PhoneNumber> _phoneNumberGateway;
-	private IConditionalGateway<Address> _addressGateway;
 	private IConditionalGateway<BillProduct> _billProductGateway;
 	private IConditionalGateway<BillPackage> _billPackageGateway;
 	private ITypeGateway _typeGateway;
@@ -44,7 +43,6 @@ public class Dao implements IDao
 		_billGateway = new BillGateway<Bill>(this);
 		_eventGateway = new EventGateway<Event>(this);
 		_paymentGateway = new PaymentGateway<Payment>(this);
-		_addressGateway = new AddressGateway<Address>(this);
 		_phoneNumberGateway = new PhoneNumberGateway<PhoneNumber>(this);
 		_billProductGateway = new BillProductGateway<BillProduct>(this);
 		_billPackageGateway = new BillPackageGateway<BillPackage>(this);
@@ -133,11 +131,6 @@ public class Dao implements IDao
 	public IConditionalGateway<Payment> paymentGateway()
 	{
 		return _paymentGateway;
-	}
-	
-	public IConditionalGateway<Address> addressGateway()
-	{
-		return _addressGateway;
 	}
 	
 	public IConditionalGateway<PhoneNumber> phoneNumberGateway()

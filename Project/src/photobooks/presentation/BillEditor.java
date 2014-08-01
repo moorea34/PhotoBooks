@@ -38,7 +38,6 @@ import photobooks.business.ClientManager;
 import photobooks.business.HtmlGenerator;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
-import photobooks.objects.Address;
 import photobooks.objects.Bill;
 import photobooks.objects.BillPackage;
 import photobooks.objects.BillProduct;
@@ -192,8 +191,9 @@ public class BillEditor extends Composite {
 		lblDescription.setLayoutData(fd_lblDescription);
 		lblDescription.setText("Description:");
 		
-		tbDescription = new Text(this, SWT.BORDER);
+		tbDescription = new Text(this, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		FormData fd_tbDescription = new FormData();
+		fd_tbDescription.height = 90;
 		fd_tbDescription.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
 		fd_tbDescription.top = new FormAttachment(lblDescription, -3, SWT.TOP);
 		fd_tbDescription.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
@@ -293,7 +293,7 @@ public class BillEditor extends Composite {
 		fd_lblAddress.top = new FormAttachment(lblClientAddress, 0, SWT.TOP);
 		lblAddress.setLayoutData(fd_lblAddress);
 		
-		tableViewer = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		tableViewer = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION);
 		FormData fd_table = new FormData();
 		fd_table.bottom = new FormAttachment(lblSubtotal, -6);
 		fd_table.top = new FormAttachment(tbDescription, 6);
@@ -659,20 +659,7 @@ public class BillEditor extends Composite {
 				}
 			}
 			
-			for (Address address : client.getAddresses())
-			{
-				if (address != null && address.getAddress() != null && address.getAddress().length() > 0)
-				{
-					if (output.length() == 0)
-					{
-						output = address.getAddress();
-					}
-					else
-					{
-						output += ", " + address.getAddress();
-					}
-				}
-			}
+			output = String.format("%s %s %s %s", client.getAddress(), client.getCity(), client.getProvince(), client.getPostalCode());
 			
 			lblAddress.setText(output);
 			

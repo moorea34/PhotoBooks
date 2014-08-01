@@ -1,6 +1,5 @@
 package photobooks.presentation;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.eclipse.swt.SWT;
@@ -10,7 +9,6 @@ import org.eclipse.swt.widgets.*;
 
 import photobooks.application.Utility;
 import photobooks.objects.*;
-import photobooks.objects.Address.AddressType;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 
 public class ClientEditor extends Composite {
@@ -475,23 +473,29 @@ public class ClientEditor extends Composite {
 			}
 		}
 		
-		ArrayList<PhoneNumber> updatedNumbers = new ArrayList<PhoneNumber>();
-		
-		if(!numHomeBox.getText().equals(""))
-			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Home, numHomeBox.getText()));
-		if(!numCellularBox.getText().equals(""))
-			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Cellular, numCellularBox.getText()));
-		if(!numWorkBox.getText().equals(""))
-			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Work, numWorkBox.getText()));
-		if(!numAltBox.getText().equals(""))
-			updatedNumbers.add(new PhoneNumber(PhoneNumberType.Alternative, numAltBox.getText()));
+		updatePhoneNumber(PhoneNumberType.Home, numHomeBox, out);
+		updatePhoneNumber(PhoneNumberType.Cellular, numCellularBox, out);
+		updatePhoneNumber(PhoneNumberType.Work, numWorkBox, out);
+		updatePhoneNumber(PhoneNumberType.Alternative, numAltBox, out);
 		
 		out.setAddress(tbAddress.getText());
 		out.setCity(tbCity.getText());
 		out.setProvince(tbProvince.getText());
 		out.setPostalCode(tbPostalCode.getText());
+	}
+	
+	private void updatePhoneNumber(PhoneNumberType type, Text tb, Client out)
+	{
+		for (PhoneNumber number : out.getNumbers())
+		{
+			if (number.getType() == type)
+			{
+				number.setNumber(tb.getText());
+				return;
+			}
+		}
 		
-		out.setNumbers(updatedNumbers);
+		out.getNumbers().add(new PhoneNumber(type, tb.getText()));
 	}
 	
 	public void setModify(boolean modify)

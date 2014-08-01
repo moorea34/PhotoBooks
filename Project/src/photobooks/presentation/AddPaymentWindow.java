@@ -61,7 +61,7 @@ public class AddPaymentWindow extends Dialog {
 	private void createContents() {
 		shlAddPayment = new Shell(getParent(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shlAddPayment.setSize(480, 310);
-		shlAddPayment.setMinimumSize(700, 340);
+		shlAddPayment.setMinimumSize(700, 410);
 		shlAddPayment.setText("Add Payment");
 		shlAddPayment.setLayout(new FormLayout());
 

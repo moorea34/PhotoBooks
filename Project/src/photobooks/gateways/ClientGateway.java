@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
-import photobooks.objects.Address;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
 
@@ -52,7 +51,6 @@ public class ClientGateway<T> implements IGateway<Client>
 		Calendar birthday = null, anniversary = null;
 		Timestamp tempDate;
 		ArrayList<PhoneNumber> phoneNumbers = null;
-		ArrayList<Address> addresses = null;
 		String address = "", city = "", province = "", postalCode = "";
 		double accountBalance;
 		
@@ -85,11 +83,10 @@ public class ClientGateway<T> implements IGateway<Client>
 			}
 			
 			phoneNumbers = new ArrayList<PhoneNumber>(_dao.phoneNumberGateway().getAllWithId(id));
-			addresses = new ArrayList<Address>(_dao.addressGateway().getAllWithId(id));		
 			
 			client = new Client(firstName, lastName, email, (birthday != null) ? (Calendar) birthday.clone() : null, 
 					(anniversary != null) ? (Calendar) anniversary.clone() : null, phoneNumbers, address, city,
-							province, postalCode, accountBalance, directory, addresses);
+							province, postalCode, accountBalance, directory);
 			
 			client.setID(id);
 		}
@@ -164,7 +161,6 @@ public class ClientGateway<T> implements IGateway<Client>
 		Date birthday = null;
 		Date anniversary = null;
 		ArrayList<PhoneNumber> phoneNumbers = null;
-		ArrayList<Address> addresses = null;
 		boolean result = false;
 		
 		try
@@ -209,18 +205,11 @@ public class ClientGateway<T> implements IGateway<Client>
 				newObj.setID(id);
 								
 				phoneNumbers = newObj.getNumbers();
-				addresses = newObj.getAddresses();
 				
 				for (PhoneNumber phoneNumber : phoneNumbers)
 				{
 					phoneNumber.setClientId(id);
 					_dao.phoneNumberGateway().add(phoneNumber);
-				}
-				
-				for (Address address : addresses)
-				{
-					address.setClientId(id);
-					_dao.addressGateway().add(address);
 				}
 			}
 			
@@ -242,8 +231,6 @@ public class ClientGateway<T> implements IGateway<Client>
 		Date anniversary = null;
 		ArrayList<PhoneNumber> phoneNumbersOld = null;
 		ArrayList<PhoneNumber> phoneNumbersNew = null;
-		ArrayList<Address> addressesOld = null;
-		ArrayList<Address> addressesNew = null;
 		boolean result = false;
 		
 		try
@@ -278,32 +265,39 @@ public class ClientGateway<T> implements IGateway<Client>
 			result = _dao.checkWarning(_statement, _updateCount);
 			
 			if (result)
-			{							
+			{
+				boolean exists;
+				
 				phoneNumbersOld = new ArrayList<PhoneNumber>(_dao.phoneNumberGateway().getAllWithId(obj.getID()));	
 				phoneNumbersNew = obj.getNumbers();
-				addressesOld = new ArrayList<Address>(_dao.addressGateway().getAllWithId(obj.getID()));
-				addressesNew = obj.getAddresses();
 				
 				// delete all phone numbers then insert all, due to the fact that you cannot update a new obj
 				for (PhoneNumber phoneNumber : phoneNumbersOld)
 				{
-					_dao.phoneNumberGateway().delete(phoneNumber);
-				}				
-				for (PhoneNumber phoneNumber : phoneNumbersNew)
-				{ 
-					phoneNumber.setClientId(obj.getID());
-					_dao.phoneNumberGateway().add(phoneNumber);
+					exists = false;
+					
+					for (PhoneNumber newNumber : phoneNumbersNew)
+					{ 
+						if (phoneNumber.getID() == newNumber.getID())
+						{
+							exists = true;
+							break;
+						}
+					}
+					
+					if (!exists || phoneNumber.getNumber().trim().length() == 0)
+						_dao.phoneNumberGateway().delete(phoneNumber);
 				}
 				
-				 // delete all addresses then insert all, due to the fact that you cannot update a new obj
-				for (Address address : addressesOld)
-				{
-					_dao.addressGateway().delete(address);
-				}				
-				for (Address address : addressesNew)
-				{
-					address.setClientId(obj.getID());
-					_dao.addressGateway().add(address);
+				for (PhoneNumber phoneNumber : phoneNumbersNew)
+				{ 
+					if (phoneNumber.getID() == 0 && phoneNumber.getNumber().trim().length() > 0)
+					{
+						phoneNumber.setClientId(obj.getID());
+						_dao.phoneNumberGateway().add(phoneNumber);
+					}
+					else if (phoneNumber.getNumber().trim().length() > 0)
+						_dao.phoneNumberGateway().update(phoneNumber);
 				}
 			}
 				

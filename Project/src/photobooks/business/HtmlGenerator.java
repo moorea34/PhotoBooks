@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import photobooks.application.Utility;
-import photobooks.objects.Address;
 import photobooks.objects.Bill;
 import photobooks.objects.BillPackage;
 import photobooks.objects.BillProduct;
@@ -57,21 +56,9 @@ public class HtmlGenerator
 			clientInfo = clientData(_client.getFullName());
 			String temp;
 			boolean first;
-		
-			temp = "";
-			first = true;
 	
-			for (Address addr : _client.getAddresses())
-			{
-				if (!first)
-					temp += ", ";
-				else
-					first = false;
-		
-				temp += addr.getAddress();
-			}
-	
-			clientInfo += clientData(temp);
+			clientInfo += clientData(_client.getAddress());
+			clientInfo += clientData(String.format("%s %s %s", _client.getCity(), _client.getProvince(), _client.getPostalCode()));
 		
 			temp = "";
 			first = true;
