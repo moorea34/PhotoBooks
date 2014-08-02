@@ -2,6 +2,7 @@ package photobooks.presentation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -133,11 +134,14 @@ public class BillsPage extends Composite {
 					{
 						payment.setDate(Calendar.getInstance());//Actual save time
 						_paymentManager.insert(payment);
+						_clientManager.recalculateClientBalance(payment.getClient());
 
 						_bill.getPayments().add(payment);
 						treeViewer.add(_bill, payment);
 
-						treeViewer.setSelection(new StructuredSelection(payment));
+						treeViewer.setExpandedState(_bill, true);
+						treeViewer.setSelection(new StructuredSelection(payment), true);
+						refresh();
 					}
 				}
 			}
@@ -169,6 +173,7 @@ public class BillsPage extends Composite {
 					}
 
 					_billManager.insert(invoice);
+					_clientManager.recalculateClientBalance(invoice.getClient());
 
 					if (parent != null)
 					{
@@ -186,7 +191,9 @@ public class BillsPage extends Composite {
 					}
 
 					treeViewer.add(parent, invoice);
-					treeViewer.setSelection(new StructuredSelection(invoice));
+					treeViewer.setExpandedState(parent, true);
+					treeViewer.setSelection(new StructuredSelection(invoice), true);
+					refresh();
 				}
 			}
 		});
@@ -215,6 +222,7 @@ public class BillsPage extends Composite {
 					if (_billEditor.getVisible())
 					{
 						_billManager.delete(_bill);
+						_clientManager.recalculateClientBalance(_bill.getClient());
 						treeViewer.remove(_bill);
 
 						_billEditor.clearTransactionFields();
@@ -224,6 +232,7 @@ public class BillsPage extends Composite {
 					else
 					{
 						_paymentManager.delete(_payment);
+						_clientManager.recalculateClientBalance(_payment.getClient());
 
 						_bill.getPayments().remove(_payment);
 						treeViewer.remove(_payment);
@@ -232,6 +241,8 @@ public class BillsPage extends Composite {
 
 						_payment = null;
 					}
+
+					refresh();
 				}
 			}
 		});
@@ -290,6 +301,7 @@ public class BillsPage extends Composite {
 					Client parent = bill.getClient();
 
 					_billManager.insert(bill);
+					_clientManager.recalculateClientBalance(bill.getClient());
 
 					if (parent != null)
 					{
@@ -307,7 +319,9 @@ public class BillsPage extends Composite {
 					}
 
 					treeViewer.add(parent, bill);
-					treeViewer.setSelection(new StructuredSelection(bill));
+					treeViewer.setExpandedState(parent, true);
+					treeViewer.setSelection(new StructuredSelection(bill), true);
+					refresh();
 				}
 			}
 		});
@@ -497,17 +511,51 @@ public class BillsPage extends Composite {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) 
 			{
-				if(txtSearchClients.getText().equals("") || txtSearchClients.getText().length() < 3)
-					return true;
-
-				if (element instanceof Client)
-				{
-					return ((Client) element).searchAll(txtSearchClients.getText().toLowerCase());
-				}
-				else 
-				{
-					return true;
-				}
+				String[] split;
+		    	
+		    	if(txtSearchClients.getText().trim().length() < 1)
+		    		return true;
+		    	
+		    	split = txtSearchClients.getText().trim().toLowerCase().split("\\|");
+		    	
+		    	if (element instanceof Client)
+		    	{
+		    		for (String str : split)
+		    		{
+		    			String s = str.trim();
+		    		
+		    			if (s.length() > 0 && ((Client) element).searchAll(s))
+		    				return true;
+		    		}
+		    		
+		    		Collection<Bill> bills = _billManager.getByClientID(((Client) element).getID());
+		    		
+		    		for (Bill bill : bills) {
+		    			for (String str : split)
+			    		{
+			    			String s = str.trim();
+			    		
+			    			if (s.length() > 0 && bill.searchAll(s))
+			    				return true;
+			    		}
+		    			
+		    			Collection<Payment> payments = _paymentManager.getByInvoiceId(bill.getID());
+			    		
+			    		for (Payment payment : payments) {
+			    			for (String str : split)
+				    		{
+				    			String s = str.trim();
+				    		
+				    			if (s.length() > 0 && payment.searchAll(s))
+				    				return true;
+				    		}
+			    		}
+		    		}
+		    	}
+		    	else
+		    		return true;
+		        
+		        return false;
 			}
 		};
 
@@ -520,8 +568,13 @@ public class BillsPage extends Composite {
 			toggleModify();
 
 		_client = selected;
+		_bill = null;
+		_payment = null;
 
 		_billEditor.setClient(selected);
+		
+		_billEditor.setVisible(true);
+		_paymentEditor.setVisible(false);
 	}
 
 	public void selectBill(Bill bill)
@@ -529,15 +582,18 @@ public class BillsPage extends Composite {
 		if (_modifying)
 			toggleModify();
 
-		_bill = bill;
+		_payment = null;
 
-		if (_bill != null)
+		if (bill != null)
 		{
-			selectClient(_bill.getClient());
+			selectClient(bill.getClient());
+			_bill = bill;
 
 			_billEditor.setVisible(true);
 			_paymentEditor.setVisible(false);
 		}
+		else
+			_bill = null;
 
 		_billEditor.setBill(_bill);
 	}
@@ -595,6 +651,7 @@ public class BillsPage extends Composite {
 				{
 					_billEditor.getBillFromFields(_bill);
 					_billManager.update(_bill);
+					_clientManager.recalculateClientBalance(_bill.getClient());
 				}
 			}
 			else//PaymentEditor
@@ -604,6 +661,7 @@ public class BillsPage extends Composite {
 
 				_paymentEditor.setModify(false);
 				_paymentManager.update(_payment);
+				_clientManager.recalculateClientBalance(_payment.getClient());
 			}
 
 			_modifying = !_modifying;
@@ -612,6 +670,7 @@ public class BillsPage extends Composite {
 			_billEditor.updateTotals();
 
 			//treeViewer.refresh();
+			refresh();
 		}
 		else
 		{
@@ -643,68 +702,13 @@ public class BillsPage extends Composite {
 		return null;
 	}
 	
-	public void addNewClient(Client newClient)
-	{
-		if (newClient != null)
-		{
-			treeViewer.add(treeViewer.getInput(), newClient);
-			_billEditor.addClient(newClient);
-		}
-	}
-	
-	public void updateClient(Client client)
-	{
-		if (client != null)
-		{
-			TreeItem treeClient = getClientFromTree(client.getID());
-			
-			treeClient.setData(client);
-			treeViewer.refresh();
-			
-			_billEditor.updateClient(client);
-			
-			if (_client != null && client.getID() == _client.getID())
-			{
-				if (_payment != null)
-				{
-					//Update client references
-					_payment.setClient(client);
-					_bill.setClient(client);
-					
-					selectPayment(_payment);
-				}
-				else if (_bill != null)
-				{
-					_bill.setClient(client);
-					
-					selectBill(_bill);
-				}
-				else
-					selectClient(client);
-			}
-		}
-	}
-	
-	public void removeClient(Client client)
-	{
-		if (client != null)
-		{
-			TreeItem treeClient = getClientFromTree(client.getID());
-			
-			treeViewer.remove(treeClient.getData());
-			
-			_billEditor.removeClient(client);
-			
-			if (_client != null && _client.getID() == client.getID())
-			{
-				_billEditor.clearTransactionFields();
-				_paymentEditor.clearFields();
-				
-				_client = null;
-				_bill = null;
-				_payment = null;
-			}
-		}
+	public void updateClientCB() {
+		refresh();
+		
+		_billEditor.updateCBClientList();
+		
+		if (_payment != null)
+			selectPayment(_paymentManager.getByID(_payment.getID()));
 	}
 
 	public void refresh()
@@ -716,5 +720,15 @@ public class BillsPage extends Composite {
 
 		treeViewer.refresh();
 		_billEditor.clearTransactionFields();
+		
+		if (_payment != null)
+			selectPayment(_payment);
+		else if (_bill != null)
+			selectBill(_bill);
+		else
+		{
+			_billEditor.clearAllFields();
+			_paymentEditor.clearFields();
+		}
 	}
 }

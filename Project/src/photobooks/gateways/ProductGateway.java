@@ -41,7 +41,7 @@ public class ProductGateway<T> implements IGateway<Product>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + PRODUCT_TABLE;
+			_commandString = "SELECT * FROM " + PRODUCT_TABLE + " ORDER BY " + NAME;
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)

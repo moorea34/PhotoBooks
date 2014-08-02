@@ -5,6 +5,7 @@ import photobooks.objects.Client;
 import photobooks.objects.Bill;
 import photobooks.objects.ITransaction.TransactionType;
 import photobooks.objects.Product;
+import photobooks.gateways.IConditionalGateway;
 import photobooks.gateways.IDao;
 import photobooks.gateways.IGateway;
 
@@ -14,7 +15,7 @@ import java.util.Collection;
 public class BillManager
 {
 	private IDao _dao;
-	private IGateway<Bill> _gateway;
+	private IConditionalGateway<Bill> _gateway;
 	
 	public BillManager( IDao dao )
 	{
@@ -52,21 +53,7 @@ public class BillManager
 	
 	public Collection<Bill> getByClientID(int clientID)
 	{
-		Collection<Bill> all = _gateway.getAll();
-		ArrayList<Bill> results = new ArrayList<Bill>();
-		Client client;
-		
-		for (Bill q : all)
-		{
-			client = q.getClient();
-			
-			if (client != null && client.getID() == clientID)
-			{
-				results.add(q);
-			}
-		}
-		
-		return results;
+		return _gateway.getAllWithId(clientID);
 	}
 	
 	public Bill getByID(int id)

@@ -4,18 +4,30 @@ import photobooks.gateways.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+
+import photobooks.objects.Bill;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
 
 public class ClientManager 
 {
+	private IDao _dao;
 	private IGateway<Client> _gateway;
 	private EventManager _eventManager;
 
 	public ClientManager( IGateway<Client> gateway, EventManager eventManager )
 	{
+		_dao = null;
 		_gateway = gateway;
+		_eventManager = eventManager;
+	}
+	
+	public ClientManager( IDao dao, EventManager eventManager )
+	{
+		_dao = dao;
+		_gateway = _dao.clientGateway();
 		_eventManager = eventManager;
 	}
 
@@ -67,5 +79,22 @@ public class ClientManager
 	{
 		_gateway.update(client);
 		_eventManager.updateEventsForClient(client);
+	}
+	
+	public void recalculateClientBalance(Client client)
+	{
+		double accountBalance = 0;
+		
+		if (_dao != null) {
+			Collection<Bill> bills = _dao.billGateway().getAllWithId(client.getID());
+			
+			for (Bill bill : bills)
+			{
+				accountBalance += bill.affectToBalance();
+			}
+			
+			client.setAccountBalance(accountBalance);
+			updateClient(client);
+		}
 	}
 }

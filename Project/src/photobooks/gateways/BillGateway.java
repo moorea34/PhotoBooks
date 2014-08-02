@@ -15,7 +15,7 @@ import photobooks.objects.Client;
 import photobooks.objects.ITransaction;
 import photobooks.objects.Payment;
 
-public class BillGateway<T> implements IGateway<Bill>
+public class BillGateway<T> implements IConditionalGateway<Bill>
 {
 	//table
 	private static final String BILL_TABLE = "BILL";
@@ -58,7 +58,7 @@ public class BillGateway<T> implements IGateway<Bill>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + BILL_TABLE;
+			_commandString = "SELECT * FROM " + BILL_TABLE + " ORDER BY " + DATE + " DESC";
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
@@ -154,6 +154,69 @@ public class BillGateway<T> implements IGateway<Bill>
 		
 		return bill;
 	}
+	
+	public Collection<Bill> getAllWithId(int clientId) {
+		Bill bill = null;
+		ArrayList<Bill> bills = new ArrayList<Bill>();
+		int id = 0, typeId = 0;
+		Client client = null;
+		String description = EOF, typeValue = EOF;
+		Calendar date = null;
+		Timestamp tempDate;
+		Double gst = 0.0, pst = 0.0;
+		ArrayList<BillProduct> products = null;
+		ArrayList<BillPackage> packages = null;
+		ArrayList<Payment> payments = null;
+		
+		try
+		{
+			_commandString = "SELECT * FROM " + BILL_TABLE + " WHERE " + CLIENT_ID + " = " + clientId + " ORDER BY " + DATE + " DESC";
+			_resultSet = _statement.executeQuery(_commandString);
+		}
+		catch (Exception e)
+		{
+			_dao.processSQLError(e);
+		}
+		
+		try
+		{
+			while (_resultSet.next())
+			{
+				id = _resultSet.getInt(ID);
+				client = _dao.clientGateway().getByID(clientId);
+				typeId = _resultSet.getInt(TRANSACTIONTYPE_ID);
+				typeValue = _dao.typeGateway().getById(TRANSACTIONTYPE_TABLE, typeId);
+				description = _resultSet.getString(DESCRIPTION);
+				tempDate = _resultSet.getTimestamp(DATE);
+				
+				if (tempDate != null) {
+					date = Calendar.getInstance();
+					date.setTimeInMillis(tempDate.getTime());
+				}
+				
+				gst = _resultSet.getDouble(GST);
+				pst = _resultSet.getDouble(PST);
+				products = new ArrayList<BillProduct>(_dao.billProductGateway().getAllWithId(id));
+				packages = new ArrayList<BillPackage>(_dao.billPackageGateway().getAllWithId(id));
+				payments = new ArrayList<Payment>(_dao.paymentGateway().getAllWithId(id));
+				
+				bill = new Bill(client, ITransaction.TransactionType.valueOf(typeValue), description, 
+						(date != null) ? (Calendar) date.clone() : null, gst, pst, products, packages, payments);
+				bill.setID(id);
+				bills.add(bill);
+				
+				date = null;
+			}
+			
+			_resultSet.close();
+		}
+		catch (Exception e)
+		{
+			_dao.processSQLError(e);
+		}
+		
+		return bills;
+	}
 
 	public boolean add(Bill newObj) 
 	{
@@ -195,6 +258,7 @@ public class BillGateway<T> implements IGateway<Bill>
 				{
 					id = _resultSet.getInt(1);
 				}
+				
 				newObj.setID(id);
 				
 				products = newObj.getProducts();
@@ -292,8 +356,6 @@ public class BillGateway<T> implements IGateway<Bill>
 
 	public void delete(Bill obj) 
 	{
-
 		_dao.globalGateway().delete(BILL_TABLE, obj.getID());		
 	}
-
 }

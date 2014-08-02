@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import photobooks.objects.Package;
 import photobooks.objects.Product;
+import photobooks.objects.ProductPackage;
 
 public class PackageGateway<T> implements IGateway<Package> 
 {
@@ -35,18 +36,23 @@ public class PackageGateway<T> implements IGateway<Package>
 	private String _commandString;
 	private int _updateCount;
 	
+	private ProductPackageGateway _productPackageGateway;
+	
 	public PackageGateway(IDao dao)
 	{
 		_dao = dao;
 		_statement = _dao.getStatement();
 		_statement2 = _dao.getStatement();
 		_statement3 = _dao.getStatement();
+		
+		_productPackageGateway = new ProductPackageGateway(dao);
 	}
 
 	public Collection<Package> getAll() 
 	{
 		Package newPackage = null;
 		ArrayList<Package> packages = new ArrayList<Package>();
+		ArrayList<ProductPackage> productPackages;
 		int id = 0, totalPurchased = 0, productId = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
@@ -54,7 +60,7 @@ public class PackageGateway<T> implements IGateway<Package>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + PACKAGE_TABLE;
+			_commandString = "SELECT * FROM " + PACKAGE_TABLE + " ORDER BY " + NAME;
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
@@ -70,36 +76,22 @@ public class PackageGateway<T> implements IGateway<Package>
 				description = _resultSet.getString(DESCRIPTION);
 				price = _resultSet.getDouble(PRICE);
 				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
+
+				productPackages = _productPackageGateway.getByPackageID(id);
 				
-				// get all products associated with a package
+				/*// get all products associated with a package
 				products = new ArrayList<Product>();
-				try
-				{
-					_commandString = "SELECT * FROM " + PRODUCT_PACKAGE_TABLE + " WHERE " + PACKAGE_ID + " = " + id + "";
-					_resultSet2 = _statement2.executeQuery(_commandString);
-				}
-				catch (Exception e)
-				{
-					_dao.processSQLError(e);
-				}
-				try
-				{
-					while (_resultSet2.next())
-					{
-						productId = _resultSet2.getInt(PRODUCT_ID);
-						products.add(_dao.productGateway().getByID(productId));
-					}
-					_resultSet2.close();
-				}
-				catch (Exception e)
-				{
-					_dao.processSQLError(e);
-				}
 				
-				newPackage = new Package(name, description, price, totalPurchased, products);
+				for (ProductPackage pp : productPackages) {
+					products.add(pp.getProduct());
+				}*/
+				
+				newPackage = new Package(name, description, price, totalPurchased, productPackages);
 				newPackage.setID(id);
+				
 				packages.add(newPackage);
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -113,6 +105,7 @@ public class PackageGateway<T> implements IGateway<Package>
 	public Package getByID(int id) 
 	{
 		Package newPackage = null;
+		ArrayList<ProductPackage> productPackages;
 		int totalPurchased = 0, productId = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
@@ -131,32 +124,16 @@ public class PackageGateway<T> implements IGateway<Package>
 				price = _resultSet.getDouble(PRICE);
 				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
 				
-				// get all products associated with a package
-				products = new ArrayList<Product>();
-				try
-				{
-					_commandString = "SELECT * FROM " + PRODUCT_PACKAGE_TABLE + " WHERE " + PACKAGE_ID + " = " + id + "";
-					_resultSet2 = _statement2.executeQuery(_commandString);
-				}
-				catch (Exception e)
-				{
-					_dao.processSQLError(e);
-				}
-				try
-				{
-					while (_resultSet2.next())
-					{
-						productId = _resultSet2.getInt(PRODUCT_ID);
-						products.add(_dao.productGateway().getByID(productId));
-					}
-					_resultSet2.close();
-				}
-				catch (Exception e)
-				{
-					_dao.processSQLError(e);
-				}
+				productPackages = _productPackageGateway.getByPackageID(id);
 				
-				newPackage = new Package(name, description, price, totalPurchased, products);
+				/*// get all products associated with a package
+				products = new ArrayList<Product>();
+				
+				for (ProductPackage pp : productPackages) {
+					products.add(pp.getProduct());
+				}*/
+				
+				newPackage = new Package(name, description, price, totalPurchased, productPackages);
 				newPackage.setID(id);
 			}
 			_resultSet.close();
@@ -173,7 +150,7 @@ public class PackageGateway<T> implements IGateway<Package>
 	{
 		String values = null, values2 = null;
 		int id = 0;
-		ArrayList<Product> products = null;
+		ArrayList<ProductPackage> products = null;
 		boolean result = false;
 		
 		try
@@ -196,25 +173,17 @@ public class PackageGateway<T> implements IGateway<Package>
 				{
 					id = _resultSet.getInt(1);
 				}
+				
 				newObj.setID(id);
 				
 				products = newObj.getProducts();
 				
-				for (Product product : products)
+				for (ProductPackage product : products)
 				{
-					try
-					{
-						values2 = "NULL, " + product.getID() + ", " + id;
-						
-						_commandString = "INSERT INTO " + PRODUCT_PACKAGE_TABLE + " VALUES(" + values2 + ")";
-						_updateCount = _statement2.executeUpdate(_commandString);
-					}
-					catch (Exception e)
-					{
-						_dao.processSQLError(e);
-					}
+					_productPackageGateway.add(product);
 				}
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -228,7 +197,7 @@ public class PackageGateway<T> implements IGateway<Package>
 	public void update(Package obj) 
 	{
 		String values = null, values2 = null, where = null;
-		ArrayList<Product> products = null;
+		ArrayList<ProductPackage> newProducts = null, oldProducts = null;
 		boolean result = false;
 		
 		try
@@ -245,32 +214,20 @@ public class PackageGateway<T> implements IGateway<Package>
 			
 			if (result)
 			{
-				//delete all product packages with package id
-				try
-				{
-					_commandString = "DELETE FROM " + PRODUCT_PACKAGE_TABLE + " WHERE " + PACKAGE_ID + " = " + obj.getID() + "";
-					_updateCount = _statement2.executeUpdate(_commandString);
-				}
-				catch (Exception e)
-				{
-					_dao.processSQLError(e);
+				oldProducts = _productPackageGateway.getByPackageID(obj.getID());
+				newProducts = obj.getProducts();
+				
+				for (ProductPackage product : oldProducts) {
+					if (!newProducts.contains(product))
+						_productPackageGateway.delete(product);
 				}
 				
-				products = obj.getProducts();
-				
-				for (Product product : products)
+				for (ProductPackage product : newProducts)
 				{
-					try
-					{
-						values2 = "NULL, " + product.getID() + ", " + obj.getID();
-						
-						_commandString = "INSERT INTO " + PRODUCT_PACKAGE_TABLE + " VALUES(" + values2 + ")";
-						_updateCount = _statement3.executeUpdate(_commandString);
-					}
-					catch (Exception e)
-					{
-						_dao.processSQLError(e);
-					}
+					if (product.getID() == 0)
+						_productPackageGateway.add(product);
+					else
+						_productPackageGateway.update(product);
 				}
 			}
 		}

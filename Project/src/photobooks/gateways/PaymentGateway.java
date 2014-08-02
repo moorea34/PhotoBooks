@@ -49,7 +49,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + PAYMENT_TABLE;
+			_commandString = "SELECT * FROM " + PAYMENT_TABLE + " ORDER BY " + DATE + " DESC";
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
@@ -235,7 +235,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + PAYMENT_TABLE + " WHERE " + BILL_ID + " = " + id + "";
+			_commandString = "SELECT * FROM " + PAYMENT_TABLE + " WHERE " + BILL_ID + " = " + id + "" + " ORDER BY " + DATE + " DESC";
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)

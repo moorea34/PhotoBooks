@@ -18,7 +18,7 @@ public interface IDao
 	public IGateway<Client> clientGateway();
 	public IGateway<Product> productGateway();
 	public IGateway<Package> packageGateway();
-	public IGateway<Bill> billGateway();
+	public IConditionalGateway<Bill> billGateway();
 	public IGateway<Event> eventGateway();
 	public IConditionalGateway<Payment> paymentGateway();
 	public IConditionalGateway<PhoneNumber> phoneNumberGateway();

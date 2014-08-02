@@ -6,6 +6,7 @@ public class BillProduct extends DBObject
 	private int _billID;
 	private double _purchasePrice;//Store price so it doesn't change after its been bought
 	private int _amount;
+	private int _order;
 	
 	public BillProduct()
 	{
@@ -13,6 +14,7 @@ public class BillProduct extends DBObject
 		_billID = 0;
 		_purchasePrice = 0;
 		_amount = 1;
+		_order = 0;
 	}
 	
 	public BillProduct(Product product, int billID, double purchasePrice)
@@ -21,6 +23,7 @@ public class BillProduct extends DBObject
 		setBillID(billID);
 		setPrice(purchasePrice);
 		_amount = 1;
+		_order = 0;
 	}
 	
 	public BillProduct(Product product, int billID, double purchasePrice, int amount)
@@ -29,6 +32,16 @@ public class BillProduct extends DBObject
 		setBillID(billID);
 		setPrice(purchasePrice);
 		setAmount(amount);
+		_order = 0;
+	}
+	
+	public BillProduct(Product product, int billID, double purchasePrice, int amount, int order)
+	{
+		setProduct(product);
+		setBillID(billID);
+		setPrice(purchasePrice);
+		setAmount(amount);
+		setOrder(order);
 	}
 	
 	public Product getProduct()
@@ -75,4 +88,7 @@ public class BillProduct extends DBObject
 	{
 		return _amount * _purchasePrice;
 	}
+	
+	public int getOrder() { return _order; }
+	public void setOrder(int order) { _order = order; }
 }

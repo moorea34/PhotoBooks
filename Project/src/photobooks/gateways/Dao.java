@@ -16,7 +16,7 @@ public class Dao implements IDao
 	private IGateway<Client> _clientGateway;
 	private IGateway<Product> _productGateway;
 	private IGateway<Package> _packageGateway;
-	private IGateway<Bill> _billGateway;
+	private IConditionalGateway<Bill> _billGateway;
 	private IGateway<Event> _eventGateway;
 	private IConditionalGateway<Payment> _paymentGateway;
 	private IConditionalGateway<PhoneNumber> _phoneNumberGateway;
@@ -118,7 +118,7 @@ public class Dao implements IDao
 		return _packageGateway;
 	}
 
-	public IGateway<Bill> billGateway()
+	public IConditionalGateway<Bill> billGateway()
 	{
 		return _billGateway;
 	}

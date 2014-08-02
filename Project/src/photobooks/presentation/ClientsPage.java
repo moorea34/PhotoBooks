@@ -187,7 +187,7 @@ public class ClientsPage extends Composite
 							
 							updateList();
 							
-							_billsPage.removeClient(oldClient);
+							_billsPage.updateClientCB();
 						}
 					}
 				});
@@ -237,7 +237,7 @@ public class ClientsPage extends Composite
 							
 							listViewer.setSelection(new StructuredSelection(newClient));
 							
-							_billsPage.addNewClient(newClient);
+							_billsPage.updateClientCB();
 						}
 
 						
@@ -310,13 +310,20 @@ public class ClientsPage extends Composite
 		    @Override
 		    public boolean select(Viewer viewer, Object parentElement, Object element) 
 		    {
-		    	if(txtSearchClients.getText().equals("") || txtSearchClients.getText().length() < 3)
+		    	String[] split;
+		    	
+		    	if(txtSearchClients.getText().trim().length() < 1)
 		    		return true;
 		    	
-		        if (((Client) element).searchAll(txtSearchClients.getText().toLowerCase()))
-		        {
-		            return true;
-		        }
+		    	split = txtSearchClients.getText().trim().toLowerCase().split("\\|");
+		    	
+		    	for (String str : split)
+		    	{
+		    		String s = str.trim();
+		    		
+		    		if (s.length() > 0 && ((Client) element).searchAll(s))
+		    			return true;
+		    	}
 		        
 		        return false;
 		    }
@@ -360,6 +367,7 @@ public class ClientsPage extends Composite
 	{
 		clearValues();
 		listViewer.refresh();
+		
 		if(currClientID != -1)
 		{
 			Client selected = _clientManager.getClientByID(currClientID);
@@ -398,9 +406,9 @@ public class ClientsPage extends Composite
 				
 				_clientManager.updateClient(currClient);
 				
-				_billsPage.updateClient(currClient);
-				
 				updateList();
+
+				_billsPage.updateClientCB();
 			}
 		}
 	}

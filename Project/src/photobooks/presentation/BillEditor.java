@@ -12,14 +12,20 @@ import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,8 +35,12 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 
 import photobooks.application.Globals;
 import photobooks.application.Utility;
@@ -45,6 +55,7 @@ import photobooks.objects.Client;
 import photobooks.objects.ITransaction;
 import photobooks.objects.ITransaction.TransactionType;
 import photobooks.objects.PhoneNumber;
+import photobooks.objects.ProductPackage;
 
 import org.eclipse.swt.widgets.Button;
 
@@ -58,6 +69,7 @@ public class BillEditor extends Composite {
 	private boolean _modifying = false;
 	
 	private TableViewer tableViewer;
+	private TreeViewer packageViewer;
 	private Text tbDescription;
 	private Text tbGst;
 	private Text tbPst;
@@ -87,8 +99,13 @@ public class BillEditor extends Composite {
 	private String[] clientNames;
 	
 	private Bill _bill = null;
+	private Client _client = null;
 	private Button btnAddPayment;
 	private Label lblAmountDueValue;
+	private Label lblAccountBalance;
+	private Label lblAccountBalanceValue;
+	private Button btnMoveUp;
+	private Button btnMoveDown;
 
 	public BillEditor(Composite parent, int style, Shell parentShell, ClientManager clientManager, ProductManager productManager, ProductPackageManager packageManager) {
 		super(parent, style);
@@ -100,20 +117,6 @@ public class BillEditor extends Composite {
 		_clientManager = clientManager;
 		_productManager = productManager;
 		_packageManager = packageManager;
-		clientList = clientManager.getClientList();
-		
-		if (clientList.size() == 0)
-		{
-			_clientManager.insertStubData();
-			clientList = clientManager.getClientList();
-		}
-		
-		clientNames = new String[clientList.size()];
-		
-		for (int i = 0; i < clientNames.length; ++i)
-		{
-			clientNames[i] = clientList.get(i).getFullName();
-		}
 		
 		FormData fd_composite = new FormData();
 		fd_composite.top = new FormAttachment(0);
@@ -149,6 +152,13 @@ public class BillEditor extends Composite {
 		lblClientPhone.setLayoutData(fd_lblClientPhone);
 		lblClientPhone.setText("Client Phone #'s:");
 		
+		lblAccountBalance = new Label(this, SWT.NONE);
+		FormData fd_lblAccountBalance = new FormData();
+		fd_lblAccountBalance.top = new FormAttachment(lblClientPhone, 6);
+		fd_lblAccountBalance.left = new FormAttachment(lblBillType, 0, SWT.LEFT);
+		lblAccountBalance.setLayoutData(fd_lblAccountBalance);
+		lblAccountBalance.setText("Account Balance:");
+		
 		lblDateValue = new Label(this, SWT.NONE);
 		FormData fd_lblDateValue = new FormData();
 		fd_lblDateValue.right = new FormAttachment(100);
@@ -166,8 +176,16 @@ public class BillEditor extends Composite {
 		FormData fd_lblPhoneNumbers = new FormData();
 		fd_lblPhoneNumbers.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
 		fd_lblPhoneNumbers.top = new FormAttachment(lblClientPhone, 0, SWT.TOP);
-		fd_lblPhoneNumbers.left = new FormAttachment(lblClientPhone, 6);
+		fd_lblPhoneNumbers.left = new FormAttachment(lblAccountBalance, 6);
 		lblPhoneNumbers.setLayoutData(fd_lblPhoneNumbers);
+		
+		lblAccountBalanceValue = new Label(this, SWT.RIGHT);
+		lblAccountBalanceValue.setText("0.00");
+		FormData fd_lblAccountBalanceValue = new FormData();
+		fd_lblAccountBalanceValue.bottom = new FormAttachment(lblAccountBalance, 0, SWT.BOTTOM);
+		fd_lblAccountBalanceValue.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
+		fd_lblAccountBalanceValue.right = new FormAttachment(lblPhoneNumbers, 0, SWT.RIGHT);
+		lblAccountBalanceValue.setLayoutData(fd_lblAccountBalanceValue);
 		
 		lblBillNumber = new Label(this, SWT.NONE);
 		FormData fd_lblBillNumber = new FormData();
@@ -182,27 +200,42 @@ public class BillEditor extends Composite {
 		fd_cbClient.bottom = new FormAttachment(lblClient, 0, SWT.BOTTOM);
 		fd_cbClient.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
 		cbClient.setLayoutData(fd_cbClient);
-		cbClient.setItems(clientNames);
+		cbClient.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int index = cbClient.getSelectionIndex();
+				
+				if (index >= 0 && index < clientList.size())
+					setClient(clientList.get(index));
+			}
+		});
+		
+		lblAddress = new Label(this, SWT.NONE);
+		FormData fd_lblAddress = new FormData();
+		fd_lblAddress.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
+		fd_lblAddress.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
+		fd_lblAddress.top = new FormAttachment(lblClientAddress, 0, SWT.TOP);
+		lblAddress.setLayoutData(fd_lblAddress);
 		
 		Label lblDescription = new Label(this, SWT.NONE);
 		FormData fd_lblDescription = new FormData();
-		fd_lblDescription.top = new FormAttachment(lblClientPhone, 6);
+		fd_lblDescription.top = new FormAttachment(lblAccountBalance, 6);
 		fd_lblDescription.left = new FormAttachment(lblBillType, 0, SWT.LEFT);
 		lblDescription.setLayoutData(fd_lblDescription);
 		lblDescription.setText("Description:");
 		
 		tbDescription = new Text(this, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		FormData fd_tbDescription = new FormData();
+		fd_tbDescription.top = new FormAttachment(lblDescription, -2, SWT.TOP);
 		fd_tbDescription.height = 90;
 		fd_tbDescription.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
-		fd_tbDescription.top = new FormAttachment(lblDescription, -3, SWT.TOP);
 		fd_tbDescription.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
 		tbDescription.setLayoutData(fd_tbDescription);
 		
 		lblAmountDueValue = new Label(this, SWT.NONE);
 		lblAmountDueValue.setText("0.0");
 		FormData fd_lblAmountDueValue = new FormData();
-		fd_lblAmountDueValue.bottom = new FormAttachment(100, 0);
+		fd_lblAmountDueValue.bottom = new FormAttachment(100);
 		fd_lblAmountDueValue.right = new FormAttachment(100, 0);
 		fd_lblAmountDueValue.width = 100;
 		lblAmountDueValue.setLayoutData(fd_lblAmountDueValue);
@@ -278,6 +311,12 @@ public class BillEditor extends Composite {
 		fd_tbGst.top = new FormAttachment(lblGst, -3, SWT.TOP);
 		fd_tbGst.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
 		tbGst.setLayoutData(fd_tbGst);
+		tbGst.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updateTotals();
+			}
+		});
 		
 		tbPst = new Text(this, SWT.BORDER | SWT.RIGHT);
 		FormData fd_tbPst = new FormData();
@@ -285,13 +324,52 @@ public class BillEditor extends Composite {
 		fd_tbPst.top = new FormAttachment(lblPst, -3, SWT.TOP);
 		fd_tbPst.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
 		tbPst.setLayoutData(fd_tbPst);
+		tbPst.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updateTotals();
+			}
+		});
 		
-		lblAddress = new Label(this, SWT.NONE);
-		FormData fd_lblAddress = new FormData();
-		fd_lblAddress.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
-		fd_lblAddress.left = new FormAttachment(lblPhoneNumbers, 0, SWT.LEFT);
-		fd_lblAddress.top = new FormAttachment(lblClientAddress, 0, SWT.TOP);
-		lblAddress.setLayoutData(fd_lblAddress);
+		packageViewer = new TreeViewer(this, SWT.BORDER);
+		Tree packageTree = packageViewer.getTree();
+		FormData fd_packageTree = new FormData();
+		fd_packageTree.bottom = new FormAttachment(lblSubtotal, -6);
+		fd_packageTree.top = new FormAttachment(tbDescription, 6);
+		fd_packageTree.right = new FormAttachment(lblDateValue, 0, SWT.RIGHT);
+		fd_packageTree.left = new FormAttachment(lblBillType, 0, SWT.LEFT);
+		packageTree.setLayoutData(fd_packageTree);
+		packageTree.setHeaderVisible(true);
+		packageTree.setLinesVisible(true);
+		packageViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				String result = null;
+				
+				if (element != null) {
+					result = element.toString();
+				}
+				
+				return result;
+			}
+		});
+		
+		TreeColumn treeColumnItem = new TreeColumn(packageTree, SWT.NONE);
+		treeColumnItem.setWidth(150);
+		treeColumnItem.setText("Item");
+		
+		TreeColumn treeColumnDesc = new TreeColumn(packageTree, SWT.NONE);
+		treeColumnDesc.setWidth(200);
+		treeColumnDesc.setText("Description");
+		
+		TreeColumn treeColumnAmount = new TreeColumn(packageTree, SWT.NONE);
+		treeColumnAmount.setWidth(70);
+		treeColumnAmount.setText("Amount");
+		
+		TreeColumn treeColumnPrice = new TreeColumn(packageTree, SWT.NONE);
+		treeColumnPrice.setWidth(70);
+		treeColumnPrice.setText("Price");
+		
 		
 		tableViewer = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION);
 		FormData fd_table = new FormData();
@@ -328,7 +406,6 @@ public class BillEditor extends Composite {
 		TableViewerColumn tblclmnItem = new TableViewerColumn(tableViewer, SWT.NONE);
 		tblclmnItem.getColumn().setWidth(150);
 		tblclmnItem.getColumn().setText("Item");
-		
 		tblclmnItem.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
@@ -446,11 +523,69 @@ public class BillEditor extends Composite {
 			}
 		});
 		
+		btnMoveUp = new Button(this, SWT.NONE);
+		FormData fd_btnMoveUp = new FormData();
+		fd_btnMoveUp.height = 30;
+		fd_btnMoveUp.width = 120;
+		fd_btnMoveUp.top = new FormAttachment(tableViewer.getTable(), 6, SWT.BOTTOM);
+		fd_btnMoveUp.left = new FormAttachment(0, 0);
+		btnMoveUp.setLayoutData(fd_btnMoveUp);
+		btnMoveUp.setText("^");
+		btnMoveUp.setEnabled(false);
+		btnMoveUp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Table table = tableViewer.getTable();
+				int index = table.getSelectionIndex();
+				
+				if (index > 0) {
+					Object temp = table.getItem(index).getData();
+					
+					table.getItem(index).setData(table.getItem(index - 1).getData());
+					table.getItem(index - 1).setData(temp);
+					
+					tableViewer.refresh(table.getItem(index).getData());
+					tableViewer.refresh(table.getItem(index - 1).getData());
+					tableViewer.setSelection(new StructuredSelection(table.getItem(index - 1).getData()));
+				}
+			}
+		});
+		
+		btnMoveDown = new Button(this, SWT.NONE);
+		FormData fd_btnMoveDown = new FormData();
+		fd_btnMoveDown.height = 30;
+		fd_btnMoveDown.width = 120;
+		fd_btnMoveDown.left = new FormAttachment(btnMoveUp, 6);
+		fd_btnMoveDown.bottom = new FormAttachment(btnMoveUp, 0, SWT.BOTTOM);
+		btnMoveDown.setLayoutData(fd_btnMoveDown);
+		btnMoveDown.setText("v");
+		btnMoveDown.setEnabled(false);
+		btnMoveDown.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Table table = tableViewer.getTable();
+				int index = table.getSelectionIndex();
+				
+				if (index >= 0 && index < table.getItemCount() - 1) {
+					Object temp = table.getItem(index).getData();
+					
+					table.getItem(index).setData(table.getItem(index + 1).getData());
+					table.getItem(index + 1).setData(temp);
+					
+					tableViewer.refresh(table.getItem(index).getData());
+					tableViewer.refresh(table.getItem(index + 1).getData());
+					tableViewer.setSelection(new StructuredSelection(table.getItem(index + 1).getData()));
+				}
+			}
+		});
+		
 		btnAddItem = new Button(this, SWT.NONE);
 		FormData fd_btnAddProductpackage = new FormData();
 		fd_btnAddProductpackage.height = 30;
 		fd_btnAddProductpackage.width = 120;
-		fd_btnAddProductpackage.top = new FormAttachment(tableViewer.getTable(), 6, SWT.BOTTOM);
+		fd_btnAddProductpackage.top = new FormAttachment(btnMoveUp, 6, SWT.BOTTOM);
 		fd_btnAddProductpackage.left = new FormAttachment(0, 0);
 		btnAddItem.setLayoutData(fd_btnAddProductpackage);
 		btnAddItem.setText("Add Item");
@@ -473,6 +608,9 @@ public class BillEditor extends Composite {
 					}
 					
 					tableViewer.add(result);
+					
+					TreeItem item = new TreeItem(packageViewer.getTree(), SWT.NONE);
+					setTreeItem(item, result);
 				}
 
 				updateTotals();
@@ -531,6 +669,7 @@ public class BillEditor extends Composite {
 			public void widgetSelected(SelectionEvent e) 
 			{
 				TableItem[] items = tableViewer.getTable().getSelection();
+				TreeItem[] treeItems = packageViewer.getTree().getSelection();
 				
 				for (TableItem item : items)
 				{
@@ -539,7 +678,13 @@ public class BillEditor extends Composite {
 					tableViewer.remove(obj);
 				}
 				
+				for (TreeItem item : treeItems)
+				{
+					packageViewer.remove(item.getData());
+				}
+				
 				tableViewer.remove(items);
+				packageViewer.remove(treeItems);
 
 				updateTotals();
 			}
@@ -637,7 +782,37 @@ public class BillEditor extends Composite {
 			}
 		});
 		
+		updateCBClientList();
+		
 		clearTransactionFields();
+	}
+	
+	public void updateCBClientList() {
+		if (_modifying) setModify(!_modifying);
+		
+		clientList = _clientManager.getClientList();
+		
+		/*if (clientList.size() == 0)
+		{
+			_clientManager.insertStubData();
+			clientList = clientManager.getClientList();
+		}*/
+		
+		clientNames = new String[clientList.size()];
+		
+		for (int i = 0; i < clientNames.length; ++i)
+		{
+			clientNames[i] = clientList.get(i).getFullName();
+		}
+		
+		cbClient.setItems(clientNames);
+		
+		if (_bill != null)
+			setBill(_bill);
+		else if (_client != null)
+			setClient(_client);
+		else
+			clearAllFields();
 	}
 	
 	public void setClient(Client client)
@@ -662,6 +837,7 @@ public class BillEditor extends Composite {
 			output = String.format("%s %s %s %s", client.getAddress(), client.getCity(), client.getProvince(), client.getPostalCode());
 			
 			lblAddress.setText(output);
+			lblAccountBalanceValue.setText(Utility.formatMoney(client.getAccountBalance()));
 			
 			output = "";
 			
@@ -682,6 +858,8 @@ public class BillEditor extends Composite {
 			
 			lblPhoneNumbers.setText(output);
 		}
+		
+		_client = client;
 	}
 	
 	public void updateTotals()
@@ -693,9 +871,9 @@ public class BillEditor extends Composite {
 			
 		getBillFromFields(bill);
 		
-		total = bill.total() + bill.getTaxes();
+		total = bill.total();
 			
-		lblSubtotalValue.setText(format.format(bill.total()));
+		lblSubtotalValue.setText(format.format(bill.subtotal()));
 			
 		lblTaxesValue.setText(format.format(bill.getTaxes()));
 		lblTotalValue.setText(format.format(total));
@@ -714,6 +892,31 @@ public class BillEditor extends Composite {
 			else
 				lblAmountDueValue.setText(format.format(total));
 		}
+	}
+	
+	private void setTreeItem(TreeItem item, Object obj) {
+		if (obj instanceof BillPackage)
+			setBillPackageInTreeItem(item, (BillPackage)obj);
+		else if (obj instanceof BillProduct)
+			setBillProductInTreeItem(item, (BillProduct)obj);
+	}
+	
+	private void setBillPackageInTreeItem(TreeItem item, BillPackage pack) {
+		item.setItemCount(0);
+		item.setData(pack);
+		item.setText(new String[] { pack.getPackage().getName(), pack.getPackage().getDescription(), String.valueOf(pack.getAmount()), String.valueOf(pack.getPrice()) });
+		
+		for (ProductPackage product : pack.getPackage().getProducts()) {
+			TreeItem childItem = new TreeItem(item, SWT.NONE);
+			childItem.setData(product);
+			childItem.setText(new String[] { product.getProduct().getName(), product.getProduct().getDescription(), String.valueOf(product.getAmount()) });
+		}
+	}
+	
+	private void setBillProductInTreeItem(TreeItem item, BillProduct prod) {
+		item.setItemCount(0);
+		item.setData(prod);
+		item.setText(new String[] { prod.getProduct().getName(), prod.getProduct().getDescription(), String.valueOf(prod.getAmount()), String.valueOf(prod.getPrice()) });
 	}
 	
 	public void setBill(Bill bill)
@@ -752,19 +955,50 @@ public class BillEditor extends Composite {
 			
 			if (bill.getType() == ITransaction.TransactionType.Quote || bill.getType() == ITransaction.TransactionType.Invoice)
 			{
+				int packageIndex = 0, packageCount = bill.getPackages().size(), productIndex = 0, productCount = bill.getProducts().size();
+				int totalCount = packageCount + productCount;
+				
 				tbGst.setText("" + format.format(bill.getGst()));
 				tbPst.setText("" + format.format(bill.getPst()));
 				
-				for (int i = 0; i < bill.getPackages().size(); ++i)
-				{
-					if (bill.getPackages().get(i) != null)
-						tableViewer.add(bill.getPackages().get(i));
-				}
-				
-				for (int i = 0; i < bill.getProducts().size(); ++i)
-				{
-					if (bill.getProducts().get(i) != null)
-						tableViewer.add(bill.getProducts().get(i));
+				for (int i = 0; i < totalCount; ++i) {
+					while (productIndex < productCount && bill.getProducts().get(productIndex) == null) ++productIndex;
+					while (packageIndex < packageCount && bill.getPackages().get(packageIndex) == null) ++packageIndex;
+					
+					if (packageIndex < packageCount && productIndex < productCount) {
+						if (bill.getProducts().get(productIndex).getOrder() < bill.getPackages().get(packageIndex).getOrder()) {
+							tableViewer.add(bill.getProducts().get(productIndex));
+							
+							TreeItem treeItem = new TreeItem(packageViewer.getTree(), SWT.NONE);
+							setBillProductInTreeItem(treeItem, bill.getProducts().get(productIndex));
+							
+							++productIndex;
+						}
+						else {
+							tableViewer.add(bill.getPackages().get(packageIndex));
+							
+							TreeItem treeItem = new TreeItem(packageViewer.getTree(), SWT.NONE);
+							setBillPackageInTreeItem(treeItem, bill.getPackages().get(packageIndex));
+							
+							++packageIndex;
+						}
+					}
+					else if (packageIndex >= packageCount && productIndex < productCount) {
+						tableViewer.add(bill.getProducts().get(productIndex));
+						
+						TreeItem treeItem = new TreeItem(packageViewer.getTree(), SWT.NONE);
+						setBillProductInTreeItem(treeItem, bill.getProducts().get(productIndex));
+						
+						++productIndex;
+					}
+					else {
+						tableViewer.add(bill.getPackages().get(packageIndex));
+						
+						TreeItem treeItem = new TreeItem(packageViewer.getTree(), SWT.NONE);
+						setBillPackageInTreeItem(treeItem, bill.getPackages().get(packageIndex));
+						
+						++packageIndex;
+					}
 				}
 			}
 			
@@ -777,11 +1011,13 @@ public class BillEditor extends Composite {
 		lblSubtotalValue.setText(ZERO);
 		lblTaxesValue.setText(ZERO);
 		lblTotalValue.setText(ZERO);
+		lblAmountDueValue.setText(ZERO);
 	}
 	
 	public void clearTransactionFields()
 	{
 		tableViewer.setItemCount(0);
+		packageViewer.getTree().setItemCount(0);
 		lblBillNumber.setText("-");
 		lblDateValue.setText("-");
 		tbDescription.setText("");
@@ -798,6 +1034,7 @@ public class BillEditor extends Composite {
 		cbClient.setText("");
 		lblAddress.setText("");
 		lblPhoneNumbers.setText("");
+		lblAccountBalanceValue.setText(ZERO);
 	}
 	
 	public void enableClientSelection(boolean enabled)
@@ -818,81 +1055,10 @@ public class BillEditor extends Composite {
 		btnAddItem.setEnabled(modify);
 		btnEditItem.setEnabled(modify);
 		btnRemoveItem.setEnabled(modify);
+		btnMoveUp.setEnabled(modify);
+		btnMoveDown.setEnabled(modify);
 		
 		cbClient.setEnabled(_clientSelection && modify);
-	}
-	
-	public void addClient(Client newClient)
-	{
-		int i = 0;
-
-		clientNames = new String[clientNames.length + 1];
-		clientList.add(newClient);
-		
-		for (Client client : clientList)
-		{
-			clientNames[i] = client.getFormattedName();
-			++i;
-		}
-		
-		cbClient.setItems(clientNames);
-	}
-	
-	public void updateClient(Client newClient)
-	{
-		int i = 0;
-		
-		if (newClient != null)
-		{
-			for (Client client : clientList)
-			{
-				if (client.getID() == newClient.getID())
-					break;
-			
-				++i;
-			}
-			
-			if (i < clientList.size())
-			{
-				clientList.set(i, newClient);
-				clientNames[i] = newClient.getFormattedName();
-		
-				cbClient.setItems(clientNames);
-			}
-		}
-	}
-	
-	public void removeClient(Client oldClient)
-	{
-		int i = 0;
-
-		if (oldClient != null)
-		{
-			for (Client client : clientList)
-			{
-				if (client.getID() == oldClient.getID())
-					break;
-			
-				++i;
-			}
-			
-			if (i < clientList.size())
-			{
-				clientList.remove(i);
-				
-				clientNames = new String[clientList.size()];
-				
-				i = 0;
-				
-				for (Client client : clientList)
-				{
-					clientNames[i] = client.getFormattedName();
-					++i;
-				}
-			
-				cbClient.setItems(clientNames);
-			}
-		}
 	}
 	
 	public Button getQuoteToInvoiceBtn()
@@ -920,6 +1086,7 @@ public class BillEditor extends Composite {
 			{
 				double gst = 0;
 				double pst = 0;
+				int order = 0;
 				
 				try
 				{
@@ -952,12 +1119,16 @@ public class BillEditor extends Composite {
 					
 					if (obj instanceof BillProduct)
 					{
+						((BillProduct)obj).setOrder(order);
 						out.getProducts().add((BillProduct)obj);
 					}
 					else if (obj instanceof BillPackage)
 					{
+						((BillPackage)obj).setOrder(order);
 						out.getPackages().add((BillPackage)obj);
 					}
+					
+					++order;
 				}
 			}
 		}

@@ -105,7 +105,7 @@ public class ClientGateway<T> implements IGateway<Client>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + CLIENT_TABLE;
+			_commandString = "SELECT * FROM " + CLIENT_TABLE + " ORDER BY " + LAST_NAME + ", " + FIRST_NAME;
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)

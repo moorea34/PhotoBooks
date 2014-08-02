@@ -17,6 +17,7 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 	private static final String BILL_ID = "BILL_ID";
 	private static final String PURCHASEPRICE = "PURCHASEPRICE";
 	private static final String AMOUNT = "AMOUNT";
+	private static final String ORDER = "IORDER";
 	
 	private ResultSet _resultSet;
 	private Statement _statement;
@@ -34,12 +35,12 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 	{
 		BillProduct billProduct = null;
 		ArrayList<BillProduct> billProducts = new ArrayList<BillProduct>();
-		int billProductId = 0, productId = 0, billId = 0, amount;
+		int billProductId = 0, productId = 0, billId = 0, amount, order = 0;
 		double purchasePrice = 0.0;
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + "";
+			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + " ORDER BY " + ORDER;
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
@@ -55,8 +56,9 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 				billId = _resultSet.getInt(BILL_ID);
 				purchasePrice = _resultSet.getDouble(PURCHASEPRICE);
 				amount = _resultSet.getInt(AMOUNT);
+				order = _resultSet.getInt(ORDER);
 				
-				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount);
+				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount, order);
 				billProduct.setID(billProductId);
 				billProducts.add(billProduct);
 			}
@@ -73,12 +75,12 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 	public BillProduct getByID(int id) 
 	{
 		BillProduct billProduct = null;
-		int productId = 0, billId = 0, amount = 0;
+		int productId = 0, billId = 0, amount = 0, order = 0;
 		double purchasePrice = 0.0;
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + " WHERE " + ID + " = " + id + "";
+			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + " WHERE " + ID + " = " + id + " ORDER BY " + ORDER;
 			_resultSet = _statement.executeQuery(_commandString);
 			
 			while (_resultSet.next())
@@ -87,8 +89,9 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 				billId = _resultSet.getInt(BILL_ID);
 				purchasePrice = _resultSet.getDouble(PURCHASEPRICE);
 				amount = _resultSet.getInt(AMOUNT);
+				order = _resultSet.getInt(ORDER);
 				
-				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount);
+				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount, order);
 				billProduct.setID(id);
 			}
 			_resultSet.close();
@@ -116,7 +119,7 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 					+ ", " + billId
 					+ ", " + newObj.getPrice()
 					+ ", " + newObj.getAmount()
-					+ "";
+					+ ", " + newObj.getOrder();
 			
 			_commandString = "INSERT INTO " + BILLPRODUCT_TABLE + " VALUES(" + values + ")";
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -132,6 +135,7 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 				{
 					id = _resultSet.getInt(1);
 				}
+				
 				newObj.setID(id);
 				_resultSet.close();
 			}
@@ -158,7 +162,8 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 					+ ", " + BILL_ID + " = " + billId
 					+ ", " + PURCHASEPRICE + " = " + obj.getPrice()
 					+ ", " + AMOUNT + " = " + obj.getAmount()
-					+ "";
+					+ ", " + ORDER + " = " + obj.getOrder();
+			
 			where = "WHERE " + ID + " = " + obj.getID();
 			
 			_commandString = "UPDATE " + BILLPRODUCT_TABLE + " SET " + values + " " + where;
@@ -173,7 +178,6 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 
 	public void delete(BillProduct obj) 
 	{
-
 		_dao.globalGateway().delete(BILLPRODUCT_TABLE, obj.getID());		
 	}
 
@@ -181,12 +185,12 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 	{
 		BillProduct billProduct = null;
 		ArrayList<BillProduct> billProducts = new ArrayList<BillProduct>();
-		int billProductId = 0, productId = 0, billId = 0, amount = 0;
+		int billProductId = 0, productId = 0, billId = 0, amount = 0, order = 0;
 		double purchasePrice = 0.0;
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + " WHERE " + BILL_ID + " = " + id + "";
+			_commandString = "SELECT * FROM " + BILLPRODUCT_TABLE + " WHERE " + BILL_ID + " = " + id + " ORDER BY " + ORDER;
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
@@ -202,9 +206,10 @@ public class BillProductGateway<T> implements IConditionalGateway<BillProduct>
 				billId = _resultSet.getInt(BILL_ID);
 				purchasePrice = _resultSet.getDouble(PURCHASEPRICE);
 				amount = _resultSet.getInt(AMOUNT);
+				order = _resultSet.getInt(ORDER);
 				
 				//cant set bill otherwise infinite loop will occur
-				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount);
+				billProduct = new BillProduct(_dao.productGateway().getByID(productId), billId, purchasePrice, amount, order);
 				billProduct.setID(billProductId);
 				billProducts.add(billProduct);
 			}

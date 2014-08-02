@@ -47,7 +47,7 @@ public class ProductPackageTest extends TestCase
 	{
 		Package productPackage;
 		
-		productPackage = new Package("Name", "Description", 12.34, new ArrayList<photobooks.objects.Product>());
+		productPackage = new Package("Name", "Description", 12.34, new ArrayList<photobooks.objects.ProductPackage>());
 		assertNotNull(productPackage);
 		assertTrue(productPackage.getName().equals("Name"));
 		assertTrue(productPackage.getDescription().equals("Description"));
@@ -66,7 +66,7 @@ public class ProductPackageTest extends TestCase
 		productPackage.setName("Name");
 		productPackage.setDescription("Description");
 		productPackage.setPrice(12.34);
-		productPackage.setProducts(new ArrayList<photobooks.objects.Product>());
+		productPackage.setProducts(new ArrayList<photobooks.objects.ProductPackage>());
 		
 		assertTrue(productPackage.getName().equals("Name"));
 		assertTrue(productPackage.getDescription().equals("Description"));

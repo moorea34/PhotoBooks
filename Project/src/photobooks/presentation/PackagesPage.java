@@ -5,11 +5,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -25,6 +27,7 @@ import photobooks.gateways.IDao;
 import photobooks.objects.Product;
 import photobooks.objects.ProductBase;
 import photobooks.objects.Package;
+import photobooks.objects.ProductPackage;
 
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -47,6 +50,8 @@ import acceptanceTests.Register;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 
 public class PackagesPage extends Composite
 {
@@ -63,6 +68,7 @@ public class PackagesPage extends Composite
 	private ListViewer addProdListViewer, rmProdListViewer, viewProdListViewer;
 	private List addProdList, removeProdList, viewProdList;
 	private int currSelectedID;
+	private Object selectedItem;
 	private String currSelectedType;
 	private boolean modifying = false;
 	private Button btnNewProduct;
@@ -71,6 +77,10 @@ public class PackagesPage extends Composite
 	private ViewerFilter prodFilterViewer;
 	
 	private PackageInfoEditor _packageInfo;
+	private Label lblAmount_1;
+	private Button btnMoveUp, btnMoveDown;
+	private Spinner nudAddAmount;
+	private Spinner nudRemoveAmount;
 	
 	public PackagesPage(Composite parent, int style, ProductPackageManager packageManager, ProductManager productManager) 
 	{
@@ -227,9 +237,11 @@ public class PackagesPage extends Composite
 						
 						if(selectedProduct != null)
 						{
-							Package p = _packageManager.getProductPackage(currSelectedID);
-							p.insertProduct(selectedProduct);
-							_packageManager.updateProductPackage(p);
+							Package p = (Package)selectedItem;//_packageManager.getProductPackage(currSelectedID);
+							int count = Integer.parseInt(nudAddAmount.getText());
+							
+							p.insertProduct(selectedProduct, count);
+							//_packageManager.updateProductPackage(p);
 							
 							setupRemoveProdListViewer(p);
 						}
@@ -247,6 +259,23 @@ public class PackagesPage extends Composite
 		fd_removeProductBox.right = new FormAttachment(_packageInfo, 0, SWT.RIGHT);
 		fd_removeProductBox.left = new FormAttachment(_packageInfo, 0, SWT.LEFT);
 		fd_removeProductBox.top = new FormAttachment(addProductBox, 6);
+		
+		Label lblAmount = new Label(addProductBox, SWT.NONE);
+		FormData fd_lblAmount = new FormData();
+		fd_lblAmount.bottom = new FormAttachment(addProdButton, -6);
+		fd_lblAmount.left = new FormAttachment(addProdList, 6);
+		lblAmount.setLayoutData(fd_lblAmount);
+		lblAmount.setText("Amount:");
+		
+		nudAddAmount = new Spinner(addProductBox, SWT.BORDER);
+		nudAddAmount.setEnabled(false);
+		nudAddAmount.setMaximum(1000000000);
+		nudAddAmount.setMinimum(1);
+		FormData fd_nudAddAmount = new FormData();
+		fd_nudAddAmount.bottom = new FormAttachment(addProdButton, -6);
+		fd_nudAddAmount.left = new FormAttachment(lblAmount, 6);
+		fd_nudAddAmount.right = new FormAttachment(addProdButton, 0, SWT.RIGHT);
+		nudAddAmount.setLayoutData(fd_nudAddAmount);
 		fd_removeProductBox.bottom = new FormAttachment(87, 0);
 		removeProductBox.setLayoutData(fd_removeProductBox);
 		removeProductBox.setText("Remove Products from Package");
@@ -307,14 +336,23 @@ public class PackagesPage extends Composite
 				if(currSelectedType.equals("Package"))
 				{
 						IStructuredSelection selection = (IStructuredSelection)rmProdListViewer.getSelection();
-						Product selectedProduct = (Product)selection.getFirstElement();
-						if(selectedProduct != null)
-						{			
-							Package p = _packageManager.getProductPackage(currSelectedID);
-							p.removeProduct(selectedProduct.getID());
-							_packageManager.updateProductPackage(p);
+						ProductPackage pp = (ProductPackage)selection.getFirstElement();
+						
+						if(pp != null)
+						{
+							Product selectedProduct = pp.getProduct();
 							
-							setupRemoveProdListViewer(p);
+							if (selectedProduct != null)
+							{
+								Package p = (Package)selectedItem;//_packageManager.getProductPackage(currSelectedID);
+								int count = Integer.parseInt(nudRemoveAmount.getText());
+							
+								p.removeProduct(selectedProduct.getID(), count);
+								//_packageManager.updateProductPackage(p);
+							
+								setupRemoveProdListViewer(p);
+								rmProdListViewer.setSelection(selection);
+							}
 						}
 					
 				}
@@ -324,6 +362,81 @@ public class PackagesPage extends Composite
 		
 		rmProdButton.setEnabled(false);
 		rmProdButton.setText("Remove Selected");
+		
+		lblAmount_1 = new Label(removeProductBox, SWT.NONE);
+		FormData fd_lblAmount_1 = new FormData();
+		fd_lblAmount_1.bottom = new FormAttachment(rmProdButton, -6);
+		fd_lblAmount_1.left = new FormAttachment(removeProdList, 6);
+		lblAmount_1.setLayoutData(fd_lblAmount_1);
+		lblAmount_1.setText("Amount:");
+		
+		nudRemoveAmount = new Spinner(removeProductBox, SWT.BORDER);
+		nudRemoveAmount.setEnabled(false);
+		nudRemoveAmount.setMaximum(1000000000);
+		nudRemoveAmount.setMinimum(1);
+		FormData fd_nudRemoveAmount = new FormData();
+		fd_nudRemoveAmount.bottom = new FormAttachment(rmProdButton, -6);
+		fd_nudRemoveAmount.left = new FormAttachment(lblAmount_1, 6);
+		fd_nudRemoveAmount.right = new FormAttachment(rmProdButton, 0, SWT.RIGHT);
+		nudRemoveAmount.setLayoutData(fd_nudRemoveAmount);
+		
+		btnMoveUp = new Button(removeProductBox, SWT.NONE);
+		btnMoveUp.setEnabled(false);
+		FormData fd_btnMoveUp = new FormData();
+		fd_btnMoveUp.height = 30;
+		fd_btnMoveUp.width = 30;
+		fd_btnMoveUp.top = new FormAttachment(removeProdList, 0, SWT.TOP);
+		fd_btnMoveUp.left = new FormAttachment(removeProdList, 6);
+		btnMoveUp.setLayoutData(fd_btnMoveUp);
+		btnMoveUp.setText("^");
+		btnMoveUp.addSelectionListener(new SelectionAdapter() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0) 
+			{
+				if (modifying && selectedItem != null && selectedItem instanceof Package) {
+					Package pack = (Package)selectedItem;
+					IStructuredSelection selection = (IStructuredSelection)rmProdListViewer.getSelection();
+					Product product = selection.isEmpty() ? null : ((ProductPackage)selection.getFirstElement()).getProduct();
+					
+					if (product != null) {
+						pack.moveUp(product.getID());
+						
+						setupRemoveProdListViewer(pack);
+						rmProdListViewer.setSelection(selection);
+					}
+				}
+			}
+		});
+		
+		btnMoveDown = new Button(removeProductBox, SWT.NONE);
+		btnMoveDown.setEnabled(false);
+		FormData fd_btnMoveDown = new FormData();
+		fd_btnMoveDown.height = 30;
+		fd_btnMoveDown.width = 30;
+		fd_btnMoveDown.top = new FormAttachment(btnMoveUp, 6);
+		fd_btnMoveDown.left = new FormAttachment(removeProdList, 6);
+		btnMoveDown.setLayoutData(fd_btnMoveDown);
+		btnMoveDown.setText("v");
+		btnMoveDown.addSelectionListener(new SelectionAdapter() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0) 
+			{
+				if (modifying && selectedItem != null && selectedItem instanceof Package) {
+					Package pack = (Package)selectedItem;
+					IStructuredSelection selection = (IStructuredSelection)rmProdListViewer.getSelection();
+					Product product = selection.isEmpty() ? null : ((ProductPackage)selection.getFirstElement()).getProduct();
+					
+					if (product != null) {
+						pack.moveDown(product.getID());
+						
+						setupRemoveProdListViewer(pack);
+						rmProdListViewer.setSelection(selection);
+					}
+				}
+			}
+		});
 		
 		removeButton = new Button(this, SWT.NONE);
 		FormData fd_removeButton = new FormData();
@@ -470,7 +583,12 @@ public class PackagesPage extends Composite
 
 			public String getText(Object element) 
 			{
-				return ((ProductBase) element).getName();
+				if (element instanceof ProductBase)
+					return ((ProductBase) element).getName();
+				else if (element instanceof ProductPackage)
+					return ((ProductPackage)element).getProduct().getName() + " x" + ((ProductPackage)element).getAmount();
+				
+				return null;
 			}
 
 			@Override
@@ -509,6 +627,7 @@ public class PackagesPage extends Composite
 			{
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 				Object selected = (Object)selection.getFirstElement();
+				
 				setLabels(selected);
 				select(selected);
 			}
@@ -520,17 +639,27 @@ public class PackagesPage extends Composite
 		    @Override
 		    public boolean select(Viewer viewer, Object parentElement, Object element) 
 		    {
-		    	if(packageSearch.getText().equals("") || packageSearch.getText().length() < 3)
+		    	String[] split;
+		    	
+		    	if(packageSearch.getText().trim().length() < 1)
 		    		return true;
+		    	
+		    	split = packageSearch.getText().trim().toLowerCase().split("\\|");
 		    	
 				if (element instanceof Package)
 				{
-					return ((Package) element).searchAll(packageSearch.getText().toLowerCase());
+					for (String str : split)
+					{
+						String s = str.trim();
+						
+						if (s.length() > 0 && ((Package) element).searchAll(s))
+							return true;
+					}
 				}
 				else 
-				{
 					return true;
-				}
+				
+				return false;
 		    }
 		};
 		
@@ -549,7 +678,11 @@ public class PackagesPage extends Composite
 			_packageInfo.descripBox.setEditable(modifying);
 			
 			addProdButton.setEnabled(modifying);
+			nudAddAmount.setEnabled(modifying);
 			rmProdButton.setEnabled(modifying);
+			nudRemoveAmount.setEnabled(modifying);
+			btnMoveUp.setEnabled(modifying);
+			btnMoveDown.setEnabled(modifying);
 			
 			if(modifying)
 			{
@@ -591,11 +724,12 @@ public class PackagesPage extends Composite
 				
 				if(currSelectedType.equals("Package"))
 				{
+					((Package)_selected).setProducts(((Package)selectedItem).getProducts());
+					
 					_packageManager.updateProductPackage((Package)_selected);
 				}
 				else
 				{
-
 					_productManager.updateProduct((Product)_selected);
 				}
 				
@@ -673,6 +807,11 @@ public class PackagesPage extends Composite
 		
 		if(selected != null)
 		{
+			selectedItem = selected;
+			
+			if (selected instanceof ProductPackage)
+				selected = ((ProductPackage)selected).getProduct();
+			
 			System.out.println("Selected " + selected.getClass().getSimpleName() + " id: " + ((ProductBase)selected).getID());
 			_packageInfo.nameBox.setText(((ProductBase)selected).getName());
 			_packageInfo.descripBox.setText(((ProductBase)selected).getDescription());
@@ -687,8 +826,9 @@ public class PackagesPage extends Composite
 		{
 			currSelectedType = "";
 			currSelectedID = -1;
+			
+			selectedItem = selected;
 		}
-		
 	}
 	
 	private void clearValues() 
@@ -765,6 +905,7 @@ public class PackagesPage extends Composite
 			{
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 				Object selected = (Object)selection.getFirstElement();
+				
 				setLabels(selected);
 				select(selected);
 			}
@@ -776,13 +917,20 @@ public class PackagesPage extends Composite
 		    @Override
 		    public boolean select(Viewer viewer, Object parentElement, Object element) 
 		    {
-		    	if(packageSearch.getText().equals("") || packageSearch.getText().length() < 3)
+		    	String[] split;
+		    	
+		    	if(packageSearch.getText().trim().length() < 1)
 		    		return true;
 		    	
-		        if (((Product) element).searchAll(packageSearch.getText().toLowerCase()))
-		        {
-		            return true;
-		        }
+		    	split = packageSearch.getText().trim().toLowerCase().split("\\|");
+		    	
+		    	for (String str : split)
+		    	{
+		    		String s = str.trim();
+		    		
+		    		if (s.length() > 0 && ((Product) element).searchAll(s))
+		    			return true;
+		    	}
 		        
 		        return false;
 		    }
@@ -793,6 +941,8 @@ public class PackagesPage extends Composite
 
 	private void setLabels(Object item)
 	{
+		if (item instanceof ProductPackage)
+			item = ((ProductPackage)item).getProduct();
 		
 		if(item instanceof Product)
 		{
@@ -817,6 +967,8 @@ public class PackagesPage extends Composite
 
 	private void setupRemoveProdListViewer(final Package selected) 
 	{
+		ISelection selection = rmProdListViewer.getSelection();
+		
 		rmProdListViewer.setContentProvider(new IStructuredContentProvider() 
 		{
 			public Object[] getElements(Object clients) 
@@ -836,14 +988,17 @@ public class PackagesPage extends Composite
 
 		rmProdListViewer.setInput(selected);
 
-		rmProdListViewer.setLabelProvider(new LabelProvider() 
+		rmProdListViewer.setLabelProvider(new LabelProvider()
 		{
 
 			public String getText(Object element) 
 			{
-				return ((Product) element).getName();
+				ProductPackage product = (ProductPackage)element;
+				
+				return product.getProduct().getName() + " x" + product.getAmount();
 			}
 		});
 		
+		rmProdListViewer.setSelection(selection);
 	}
 }

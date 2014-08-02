@@ -106,4 +106,7 @@ public class Payment extends DBObject implements ITransaction
 		return total();
 	}
 
+	public boolean searchAll(String lowerCase) {
+		return getDisplayName().toLowerCase().contains(lowerCase) || _description.toLowerCase().contains(lowerCase);
+	}
 }

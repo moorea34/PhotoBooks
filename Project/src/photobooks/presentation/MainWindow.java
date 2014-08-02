@@ -55,7 +55,7 @@ public class MainWindow {
 
 		_dao = Globals.getDao();
 		_eventManager = new EventManager( this, _dao.eventGateway() );
-		_clientManager = new ClientManager( _dao.clientGateway(), _eventManager );
+		_clientManager = new ClientManager( _dao, _eventManager );
 		_billManager = new BillManager(_dao);
 		_paymentManager = new PaymentManager(_dao.paymentGateway());
 		

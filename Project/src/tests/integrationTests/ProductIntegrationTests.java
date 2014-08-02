@@ -156,40 +156,4 @@ public class ProductIntegrationTests extends TestCase
 		packages = new ArrayList<Package>( _productPackageManager.getProductPackageList() );
 		assertTrue( packages.size() == 2 );
 	}
-	
-	public void test_ProductsAndPackages()
-	{
-		Product product1 = new Product();
-		Product product2 = new Product();
-		Product product3 = new Product();
-		
-		product1.setID( PRODUCT_ID );
-		product2.setID( PRODUCT_ID + 1 );
-		product3.setID( PRODUCT_ID + 2 );
-		
-		ArrayList<Product> products = new ArrayList<Product>();
-		
-		Package package1 = new Package();
-		
-		products.add(product1);
-		products.add(product2);
-		package1.setProducts(products);
-		ArrayList<Product> test = package1.getProducts();
-		assertTrue( test.size() == 2 );
-		assertTrue( test.get(0).equals( product1 ) );
-		assertTrue( test.get(1).equals( product2 ) );
-		
-		package1.insertProduct( product3 );
-		test = package1.getProducts();
-		assertTrue( test.size() == 3 );
-		assertTrue( test.get(0).equals( product1 ) );
-		assertTrue( test.get(1).equals( product2 ) );
-		assertTrue( test.get(2).equals( product3 ) );
-		
-		package1.removeProduct( product2.getID() );
-		test = package1.getProducts();
-		assertTrue( test.size() == 2 );
-		assertTrue( test.get(0).equals( product1 ) );
-		assertTrue( test.get(1).equals( product3 ) );		
-	}
 }

@@ -165,7 +165,7 @@ public class Bill extends DBObject implements ITransaction
 	
 	public double getTaxes()
 	{
-		double _total =  total();
+		double _total =  subtotal();
 		
 		return (_total * _gst) + (_total * _pst);
 	}
@@ -208,7 +208,7 @@ public class Bill extends DBObject implements ITransaction
 		}
 	}
 	
-	public double total()
+	public double subtotal()
 	{
 		double sum = 0;
 		
@@ -225,12 +225,17 @@ public class Bill extends DBObject implements ITransaction
 		return sum;
 	}
 	
+	public double total()
+	{
+		return subtotal() + getTaxes();
+	}
+	
 	public double affectToBalance()
 	{
 		switch (_type)
 		{
 			case Invoice:
-				return -total();
+				return totalPayments() - total();
 			default://Quote
 				return 0;
 		}
@@ -247,5 +252,9 @@ public class Bill extends DBObject implements ITransaction
 		}
 		
 		return sum;
+	}
+	
+	public boolean searchAll(String lowerCase) {
+		return getDisplayName().toLowerCase().contains(lowerCase) || _description.toLowerCase().contains(lowerCase);
 	}
 }

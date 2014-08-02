@@ -12,7 +12,7 @@ public class StubDao implements IDao
 	public IGateway<Client> _clientGateway = new StubGateway<Client>();
 	public IGateway<Product> _productGateway = new StubGateway<Product>();
 	public IGateway<Package> _packageGateway = new StubGateway<Package>();
-	public IGateway<Bill> _billGateway = new StubGateway<Bill>();
+	public IConditionalGateway<Bill> _billGateway = new StubConditionalGateway<Bill>();
 	public IGateway<Event> _eventGateway = new StubGateway<Event>();
 	public IConditionalGateway<Payment> _paymentGateway = new StubConditionalGateway<Payment>();
 	public IConditionalGateway<PhoneNumber> _phoneNumberGateway = new StubConditionalGateway<PhoneNumber>();
@@ -60,7 +60,7 @@ public class StubDao implements IDao
 		return _packageGateway;
 	}
 
-	public IGateway<Bill> billGateway()
+	public IConditionalGateway<Bill> billGateway()
 	{
 		return _billGateway;
 	}

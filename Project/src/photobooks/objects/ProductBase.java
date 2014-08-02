@@ -86,9 +86,9 @@ public class ProductBase extends DBObject
 		this._totalPurchased--;
 	}
 
-	public boolean searchAll(String lowerCase) 
+	public boolean searchAll(String lowerCase)
 	{
-		if(_name.contains(lowerCase) || _description.contains(lowerCase))
+		if(_name.toLowerCase().contains(lowerCase) || _description.toLowerCase().contains(lowerCase))
 			return true;
 		
 		return false;
