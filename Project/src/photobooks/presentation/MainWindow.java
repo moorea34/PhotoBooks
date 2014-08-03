@@ -73,10 +73,13 @@ public class MainWindow {
 
 	public void open() {
 		Display display = Display.getDefault();
-		createContents();		
+		
+		createContents();	
+		
 		shell.open();
 		shell.layout();
-		_eventManager.checkForEvents( _clientManager );
+		
+		//_eventManager.checkForEvents( _clientManager );
 		
 		if(EventLoop.isEnabled())
 		{
@@ -130,7 +133,7 @@ public class MainWindow {
 	    });
 	    exit.setText("Exit");
 	    
-	    setupEventMenu( menuBar );
+	    //setupEventMenu( menuBar );
 	    setupProductMenu( menuBar );
 	    setupPackageMenu( menuBar );
 

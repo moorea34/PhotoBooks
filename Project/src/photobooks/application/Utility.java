@@ -163,6 +163,21 @@ public class Utility {
 		return years;
 	}
 	
+	public static String getOsName() {
+		String name = null;
+		
+		try
+		{
+			name = System.getProperty("os.name");
+		}
+		catch (Exception ex)
+		{
+			System.out.println("Error getting OS name: " + ex.toString());
+		}
+		
+		return name;
+	}
+	
 	public static DecimalFormat getMoneyFormatter() { return moneyFormat; }
 	
 	public static String formatDate(Calendar calendar)
@@ -224,11 +239,11 @@ public class Utility {
 		
 		fileDialog.setText("Save");
 		
-		fileDialog.setFilterNames(new String[] { "Html Files" });
-		fileDialog.setFilterExtensions(new String[] { "*.html" });
+		fileDialog.setFilterNames(new String[] { "PDF Files" });
+		fileDialog.setFilterExtensions(new String[] { "*.pdf" });
 		
 		if (defaultName != null)
-			fileDialog.setFileName(defaultName + ".html");
+			fileDialog.setFileName(defaultName + ".pdf");
 		
 		return fileDialog.open();
 	}

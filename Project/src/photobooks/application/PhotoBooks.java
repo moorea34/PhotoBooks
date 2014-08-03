@@ -6,6 +6,7 @@ public class PhotoBooks
 {
 	public static void main(String[] args)
 	{
+		Globals.loadSettings();
 		
 		new MainWindow();
 		
