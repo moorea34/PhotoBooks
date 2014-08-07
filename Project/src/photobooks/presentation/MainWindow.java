@@ -45,8 +45,8 @@ public class MainWindow {
 	
 	final private String PRODUCT_TYPE = "Product";
 	final private String PACKAGE_TYPE = "Package";
-	private MenuItem fileItem, exit, eventItem, checkForEventsItem;
-	private MenuItem manageEvents;
+	private MenuItem fileItem, exit;
+	//private MenuItem manageEvents, eventItem, checkForEventsItem;
 
 	public MainWindow() 
 	{
@@ -168,7 +168,7 @@ public class MainWindow {
 		Utility.centerScreen(shell);
 	}
 
-	private void setupEventMenu( Menu menuBar )
+	/*private void setupEventMenu( Menu menuBar )
 	{
 	    Menu eventMenu = new Menu(menuBar);
 	    
@@ -207,7 +207,7 @@ public class MainWindow {
 	    	}
 	    });
 	    
-	}
+	}*/
 	
 	private void setupProductMenu( Menu menuBar )
 	{

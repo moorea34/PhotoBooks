@@ -689,7 +689,7 @@ public class BillsPage extends Composite {
 		}
 	}
 	
-	private TreeItem getClientFromTree(int id)
+	/*private TreeItem getClientFromTree(int id)
 	{
 		for (TreeItem item : treeViewer.getTree().getItems())
 		{
@@ -700,7 +700,7 @@ public class BillsPage extends Composite {
 		}
 		
 		return null;
-	}
+	}*/
 	
 	public void updateClientCB() {
 		refresh();

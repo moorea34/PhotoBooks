@@ -1,8 +1,5 @@
 package photobooks.presentation;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -14,8 +11,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -36,7 +31,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import photobooks.application.Globals;
 import photobooks.application.Utility;
 import photobooks.business.ClientManager;
-import photobooks.business.HtmlGenerator;
 import photobooks.business.InvoiceExporter;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
@@ -591,13 +585,13 @@ public class BillEditor extends Composite {
 			{
 				if (_bill != null)
 				{
-					String line;
+					//String line;
 					//String html = HtmlGenerator.createBill(_bill);
 					String fileName = Utility.getSaveLoc(shell, String.format("%s %s %s %d", _bill.getClient().getLastName(), _bill.getClient().getFirstName(), _bill.getType().toString(), _bill.getID()));
 					
 					if (fileName != null)
 					{
-						String directory;
+						/*String directory;
 						int index = fileName.lastIndexOf('\\');
 						int index2 = fileName.lastIndexOf('/');
 						
@@ -607,7 +601,7 @@ public class BillEditor extends Composite {
 						if (index < 0)
 							directory = "";
 						else
-							directory = fileName.substring(0, index + 1);
+							directory = fileName.substring(0, index + 1);*/
 						
 						try
 						{

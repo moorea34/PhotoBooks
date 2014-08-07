@@ -54,7 +54,7 @@ public class InvoiceExporter {
 		bannerY = pageHeight - (bannerHeight + margin);
 		
 		PDFont font = PDFHelper.loadFont(document, "Arial.ttf");
-		PDFont fontBd = PDFHelper.loadFont(document, "Arialbd.ttf");
+		//PDFont fontBd = PDFHelper.loadFont(document, "Arialbd.ttf");
 		
 		dateWidth = font.getStringWidth(date) / 1000.0f;
 		

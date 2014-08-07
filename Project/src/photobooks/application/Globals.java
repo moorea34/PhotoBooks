@@ -16,6 +16,7 @@ public class Globals
 	private static final String settingsFileName = "settings.txt";
 	
 	private static IDao dao = new Dao();
+	
 	private static double _gst = 0.12;
 	private static double _pst = 0.10;
 	
@@ -60,15 +61,10 @@ public class Globals
 					name = split[0].trim().toLowerCase();
 					value = split[1].trim();
 					
-					switch (name)
-					{
-						case "gst":
-							_gst = Double.parseDouble(value);
-							break;
-						case "pst":
-							_pst = Double.parseDouble(value);
-							break;
-					}
+					if (name.equals("gst"))
+						_gst = Double.parseDouble(value);
+					else if (name.equals("pst"))
+						_pst = Double.parseDouble(value);
 				}
 				
 				line = fileIn.readLine();

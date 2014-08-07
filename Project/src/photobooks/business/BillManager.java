@@ -7,7 +7,6 @@ import photobooks.objects.ITransaction.TransactionType;
 import photobooks.objects.Product;
 import photobooks.gateways.IConditionalGateway;
 import photobooks.gateways.IDao;
-import photobooks.gateways.IGateway;
 
 import java.util.ArrayList;
 import java.util.Collection;

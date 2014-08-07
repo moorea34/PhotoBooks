@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import photobooks.objects.Package;
-import photobooks.objects.Product;
 import photobooks.objects.ProductPackage;
 
 public class PackageGateway<T> implements IGateway<Package> 
 {
 	//table 
 	private static final String PACKAGE_TABLE = "PACKAGE";
-	private static final String PRODUCT_PACKAGE_TABLE = "PRODUCTPACKAGE";
+	//private static final String PRODUCT_PACKAGE_TABLE = "PRODUCTPACKAGE";
 	//columns
 	//shared 
 	private static final String ID = "ID";
@@ -23,15 +22,15 @@ public class PackageGateway<T> implements IGateway<Package>
 	private static final String PRICE = "PRICE";
 	private static final String TOTAL_PURCHASED = "TOTALPURCHASED";
 	//product package table
-	private static final String PRODUCT_ID = "PRODUCT_ID";
-	private static final String PACKAGE_ID = "PACKAGE_ID";
+	//private static final String PRODUCT_ID = "PRODUCT_ID";
+	//private static final String PACKAGE_ID = "PACKAGE_ID";
 	
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
-	private ResultSet _resultSet2;
+	//private ResultSet _resultSet2;
 	private Statement _statement;
-	private Statement _statement2;
-	private Statement _statement3;
+	//private Statement _statement2;
+	//private Statement _statement3;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
@@ -42,8 +41,8 @@ public class PackageGateway<T> implements IGateway<Package>
 	{
 		_dao = dao;
 		_statement = _dao.getStatement();
-		_statement2 = _dao.getStatement();
-		_statement3 = _dao.getStatement();
+		//_statement2 = _dao.getStatement();
+		//_statement3 = _dao.getStatement();
 		
 		_productPackageGateway = new ProductPackageGateway(dao);
 	}
@@ -53,10 +52,10 @@ public class PackageGateway<T> implements IGateway<Package>
 		Package newPackage = null;
 		ArrayList<Package> packages = new ArrayList<Package>();
 		ArrayList<ProductPackage> productPackages;
-		int id = 0, totalPurchased = 0, productId = 0;
+		int id = 0, totalPurchased = 0;//, productId = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
-		ArrayList<Product> products = null;
+		//ArrayList<Product> products = null;
 		
 		try
 		{
@@ -106,10 +105,10 @@ public class PackageGateway<T> implements IGateway<Package>
 	{
 		Package newPackage = null;
 		ArrayList<ProductPackage> productPackages;
-		int totalPurchased = 0, productId = 0;
+		int totalPurchased = 0;//, productId = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
-		ArrayList<Product> products = null;
+		//ArrayList<Product> products = null;
 		
 		try
 		{
@@ -148,7 +147,7 @@ public class PackageGateway<T> implements IGateway<Package>
 
 	public boolean add(Package newObj) 
 	{
-		String values = null, values2 = null;
+		String values = null;//, values2 = null;
 		int id = 0;
 		ArrayList<ProductPackage> products = null;
 		boolean result = false;
@@ -196,7 +195,7 @@ public class PackageGateway<T> implements IGateway<Package>
 
 	public void update(Package obj) 
 	{
-		String values = null, values2 = null, where = null;
+		String values = null, where = null;
 		ArrayList<ProductPackage> newProducts = null, oldProducts = null;
 		boolean result = false;
 		

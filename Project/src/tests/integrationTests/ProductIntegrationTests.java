@@ -21,7 +21,7 @@ public class ProductIntegrationTests extends TestCase
 	private final String PRODUCT_DESCRIPTION = "Some product description";
 	private final Double PRODUCT_PRICE = 3.14;
 	private final Double NEW_PRICE = 4.23;
-	private final int PRODUCT_ID = 4;
+	//private final int PRODUCT_ID = 4;
 
 	public void tearDown()
 	{

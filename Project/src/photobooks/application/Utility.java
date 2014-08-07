@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Hashtable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
@@ -22,52 +23,35 @@ public class Utility {
 	private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 	
 	public static final int YEAR_CONST = 1940;
-	private static final String[] MONTHS = {
-		"January",
-		"February",
-		"March",
-		"April",
-		"May",
-		"June",
-		"July",	
-		"August",
-		"September",
-		"October",
-		"November",
-		"December"
-		};
+	private static final String[] MONTHS = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	private static final String[] DAYSOFWEEK = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+	private static Hashtable<String, Integer> _monthMap = null;
+	private static final Object lock = new Object();
 	
 	public static int stringToMonth(String month)
 	{
 		int result = -1;
+		Integer value = null;
 		
-		switch (month.toLowerCase().trim())
+		if (_monthMap == null)
 		{
-			case "january": result = 0;
-				break;
-			case "february": result = 1;
-				break;
-			case "march": result = 2;
-				break;
-			case "april": result = 3;
-				break;
-			case "may": result = 4;
-				break;
-			case "june": result = 5;
-				break;
-			case "july": result = 6;
-				break;
-			case "august": result = 7;
-				break;
-			case "september": result = 8;
-				break;
-			case "october": result = 9;
-				break;
-			case "november": result = 10;
-				break;
-			case "december": result = 11;
-				break;
+			synchronized (lock) {
+				if (_monthMap == null)
+				{
+					_monthMap = new Hashtable<String, Integer>();
+					
+					for (int i = 0; i < MONTHS.length; ++i)
+					{
+						_monthMap.put(MONTHS[i].trim().toLowerCase(), i);
+					}
+				}
+			}
 		}
+		
+		value = _monthMap.get(month.trim().toLowerCase());
+		
+		if (value != null)
+			result = value;
 		
 		return result;
 	}
@@ -76,33 +60,8 @@ public class Utility {
 	{
 		String result = "";
 		
-		switch (dayOfMonth)
-		{
-			case 0: result = "January";
-					break;
-			case 1: result = "February";
-					break;
-			case 2: result = "March";
-					break;
-			case 3: result = "April";
-					break;
-			case 4: result = "May";
-					break;
-			case 5: result = "June";
-					break;
-			case 6: result = "July";
-					break;
-			case 7: result = "August";
-					break;
-			case 8: result = "September";
-					break;
-			case 9: result = "October";
-					break;
-			case 10:result = "November";
-					break;
-			case 11:result = "December";
-					break;
-		}
+		if (dayOfMonth < MONTHS.length && dayOfMonth >= 0)
+			result = MONTHS[dayOfMonth];
 		
 		return result;
 	}
@@ -111,23 +70,8 @@ public class Utility {
 	{
 		String result = "";
 		
-		switch (dayOfWeek)
-		{
-			case 1: result = "Sunday";
-					break;
-			case 2: result = "Monday";
-					break;
-			case 3: result = "Tuesday";
-					break;
-			case 4: result = "Wednesday";
-					break;
-			case 5: result = "Thursday";
-					break;
-			case 6: result = "Friday";
-					break;
-			case 7: result = "Saturday";
-					break;
-		}
+		if (dayOfWeek < 7 && dayOfWeek > 0)
+			result = DAYSOFWEEK[dayOfWeek - 1];
 		
 		return result;
 	}
