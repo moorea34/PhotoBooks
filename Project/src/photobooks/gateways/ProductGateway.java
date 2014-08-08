@@ -16,7 +16,6 @@ public class ProductGateway<T> implements IGateway<Product>
 	private static final String NAME = "NAME";
 	private static final String DESCRIPTION = "DESCRIPTION";
 	private static final String PRICE = "PRICE";
-	private static final String TOTAL_PURCHASED = "TOTALPURCHASED";
 	
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
@@ -35,7 +34,7 @@ public class ProductGateway<T> implements IGateway<Product>
 	{
 		Product product = null;
 		ArrayList<Product> products = new ArrayList<Product>();
-		int id = 0, totalPurchased = 0;
+		int id = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
 		
@@ -56,9 +55,8 @@ public class ProductGateway<T> implements IGateway<Product>
 				name = _resultSet.getString(NAME);
 				description = _resultSet.getString(DESCRIPTION);
 				price = _resultSet.getDouble(PRICE);
-				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
 				
-				product = new Product(name, description, price, totalPurchased);
+				product = new Product(name, description, price);
 				product.setID(id);
 				products.add(product);
 			}
@@ -75,7 +73,6 @@ public class ProductGateway<T> implements IGateway<Product>
 	public Product getByID(int id) 
 	{
 		Product product = null;
-		int totalPurchased = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
 		
@@ -90,9 +87,8 @@ public class ProductGateway<T> implements IGateway<Product>
 				name = _resultSet.getString(NAME);
 				description = _resultSet.getString(DESCRIPTION);
 				price = _resultSet.getDouble(PRICE);
-				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
 				
-				product = new Product(name, description, price, totalPurchased);
+				product = new Product(name, description, price);
 				product.setID(id);
 			}
 			_resultSet.close();
@@ -115,8 +111,7 @@ public class ProductGateway<T> implements IGateway<Product>
 		{
 			values = "NULL, '" + newObj.getName() 
 					+ "', '" + newObj.getDescription()
-					+ "', " + newObj.getPrice()
-					+ ", " + newObj.getTotalPurchased();
+					+ "', " + newObj.getPrice();
 			
 			_commandString = "INSERT INTO " + PRODUCT_TABLE + " VALUES(" + values +")";
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -152,8 +147,8 @@ public class ProductGateway<T> implements IGateway<Product>
 		{
 			values = NAME + " = '" + obj.getName() 
 					+ "', " + DESCRIPTION + " = '" + obj.getDescription()
-					+ "', " + PRICE + " = " + obj.getPrice()
-					+ ", " + TOTAL_PURCHASED +  " = " + obj.getTotalPurchased() + "";
+					+ "', " + PRICE + " = " + obj.getPrice();
+			
 			where = "WHERE " + ID + " = " + obj.getID();
 			
 			_commandString = "UPDATE " + PRODUCT_TABLE + " SET " + values + " " + where;
@@ -166,8 +161,7 @@ public class ProductGateway<T> implements IGateway<Product>
 	}
 
 	public void delete(Product obj) 
-	{		
-
+	{
 		_dao.globalGateway().delete(PRODUCT_TABLE, obj.getID());				
 	}
 

@@ -2,6 +2,7 @@ package photobooks.gateways;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -10,17 +11,15 @@ import java.util.Collection;
 
 import photobooks.objects.Event;
 
-public class EventGateway<T> implements IConditionalGateway<Event>
+public class EventGateway<T> implements IGateway<Event>
 {
 	// table
 	private static final String EVENT_TABLE = "EVENT";
 	// columns
 	private static final String ID = "ID";
-	private static final String CLIENT_ID = "CLIENT_ID";
 	private static final String DATE = "DATE";
-	private static final String EVENTTYPE_ID = "EVENTTYPE_ID";
+	private static final String DESCRIPTION = "DESCRIPTION";
 	
-	private static String EOF = "  ";
 	private ResultSet _resultSet;
 	private Statement _statement;
 	private IDao _dao;
@@ -32,45 +31,51 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 		_dao = dao;
 		_statement = dao.getStatement();
 	}
-
-	public Collection<Event> getAll() 
+	
+	private Event resultSetToEvent(ResultSet results) throws SQLException
 	{
 		Event event = null;
-		ArrayList<Event> events = new ArrayList<Event>();
-		int eventId = 0, typeId = 0, clientId = 0;
-		String typeValue = EOF;
+		int eventId = 0;
+		String description;
 		Calendar dateValue = null;
 		Timestamp tempDate;
 		
+		eventId = _resultSet.getInt(ID);
+		description = _resultSet.getString(DESCRIPTION);
+		tempDate = _resultSet.getTimestamp(DATE);
+		
+		if (tempDate != null) {
+			dateValue = Calendar.getInstance();
+			dateValue.setTimeInMillis(tempDate.getTime());
+			dateValue = (Calendar)dateValue.clone();
+		}
+		
+		event = new Event(dateValue, description, eventId);
+		
+		return event;
+	}
+
+	public Collection<Event> getAll() 
+	{
+		ArrayList<Event> events = new ArrayList<Event>();
+		
 		try
 		{
-			_commandString = "SELECT * FROM " + EVENT_TABLE  + "";
+			_commandString = "SELECT * FROM " + EVENT_TABLE + " ORDER BY " + DATE + " DESC";
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)
 		{
 			_dao.processSQLError(e);
 		}
+		
 		try
 		{
 			while (_resultSet.next())
 			{
-				eventId = _resultSet.getInt(ID);
-				clientId = _resultSet.getInt(CLIENT_ID);
-				tempDate = _resultSet.getTimestamp(DATE);
-				if (tempDate != null) {
-					dateValue = Calendar.getInstance();
-					dateValue.setTimeInMillis(tempDate.getTime());
-				}
-				typeId = _resultSet.getInt(EVENTTYPE_ID);
-				typeValue = _dao.typeGateway().getById(EVENT_TABLE, typeId);	
-				
-				event = new Event(Event.EventType.valueOf(typeValue), (dateValue != null) ? (Calendar) dateValue.clone() : null, clientId);
-				event.setID(eventId);
-				events.add(event);
-				
-				dateValue = null;
+				events.add(resultSetToEvent(_resultSet));
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -84,32 +89,17 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 	public Event getByID(int id) 
 	{
 		Event event = null;
-		int eventId = 0, typeId = 0;
-		String typeValue = EOF;
-		Calendar dateValue = null;
-		Timestamp tempDate;
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + EVENT_TABLE + " WHERE " + CLIENT_ID + " = " + id + "";
+			_commandString = "SELECT * FROM " + EVENT_TABLE + " WHERE " + ID + " = " + id;
 			_resultSet = _statement.executeQuery(_commandString);
 	
 			while (_resultSet.next())
 			{
-				eventId = _resultSet.getInt(ID);
-				tempDate = _resultSet.getTimestamp(DATE);
-				if (tempDate != null) {
-					dateValue = Calendar.getInstance();
-					dateValue.setTimeInMillis(tempDate.getTime());
-				}
-				typeId = _resultSet.getInt(EVENTTYPE_ID);
-				typeValue = _dao.typeGateway().getById(EVENT_TABLE, typeId);	
-				
-				event = new Event(Event.EventType.valueOf(typeValue), (dateValue != null) ? (Calendar) dateValue.clone() : null, id);
-				event.setID(eventId);
-				
-				dateValue = null;
+				event = resultSetToEvent(_resultSet);
 			}
+			
 			_resultSet.close();
 		}
 		catch (Exception e)
@@ -123,24 +113,24 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 	public boolean add(Event newObj) 
 	{		
 		String values = null;
-		int id = 0, typeId = 0;
+		int id = 0;
 		Date date = null;
 		boolean result = false;
 		
 		try
 		{
-			typeId = _dao.typeGateway().getByType(EVENT_TABLE, newObj.getType().toString());
 			date = newObj.getDate() != null ? new Date(newObj.getDate().getTime().getTime()) : null;
 			
-			values = "NULL, " + newObj.getClientID() 
-					+ "";
+			values = "NULL";
+			
 			if (date != null)
 				values += ", '" + date.toString() + "'";
 			else
 				values += ", NULL";
-			values += ", " + typeId + "";
 			
-			_commandString = "INSERT INTO " + EVENT_TABLE + " VALUES(" + values + ")";
+			values += ", '" + newObj.getDescription() + "'";
+			
+			_commandString = String.format("INSERT INTO %s VALUES(%s)", EVENT_TABLE, values);
 			_updateCount = _statement.executeUpdate(_commandString);
 			result = _dao.checkWarning(_statement, _updateCount);
 			
@@ -154,6 +144,7 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 				{
 					id = _resultSet.getInt(1);
 				}
+				
 				newObj.setID(id);
 				_resultSet.close();
 			}
@@ -170,24 +161,22 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 	public void update(Event obj) 
 	{
 		String values = null, where = null;
-		int typeId = 0;
 		Date date = null;
 		
 		try
 		{
-			typeId = _dao.typeGateway().getByType(EVENT_TABLE, obj.getType().toString());
 			date = obj.getDate() != null ? new Date(obj.getDate().getTime().getTime()) : null;
 			
-			values = CLIENT_ID + " = " + obj.getClientID() 
-					+ "";
 			if (date != null)
-				values += ", " + DATE + " = '" + date.toString() + "'";
+				values = DATE + " = '" + date.toString() + "'";
 			else
-				values += ", " + DATE + " = NULL";
-			values += ", " + EVENTTYPE_ID + " = " + typeId
-					+ "";	
-			where = "WHERE " + ID + " = " + obj.getID();
-			_commandString = "UPDATE " + EVENT_TABLE + " SET " + values + " " + where;
+				values = DATE + " = NULL";
+			
+			values += ", " + DESCRIPTION + " = '" + obj.getDescription() + "'";
+			
+			where = String.format("%s = %d", ID, obj.getID());
+			
+			_commandString = String.format("UPDATE %s SET %s WHERE %s", EVENT_TABLE, values, where);
 			_updateCount = _statement.executeUpdate(_commandString);			
 		}
 		catch (Exception e)
@@ -198,55 +187,6 @@ public class EventGateway<T> implements IConditionalGateway<Event>
 
 	public void delete(Event obj) 
 	{		
-
 		_dao.globalGateway().delete(EVENT_TABLE, obj.getID());		
 	}
-
-	public Collection<Event> getAllWithId(int id) 
-	{
-		Event event = null;
-		ArrayList<Event> events = new ArrayList<Event>();
-		int eventId = 0, typeId = 0;
-		String typeValue = EOF;
-		Calendar dateValue = null;
-		Timestamp tempDate;
-		
-		try
-		{
-			_commandString = "SELECT * FROM " + EVENT_TABLE + " WHERE " + CLIENT_ID + " = " + id + "";
-			_resultSet = _statement.executeQuery(_commandString);
-		}
-		catch (Exception e)
-		{
-			_dao.processSQLError(e);
-		}
-		try
-		{
-			while (_resultSet.next())
-			{
-				eventId = _resultSet.getInt(ID);
-				tempDate = _resultSet.getTimestamp(DATE);
-				if (tempDate != null) {
-					dateValue = Calendar.getInstance();
-					dateValue.setTimeInMillis(tempDate.getTime());
-				}
-				typeId = _resultSet.getInt(EVENTTYPE_ID);
-				typeValue = _dao.typeGateway().getById(EVENT_TABLE, typeId);	
-				
-				event = new Event(Event.EventType.valueOf(typeValue), (dateValue != null) ? (Calendar) dateValue.clone() : null, id);
-				event.setID(eventId);
-				events.add(event);
-				
-				dateValue = null;
-			}
-			_resultSet.close();
-		}
-		catch (Exception e)
-		{
-			_dao.processSQLError(e);
-		}
-		
-		return events;
-	}
-
 }

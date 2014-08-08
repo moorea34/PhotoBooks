@@ -8,7 +8,6 @@ import photobooks.gateways.*;
 import photobooks.objects.*;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 import junit.framework.TestCase;
-import static org.mockito.Mockito.*;
 
 public class ClientManagerTest extends TestCase
 {
@@ -23,8 +22,7 @@ public class ClientManagerTest extends TestCase
 	public void setUp()
 	{
 		IGateway<Client> stubGateway = new StubGateway<Client>();
-		EventManager eventManager = mock( EventManager.class );
-		_clientManager = new ClientManager( stubGateway, eventManager );
+		_clientManager = new ClientManager(stubGateway);
 		
 		clearStubDB();
 	}

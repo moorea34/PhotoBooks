@@ -20,7 +20,6 @@ public class PackageGateway<T> implements IGateway<Package>
 	private static final String NAME = "NAME";
 	private static final String DESCRIPTION = "DESCRIPTION";
 	private static final String PRICE = "PRICE";
-	private static final String TOTAL_PURCHASED = "TOTALPURCHASED";
 	//product package table
 	//private static final String PRODUCT_ID = "PRODUCT_ID";
 	//private static final String PACKAGE_ID = "PACKAGE_ID";
@@ -52,7 +51,7 @@ public class PackageGateway<T> implements IGateway<Package>
 		Package newPackage = null;
 		ArrayList<Package> packages = new ArrayList<Package>();
 		ArrayList<ProductPackage> productPackages;
-		int id = 0, totalPurchased = 0;//, productId = 0;
+		int id = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
 		//ArrayList<Product> products = null;
@@ -74,7 +73,6 @@ public class PackageGateway<T> implements IGateway<Package>
 				name = _resultSet.getString(NAME);
 				description = _resultSet.getString(DESCRIPTION);
 				price = _resultSet.getDouble(PRICE);
-				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
 
 				productPackages = _productPackageGateway.getByPackageID(id);
 				
@@ -85,7 +83,7 @@ public class PackageGateway<T> implements IGateway<Package>
 					products.add(pp.getProduct());
 				}*/
 				
-				newPackage = new Package(name, description, price, totalPurchased, productPackages);
+				newPackage = new Package(name, description, price, productPackages);
 				newPackage.setID(id);
 				
 				packages.add(newPackage);
@@ -105,7 +103,6 @@ public class PackageGateway<T> implements IGateway<Package>
 	{
 		Package newPackage = null;
 		ArrayList<ProductPackage> productPackages;
-		int totalPurchased = 0;//, productId = 0;
 		String name = EOF, description = EOF;
 		double price = 0;
 		//ArrayList<Product> products = null;
@@ -121,7 +118,6 @@ public class PackageGateway<T> implements IGateway<Package>
 				name = _resultSet.getString(NAME);
 				description = _resultSet.getString(DESCRIPTION);
 				price = _resultSet.getDouble(PRICE);
-				totalPurchased = _resultSet.getInt(TOTAL_PURCHASED);
 				
 				productPackages = _productPackageGateway.getByPackageID(id);
 				
@@ -132,7 +128,7 @@ public class PackageGateway<T> implements IGateway<Package>
 					products.add(pp.getProduct());
 				}*/
 				
-				newPackage = new Package(name, description, price, totalPurchased, productPackages);
+				newPackage = new Package(name, description, price, productPackages);
 				newPackage.setID(id);
 			}
 			_resultSet.close();
@@ -156,8 +152,7 @@ public class PackageGateway<T> implements IGateway<Package>
 		{
 			values = "NULL, '" + newObj.getName()
 					+ "', '" + newObj.getDescription()
-					+ "', " + newObj.getPrice()
-					+ ", " + newObj.getTotalPurchased();
+					+ "', " + newObj.getPrice();
 			
 			_commandString = "INSERT INTO " + PACKAGE_TABLE + " VALUES(" + values +")";
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -203,8 +198,7 @@ public class PackageGateway<T> implements IGateway<Package>
 		{
 			values = NAME + " = '" + obj.getName() 
 					+ "', " + DESCRIPTION + " = '" + obj.getDescription()
-					+ "', " + PRICE + " = " + obj.getPrice()
-					+ ", " + TOTAL_PURCHASED +  " = " + obj.getTotalPurchased() + "";
+					+ "', " + PRICE + " = " + obj.getPrice();
 			where = "WHERE " + ID + " = " + obj.getID();
 			
 			_commandString = "UPDATE " + PACKAGE_TABLE + " SET " + values + " " + where;

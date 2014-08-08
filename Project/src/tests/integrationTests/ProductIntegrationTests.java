@@ -13,7 +13,6 @@ public class ProductIntegrationTests extends TestCase
 	private IDao _dao;
 	private boolean _isStub;
 	private ClientManager _clientManager;
-	private EventManager _eventManager;
 	private ProductManager _productManager;
 	private ProductPackageManager _productPackageManager;
 	
@@ -43,8 +42,7 @@ public class ProductIntegrationTests extends TestCase
 		IGateway<Product> productGateway = _dao.productGateway();
 		IGateway<Package> packageGateway = _dao.packageGateway();
 		
-		_eventManager = new EventManager( null, _dao.eventGateway() ); 
-		_clientManager = new ClientManager( clientGateway, _eventManager );
+		_clientManager = new ClientManager( clientGateway );
 		_productPackageManager = new ProductPackageManager( packageGateway );
 		_productManager = new ProductManager( productGateway, _productPackageManager );
 		

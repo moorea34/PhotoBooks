@@ -11,7 +11,6 @@ public class ClientIntegrationTests extends TestCase
 	private IDao _dao;
 	private boolean _isStub;
 	private ClientManager _clientManager;
-	private EventManager _eventManager;
 	private final String FIRST_NAME = "Mark";
 	private final String LAST_NAME = "Twain";
 	private final String NEW_FIRST_NAME = "John";
@@ -30,8 +29,7 @@ public class ClientIntegrationTests extends TestCase
 		
 		_dao = getDao();
 		IGateway<Client> clientGateway = _dao.clientGateway();
-		_eventManager = new EventManager( null, _dao.eventGateway() ); 
-		_clientManager = new ClientManager( clientGateway, _eventManager );
+		_clientManager = new ClientManager( clientGateway );
 		
 		if (_isStub)
 		{

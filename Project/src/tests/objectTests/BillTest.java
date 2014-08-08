@@ -226,27 +226,27 @@ public class BillTest extends TestCase {
 		
 		//Test products
 		assertTrue(quote1.affectToBalance() == 0);
-		assertTrue(quote1.total() == 0);
+		assertTrue(quote1.subtotal() == 0);
 		
 		quote1.getProducts().add(billProduct1);
-		assertTrue(quote1.total() == product1.getPrice());
+		assertTrue(quote1.subtotal() == product1.getPrice());
 		
 		quote1.getProducts().add(billProduct2);
-		assertTrue(quote1.total() == totalValueProducts);
+		assertTrue(quote1.subtotal() == totalValueProducts);
 		
 		assertTrue(quote1.affectToBalance() == 0);
 		
 		//Test packages
 		quote1.getPackages().add(billPackage1);
-		assertTrue(quote1.total() == (totalValueProducts + package1.getPrice()));
+		assertTrue(quote1.subtotal() == (totalValueProducts + package1.getPrice()));
 		
 		quote1.getPackages().add(billPackage2);
-		assertTrue(quote1.total() == totalValue);
+		assertTrue(quote1.subtotal() == totalValue);
 		
 		assertTrue(quote1.affectToBalance() == 0);
 		
 		quote1.setType(TransactionType.Invoice);
-		assertTrue(quote1.affectToBalance() == -totalValue);
+		assertTrue(quote1.affectToBalance() == -(totalValue + quote1.getTaxes()));
 	}
 	
 	public void testTotalPayments() {

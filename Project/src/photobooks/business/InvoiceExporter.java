@@ -3,6 +3,7 @@ package photobooks.business;
 import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.pdfbox.pdmodel.*;
@@ -14,6 +15,8 @@ import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 
 import photobooks.application.Utility;
 import photobooks.objects.Bill;
+import photobooks.objects.Client;
+import photobooks.objects.PhoneNumber;
 
 public class InvoiceExporter {
 	
@@ -27,20 +30,59 @@ public class InvoiceExporter {
 	}
 
 	public static void export(Bill bill, String fileName) throws Exception {
-		float dpi = 72;
+		float dpi = 250;
 		float scale = PDFHelper.dpiScale(dpi);
 		float pageWidth = PDFHelper.pageWidth(dpi);
 		float pageHeight = PDFHelper.pageHeight(dpi);
-		float fontSize;
-		float margin = 40 * scale;
+		float fontSize, titleFontSize;
+		float margin = dpi * 0.7f * scale;
 		float bannerWidth = pageWidth - (margin * 2);
 		float bannerHeight, bannerY;
-		float barHeight = 15 * scale;
+		float barHeight = 60 * 0.8f * scale;
 		float barColorG = 0.28f;
+		float line1y, line2y;
 		Color barColor = new Color(barColorG, barColorG, barColorG);
 		String date = formatDate(bill.getDate());
+		String type = bill.getType().toString();
+		float typeStringLength;
 		float dateWidth;
-		float offset;
+		float offset, offset2, offsetX, offsetY, oldX, oldY, newX, newY;
+		ArrayList<String> customerLines = new ArrayList<String>();
+		Client client = bill.getClient();
+		String addressLine2 = "";
+		
+		customerLines.add(client.getFullName());
+		
+		if (client.getAddress() != null && client.getAddress().length() > 0)
+			customerLines.add(client.getAddress());
+		
+		//Construct city, province, postal code
+		if (client.getCity() != null && client.getCity().length() > 0)
+			addressLine2 += client.getCity() + " ";
+		
+		if (client.getProvince() != null && client.getProvince().length() > 0)
+			addressLine2 += client.getProvince() + " ";
+		
+		if (client.getPostalCode() != null && client.getPostalCode().length() > 0)
+			addressLine2 += client.getPostalCode();
+		
+		addressLine2 = addressLine2.trim();
+		
+		if (addressLine2.length() > 0)
+			customerLines.add(addressLine2);
+		
+		//Construct phone numbers
+		if (client.getNumbers().size() > 0)
+		{
+			String phone = "Phone";
+			
+			for (PhoneNumber number : client.getNumbers())
+			{
+				phone += " " + Utility.formatPhoneNumber(number.getNumber());
+			}
+			
+			customerLines.add(phone);
+		}
 		
 		PDDocument document = new PDDocument();
 		PDPage page = new PDPage(new PDRectangle(pageWidth, pageHeight));
@@ -68,17 +110,44 @@ public class InvoiceExporter {
 		contentStream.setNonStrokingColor(barColor);
 		contentStream.fillRect(margin, bannerY - barHeight, bannerWidth, barHeight);
 		
+		fontSize = 47.0f * scale;
+		titleFontSize = fontSize * 2.0f;
+		
+		offset = 10.0f * scale;
+		offset2 = 60.0f * scale;
+		
+		//Draw lines around client information
+		offsetY = barHeight * 3;
+		typeStringLength = titleFontSize * font.getStringWidth(type) / 1000.0f;
+		
+		line1y = bannerY - offsetY;
+		line2y = line1y - (350.0f * scale);
+		
+		contentStream.drawLine(margin, line1y, pageWidth - (margin + (typeStringLength * 2) + offset2), line1y);
+		contentStream.drawLine(pageWidth + offset2 - (margin + typeStringLength), line1y, pageWidth - margin, line1y);
+		contentStream.drawLine(margin, line2y, pageWidth - margin, line2y);
+		
 		contentStream.beginText();
 		
-		fontSize = 14 * scale;
-		offset = 3.0f * scale;
+		//Draw Invoice/Quote
+		oldX = pageWidth - (margin + (typeStringLength * 2));
+		oldY = line1y - (30.0f * scale);
+				
+		contentStream.setFont(font, titleFontSize);
+		contentStream.setNonStrokingColor(0, 0, 0);
+		contentStream.moveTextPositionByAmount(oldX, oldY);
+		contentStream.drawString(type);
+		contentStream.moveTextPositionByAmount(-oldX, -oldY);
 		
 		//Draw date on bar below banner
+		oldX = margin + bannerWidth - ((dateWidth * fontSize) + offset);
+		oldY = bannerY + offset - barHeight;
+		
 		contentStream.setFont(font, fontSize);
 		contentStream.setNonStrokingColor(255, 255, 255);
-		contentStream.moveTextPositionByAmount(margin + bannerWidth - ((dateWidth * fontSize) + offset), bannerY + offset - barHeight);
+		contentStream.moveTextPositionByAmount(oldX, oldY);
 		contentStream.drawString(date);
-		contentStream.moveTextPositionByAmount(-bannerWidth + ((dateWidth * fontSize) + offset), -offset);//Move to bottom left of bar
+		contentStream.moveTextPositionByAmount(-oldX, -oldY);//Move to origin
 		
 		contentStream.endText();
 

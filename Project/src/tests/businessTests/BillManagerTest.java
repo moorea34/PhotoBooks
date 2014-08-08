@@ -4,11 +4,9 @@ import photobooks.objects.Client;
 import photobooks.objects.Bill;
 
 import photobooks.business.ClientManager;
-import photobooks.business.EventManager;
 import photobooks.business.BillManager;
 import photobooks.gateways.*;
 import junit.framework.TestCase;
-import static org.mockito.Mockito.*;
 
 public class BillManagerTest extends TestCase {
 	
@@ -25,8 +23,7 @@ public class BillManagerTest extends TestCase {
 
 	public void testGetByClientID() {
 		IGateway<Client> stubClientGateway = new StubGateway<Client>();
-		EventManager eventManager = mock( EventManager.class );
-		ClientManager clientManager = new ClientManager( stubClientGateway, eventManager );
+		ClientManager clientManager = new ClientManager(stubClientGateway);
 		Bill bill = new Bill();
 		Client client = new Client("Alex", "Moore");
 		

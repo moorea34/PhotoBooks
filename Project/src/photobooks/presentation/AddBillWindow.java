@@ -22,6 +22,7 @@ import photobooks.business.ClientManager;
 import photobooks.business.ProductManager;
 import photobooks.business.ProductPackageManager;
 import photobooks.objects.Bill;
+import photobooks.objects.Client;
 import photobooks.objects.ITransaction.TransactionType;
 
 import org.eclipse.swt.widgets.Button;
@@ -61,8 +62,11 @@ public class AddBillWindow extends Dialog {
 	 * Open the dialog.
 	 * @return the result
 	 */
-	public Object open() {
+	public Object open(Client client) {
 		createContents();
+		
+		if (client != null)
+			billEditor.setClient(client);
 		
 		shell.open();
 		shell.layout();

@@ -11,8 +11,7 @@ public class PDFHelper {
 	public final static String[] fontPaths = new String[] { "/Library/Fonts/", "/System/Library/Fonts/", "$HOME/Library/Fonts/", "C:/Windows/Fonts/" };
 	
 	public static final float aspectRatio = 11.0f / 8.5f;
-	public static final float layoutDpi = 72;
-	//Using 72 till futher notice
+	public static final float layoutDpi = 250;
 	
 	public static float dpiScale(float dpi) { return dpi / layoutDpi; }
 	

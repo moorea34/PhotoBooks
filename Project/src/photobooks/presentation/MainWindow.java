@@ -14,7 +14,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 
 import photobooks.application.Globals;
 import photobooks.application.Utility;
@@ -54,8 +53,9 @@ public class MainWindow {
 		System.out.println("Opening Main Window...");
 
 		_dao = Globals.getDao();
-		_eventManager = new EventManager( this, _dao.eventGateway() );
-		_clientManager = new ClientManager( _dao, _eventManager );
+		
+		_eventManager = new EventManager(_dao.eventGateway());
+		_clientManager = new ClientManager( _dao );
 		_billManager = new BillManager(_dao);
 		_paymentManager = new PaymentManager(_dao.paymentGateway());
 		
@@ -65,7 +65,7 @@ public class MainWindow {
 		if (_dao instanceof StubDao)
 		{
 			_clientManager.insertStubData();
-			_eventManager.insertStubData( _clientManager );
+			//_eventManager.insertStubData( _clientManager );
 		}
 		
 		open();
@@ -78,8 +78,6 @@ public class MainWindow {
 		
 		shell.open();
 		shell.layout();
-		
-		//_eventManager.checkForEvents( _clientManager );
 		
 		if(EventLoop.isEnabled())
 		{
@@ -95,14 +93,6 @@ public class MainWindow {
 		}
 
 		System.out.println("Closing Main Window...");
-	}
-	
-	public void alertToEvents( String message )
-	{
-		MessageBox messageBox = new MessageBox( shell, SWT.OK );
-		messageBox.setText("New Event(s)!");
-		messageBox.setMessage( message );
-		messageBox.open();
 	}
 
 	protected void createContents() {

@@ -76,6 +76,17 @@ public class Utility {
 		return result;
 	}
 	
+	public static boolean calendarsEqual(Calendar c1, Calendar c2)
+	{
+		return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH);
+	}
+	
+	public static boolean withinDayOfYearRange( Calendar target, Calendar start, Calendar end )
+	{
+		return target.get(Calendar.DAY_OF_YEAR) >= start.get(Calendar.DAY_OF_YEAR) &&
+			   target.get(Calendar.DAY_OF_YEAR) < end.get(Calendar.DAY_OF_YEAR);
+	}
+	
 	public static String[] getDays()
 	{
 		String[] days = new String[31];

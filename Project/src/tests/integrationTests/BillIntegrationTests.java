@@ -16,7 +16,6 @@ public class BillIntegrationTests extends TestCase
 	private boolean _isStub;
 	private PaymentManager _paymentManager;
 	private ClientManager _clientManager;
-	private EventManager _eventManager;
 	private BillManager _billManager;
 	
 	private final String DESCRIPTION = "Some description thing.";
@@ -43,8 +42,7 @@ public class BillIntegrationTests extends TestCase
 		_paymentManager = new PaymentManager( gateway );
 		_billManager = new BillManager( _dao );
 		IGateway<Client> clientGateway = _dao.clientGateway();
-		_eventManager = new EventManager( null, _dao.eventGateway() );
-		_clientManager = new ClientManager( clientGateway, _eventManager );
+		_clientManager = new ClientManager( clientGateway );
 		
 		if (_isStub)
 		{

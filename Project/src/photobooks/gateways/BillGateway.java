@@ -324,27 +324,60 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 			{			
 				productsOld = new ArrayList<BillProduct>(_dao.billProductGateway().getAllWithId(obj.getID()));			
 				productsNew = obj.getProducts();
+				
 				packagesOld = new ArrayList<BillPackage>(_dao.billPackageGateway().getAllWithId(obj.getID()));
 				packagesNew = obj.getPackages();
+				
+				for (BillProduct product : productsNew)
+				{
+					product.setBillID(obj.getID());
+					
+					if (product.getID() == 0)
+						_dao.billProductGateway().add(product);
+					else
+					{
+						_dao.billProductGateway().update(product);
+						
+						for (int i = 0; i < productsOld.size(); ++i)
+						{
+							if (productsOld.get(i).getID() == product.getID())
+							{
+								productsOld.remove(i);
+								break;
+							}
+						}
+					}
+				}
 				
 				for (BillProduct product : productsOld)
 				{
 					_dao.billProductGateway().delete(product);
 				}				
-				for (BillProduct product : productsNew)
+				
+				for (BillPackage newPackage : packagesNew)
 				{
-					product.setBillID(obj.getID());
-					_dao.billProductGateway().add(product);
+					newPackage.setBillID(obj.getID());
+					
+					if (newPackage.getID() == 0)
+						_dao.billPackageGateway().add(newPackage);
+					else
+					{
+						_dao.billPackageGateway().update(newPackage);
+						
+						for (int i = 0; i < packagesOld.size(); ++i)
+						{
+							if (packagesOld.get(i).getID() == newPackage.getID())
+							{
+								packagesOld.remove(i);
+								break;
+							}
+						}
+					}
 				}
 				
 				for (BillPackage newPackage : packagesOld)
 				{
 					_dao.billPackageGateway().delete(newPackage);					
-				}
-				for (BillPackage newPackage : packagesNew)
-				{
-					newPackage.setBillID(obj.getID());
-					_dao.billPackageGateway().add(newPackage);
 				}
 			}
 		}

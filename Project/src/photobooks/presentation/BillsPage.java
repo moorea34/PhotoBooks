@@ -293,7 +293,7 @@ public class BillsPage extends Composite {
 
 				AddBillWindow addBillWnd = new AddBillWindow(shell, SWT.SHELL_TRIM | SWT.RESIZE, _clientManager, _productManager, _packageManager);
 
-				Object result = addBillWnd.open();
+				Object result = addBillWnd.open(_client);
 
 				if (result != null)
 				{

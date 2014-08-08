@@ -15,20 +15,17 @@ public class ClientManager
 {
 	private IDao _dao;
 	private IGateway<Client> _gateway;
-	private EventManager _eventManager;
 
-	public ClientManager( IGateway<Client> gateway, EventManager eventManager )
+	public ClientManager( IGateway<Client> gateway )
 	{
 		_dao = null;
 		_gateway = gateway;
-		_eventManager = eventManager;
 	}
 	
-	public ClientManager( IDao dao, EventManager eventManager )
+	public ClientManager( IDao dao )
 	{
 		_dao = dao;
 		_gateway = _dao.clientGateway();
-		_eventManager = eventManager;
 	}
 
 	public void insertStubData()
@@ -66,19 +63,16 @@ public class ClientManager
 	public void insertClient(Client client)
 	{
 		_gateway.add(client);
-		_eventManager.insertEventsForClient(client);
 	}
 
 	public void removeClient(Client client)
 	{	
-		_eventManager.removeEventsForClient(client);
 		_gateway.delete(client);
 	}
 
 	public void updateClient(Client client)
 	{
 		_gateway.update(client);
-		_eventManager.updateEventsForClient(client);
 	}
 	
 	public void recalculateClientBalance(Client client)

@@ -178,14 +178,15 @@ public class Bill extends DBObject implements ITransaction
 			Product p = bp.getProduct();
 							
 			if (p != null)
-				p.cancel();
+				p.cancel(bp.getAmount());
 		}
+		
 		for ( BillPackage bp : _packages)
 		{
 			Package p = bp.getPackage();
 					
 			if (p != null)
-				p.cancel();
+				p.cancel(bp.getAmount());
 		}
 	}
 	
@@ -197,14 +198,15 @@ public class Bill extends DBObject implements ITransaction
 			Product p = bp.getProduct();
 									
 			if (p != null)
-				p.purchase();
+				p.purchase(bp.getAmount());
 		}
+		
 		for ( BillPackage bp : _packages)
 		{
 			Package p = bp.getPackage();
 							
 			if (p != null)
-				p.purchase();
+				p.purchase(bp.getAmount());
 		}
 	}
 	
