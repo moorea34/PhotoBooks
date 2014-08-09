@@ -34,7 +34,8 @@ public class InvoiceExporter {
 		float scale = PDFHelper.dpiScale(dpi);
 		float pageWidth = PDFHelper.pageWidth(dpi);
 		float pageHeight = PDFHelper.pageHeight(dpi);
-		float fontSize, titleFontSize;
+		float fontSize = 47.0f * scale;
+		float titleFontSize = fontSize * 2.0f;
 		float margin = dpi * 0.7f * scale;
 		float bannerWidth = pageWidth - (margin * 2);
 		float bannerHeight, bannerY;
@@ -46,10 +47,13 @@ public class InvoiceExporter {
 		String type = bill.getType().toString();
 		float typeStringLength;
 		float dateWidth;
+		
 		float offset, offset2, offsetX, offsetY, oldX, oldY, newX, newY;
 		ArrayList<String> customerLines = new ArrayList<String>();
 		Client client = bill.getClient();
 		String addressLine2 = "";
+		float addressLineHeight = fontSize + (5.0f * scale);
+		float addressHeight;
 		
 		customerLines.add(client.getFullName());
 		
@@ -109,9 +113,6 @@ public class InvoiceExporter {
 		//Draw bar below banner
 		contentStream.setNonStrokingColor(barColor);
 		contentStream.fillRect(margin, bannerY - barHeight, bannerWidth, barHeight);
-		
-		fontSize = 47.0f * scale;
-		titleFontSize = fontSize * 2.0f;
 		
 		offset = 10.0f * scale;
 		offset2 = 60.0f * scale;

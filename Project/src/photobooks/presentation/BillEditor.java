@@ -49,7 +49,6 @@ import acceptanceTests.Register;
 
 public class BillEditor extends Composite {
 	final String ZERO = "0.00";
-	final String autoActivationCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
 	private DecimalFormat format = new DecimalFormat("0.00");
 	private boolean _clientSelection = false;
@@ -220,7 +219,7 @@ public class BillEditor extends Composite {
 		ppClient = new SimpleContentProposalProvider(new String[] { });
 		ppClient.setFiltering(true);
 		
-		paClient = new ContentProposalAdapter(cbClient, new ComboContentAdapter(), ppClient, null, autoActivationCharacters.toCharArray());
+		paClient = new ContentProposalAdapter(cbClient, new ComboContentAdapter(), ppClient, null, Utility.autoActivationCharacters.toCharArray());
 		paClient.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 		
 		lblAddress = new Label(this, SWT.NONE);

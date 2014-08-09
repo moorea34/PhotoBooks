@@ -23,6 +23,7 @@ public class Utility {
 	private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
 	
 	public static final int YEAR_CONST = 1940;
+	public static final String autoActivationCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,";
 	private static final String[] MONTHS = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 	private static final String[] DAYSOFWEEK = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 	private static Hashtable<String, Integer> _monthMap = null;

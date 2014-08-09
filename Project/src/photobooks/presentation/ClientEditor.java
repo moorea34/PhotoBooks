@@ -1,13 +1,9 @@
 package photobooks.presentation;
 
-import java.util.Calendar;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import photobooks.application.Utility;
 import photobooks.objects.*;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 
@@ -19,7 +15,6 @@ public class ClientEditor extends Composite {
 	private Text numCellularBox;
 	private Text numWorkBox;
 	private Text numAltBox;
-	private CCombo dobDay, dobMonth, dobYear, annDay, annMonth, annYear;
 	private Text emailBox;
 	private Label lblAddress;
 	private Text tbAddress;
@@ -29,6 +24,7 @@ public class ClientEditor extends Composite {
 	private Text tbProvince;
 	private Label lblPostalCode;
 	private Text tbPostalCode;
+	private DatePicker dpBirthday, dpAnniversary;
 
 	public ClientEditor(Composite parent, int style) {
 		super(parent, style);
@@ -121,59 +117,21 @@ public class ClientEditor extends Composite {
 														fd_emailBox.height = boxHeight;
 														emailBox.setLayoutData(fd_emailBox);
 														
-														dobDay = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_dobDay = new FormData();
-														fd_dobDay.right = new FormAttachment(45, 0);
-														fd_dobDay.top = new FormAttachment(lblDob, boxOffsetY, SWT.TOP);
-														fd_dobDay.left = new FormAttachment(firstNameBox, 0, SWT.LEFT);
-														fd_dobDay.height = nudHeight;
-														dobDay.setLayoutData(fd_dobDay);
-														dobDay.setText("Day");
+														dpBirthday = new DatePicker(infoGroup, SWT.NONE);
+														FormData fd_dob = new FormData();
+														fd_dob.left = new FormAttachment(firstNameBox, 0, SWT.LEFT);
+														fd_dob.right = new FormAttachment(100, -6);
+														fd_dob.top = new FormAttachment(lblDob, boxOffsetY, SWT.TOP);
+														fd_dob.height = nudHeight + 4;
+														dpBirthday.setLayoutData(fd_dob);
 														
-														dobMonth = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_dobMonth = new FormData();
-														fd_dobMonth.right = new FormAttachment(75, 0);
-														fd_dobMonth.top = new FormAttachment(dobDay, 0, SWT.TOP);
-														fd_dobMonth.bottom = new FormAttachment(dobDay, 0, SWT.BOTTOM);
-														fd_dobMonth.left = new FormAttachment(dobDay, boxOffsetX, SWT.RIGHT);
-														dobMonth.setLayoutData(fd_dobMonth);
-														dobMonth.setText("Month");
-														
-														dobYear = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_dobYear = new FormData();
-														fd_dobYear.right = new FormAttachment(100, -6);
-														fd_dobYear.top = new FormAttachment(dobDay, 0, SWT.TOP);
-														fd_dobYear.bottom = new FormAttachment(dobDay, 0, SWT.BOTTOM);
-														fd_dobYear.left = new FormAttachment(dobMonth, boxOffsetX, SWT.RIGHT);
-														dobYear.setLayoutData(fd_dobYear);
-														dobYear.setText("Year");
-														
-														annDay = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_annDay = new FormData();
-														fd_annDay.top = new FormAttachment(lblAnniversary, boxOffsetY, SWT.TOP);
-														fd_annDay.left = new FormAttachment(dobDay, 0, SWT.LEFT);
-														fd_annDay.right = new FormAttachment(dobDay, 0, SWT.RIGHT);
-														fd_annDay.height = nudHeight;
-														annDay.setLayoutData(fd_annDay);
-														annDay.setText("Day");
-														
-														annMonth = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_annMonth = new FormData();
-														fd_annMonth.top = new FormAttachment(annDay, 0, SWT.TOP);
-														fd_annMonth.bottom = new FormAttachment(annDay, 0, SWT.BOTTOM);
-														fd_annMonth.left = new FormAttachment(dobMonth, 0, SWT.LEFT);
-														fd_annMonth.right = new FormAttachment(dobMonth, 0, SWT.RIGHT);
-														annMonth.setLayoutData(fd_annMonth);
-														annMonth.setText("Month");
-														
-														annYear = new CCombo(infoGroup, SWT.BORDER);
-														FormData fd_annYear = new FormData();
-														fd_annYear.top = new FormAttachment(annDay, 0, SWT.TOP);
-														fd_annYear.bottom = new FormAttachment(annDay, 0, SWT.BOTTOM);
-														fd_annYear.left = new FormAttachment(dobYear, 0, SWT.LEFT);
-														fd_annYear.right = new FormAttachment(dobYear, 0, SWT.RIGHT);
-														annYear.setLayoutData(fd_annYear);
-														annYear.setText("Year");
+														dpAnniversary = new DatePicker(infoGroup, SWT.NONE);
+														FormData fd_ann = new FormData();
+														fd_ann.top = new FormAttachment(lblAnniversary, boxOffsetY, SWT.TOP);
+														fd_ann.left = new FormAttachment(dpBirthday, 0, SWT.LEFT);
+														fd_ann.right = new FormAttachment(dpBirthday, 0, SWT.RIGHT);
+														fd_ann.height = nudHeight + 4;
+														dpAnniversary.setLayoutData(fd_ann);
 
 		Group grpPhoneNumbers = new Group(this, SWT.NONE);
 		grpPhoneNumbers.setLayout(new FormLayout());
@@ -334,19 +292,8 @@ public class ClientEditor extends Composite {
 														fd_tbPostalCode.right = new FormAttachment(tbAddress, 0, SWT.RIGHT);
 														fd_tbPostalCode.height = boxHeight;
 														tbPostalCode.setLayoutData(fd_tbPostalCode);
-														
-		initDateValues();
+							
 		clearValues();
-	}
-	
-	private void initDateValues() 
-	{		
-		dobDay.setItems( Utility.getDays() );
-		annDay.setItems( Utility.getDays() );
-		dobMonth.setItems( Utility.getMonths() );
-		annMonth.setItems( Utility.getMonths() );
-		dobYear.setItems( Utility.getYears() );
-		annYear.setItems( Utility.getYears() );		
 	}
 	
 	public void clearValues()
@@ -362,13 +309,8 @@ public class ClientEditor extends Composite {
 		numWorkBox.setText("");
 		numAltBox.setText("");
 		
-		dobDay.select(-1);
-		dobMonth.select(-1);
-		dobYear.select(-1);
-		
-		annDay.select(-1);
-		annMonth.select(-1);
-		annYear.select(-1);
+		dpBirthday.clear();
+		dpAnniversary.clear();
 	}
 	
 	public void setClient(Client client)
@@ -385,19 +327,8 @@ public class ClientEditor extends Composite {
 			else
 				emailBox.setText(client.getEmail());
 			
-			if(client.getBirthday() != null)
-			{
-				dobDay.setText("" + client.getBirthday().get(Calendar.DAY_OF_MONTH));
-				dobMonth.select(client.getBirthday().get(Calendar.MONTH));
-				dobYear.setText("" + client.getBirthday().get(Calendar.YEAR));
-			}
-			
-			if(client.getAnniversary() != null)
-			{
-				annDay.setText("" + client.getAnniversary().get(Calendar.DAY_OF_MONTH));
-				annMonth.select(client.getAnniversary().get(Calendar.MONTH));
-				annYear.setText("" + client.getAnniversary().get(Calendar.YEAR));
-			}
+			dpBirthday.setDate(client.getBirthday());
+			dpAnniversary.setDate(client.getAnniversary());
 			
 			for(PhoneNumber num : client.getNumbers())
 			{
@@ -427,51 +358,13 @@ public class ClientEditor extends Composite {
 	
 	public void getClientFromFields(Client out)
 	{
-		int year, month, day;
-		
 		out.setFirstName(firstNameBox.getText());
 		out.setLastName(lastNameBox.getText());
 		out.setEmail(emailBox.getText());
 		
-		try
-		{
-			year = Integer.parseInt(dobYear.getText());
-			month = Utility.stringToMonth(dobMonth.getText());
-			day = Integer.parseInt(dobDay.getText());
-			
-			if (month >= 0)
-			{
-				Calendar newDob = Calendar.getInstance();
-				newDob.set(year, month, day);
-				out.setBirthday(newDob);
-			}
-		}
-		catch (Exception e)
-		{
-			if (dobYear.getText().length() == 0 && dobMonth.getText().length() == 0 && dobDay.getText().length() == 0) {
-				out.setBirthday(null);
-			}
-		}
+		out.setBirthday(dpBirthday.getDate());
 		
-		try
-		{
-			year = Integer.parseInt(annYear.getText());
-			month = Utility.stringToMonth(annMonth.getText());
-			day = Integer.parseInt(annDay.getText());
-			
-			if (month >= 0)
-			{
-				Calendar newAnn = Calendar.getInstance();
-				newAnn.set(year, month, day);
-				out.setAnniversary(newAnn);
-			}
-		}
-		catch (Exception e)
-		{
-			if (annYear.getText().length() == 0 && annMonth.getText().length() == 0 && annDay.getText().length() == 0) {
-				out.setAnniversary(null);
-			}
-		}
+		out.setAnniversary(dpAnniversary.getDate());
 		
 		updatePhoneNumber(PhoneNumberType.Home, numHomeBox, out);
 		updatePhoneNumber(PhoneNumberType.Cellular, numCellularBox, out);
@@ -504,13 +397,8 @@ public class ClientEditor extends Composite {
 		lastNameBox.setEnabled(modify);
 		emailBox.setEnabled(modify);
 		
-		dobDay.setEnabled(modify);
-		dobMonth.setEnabled(modify);
-		dobYear.setEnabled(modify);
-		
-		annDay.setEnabled(modify);
-		annMonth.setEnabled(modify);
-		annYear.setEnabled(modify);
+		dpBirthday.setModify(modify);
+		dpAnniversary.setModify(modify);
 		
 		numHomeBox.setEnabled(modify);
 		numCellularBox.setEnabled(modify);
