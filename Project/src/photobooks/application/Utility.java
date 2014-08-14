@@ -1,7 +1,10 @@
 package photobooks.application;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -21,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Utility {
 
 	private static DecimalFormat moneyFormat = new DecimalFormat("0.00");
+	private static DecimalFormat exportMoneyFormat = new DecimalFormat("###,###,###,##0.00");
 	
 	public static final int YEAR_CONST = 1940;
 	public static final String autoActivationCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,";
@@ -149,6 +153,16 @@ public class Utility {
 			return moneyFormat.format(price);
 	}
 	
+	public static String formatMoneyExport(double price)
+	{
+		if (Math.abs(price) < 0.01)
+			return "0.00";
+		else if (price < 0.00)
+			return String.format("(%s)", formatMoneyExport(-price));
+		else
+			return exportMoneyFormat.format(price);
+	}
+	
 	public static String formatPhoneNumber(String number)
 	{
 		String result = "";
@@ -181,6 +195,51 @@ public class Utility {
 		
 		return result;
 	}
+	
+	public static boolean confirmDelete(Shell shell, String item) {
+		MessageBox mb = new MessageBox(shell, SWT.YES | SWT.NO);
+		
+		mb.setText("Confirm delete...");
+		mb.setMessage("Are you sure you want to delete " + item + "?");
+		
+		return mb.open() == SWT.YES;
+	}
+	
+	public static void showErrorMessage(Shell shell, String msg) {
+		MessageBox mb = new MessageBox(shell, SWT.OK);
+		
+		System.out.println(msg);
+		
+		mb.setMessage(msg);
+		mb.open();
+	}
+	
+	public static void copyDatabase(String srcFolder, String destFolder) throws Exception
+	{
+		copyFile(srcFolder + "/PhotoBooks.properties", destFolder + "/PhotoBooks.properties");
+		copyFile(srcFolder + "/PhotoBooks.script", destFolder + "/PhotoBooks.script");
+	}
+	
+	public static void copyFile(String src, String dest) throws Exception
+	{
+		FileReader reader = new FileReader(src);
+		BufferedReader fileIn = new BufferedReader(reader);
+		
+		FileWriter writer = new FileWriter(dest);
+		
+		String line = fileIn.readLine();
+		
+		while (line != null)
+		{
+			writer.write(line + "\n");
+			line = fileIn.readLine();
+		}
+		
+		writer.close();
+		
+		fileIn.close();
+		reader.close();
+	}
 
 	public static String getDir(Shell shell) 
 	{
@@ -207,12 +266,14 @@ public class Utility {
 	public static void openDir(Shell shell, String path)
 	{
 		File dir = new File(path);
+		
 		if (Desktop.isDesktopSupported()) 
 		{
 		    try 
 		    {
 				Desktop.getDesktop().open(dir);
-			} catch (IllegalArgumentException e) 
+			}
+		    catch (IllegalArgumentException e) 
 			{
 				MessageBox messageBox = new MessageBox( shell, SWT.OK );
 				messageBox.setText("Error");

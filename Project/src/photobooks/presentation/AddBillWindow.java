@@ -92,7 +92,7 @@ public class AddBillWindow extends Dialog {
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle() | SWT.APPLICATION_MODAL);
 		shell.setSize(470, 400);
-		shell.setMinimumSize(600, 600);
+		shell.setMinimumSize(700, 700);
 		shell.setText(getText());
 		shell.addListener(SWT.Resize, new Listener() {
 			

@@ -2,6 +2,10 @@ package photobooks.gateways;
 
 public class StubTypeGateway implements ITypeGateway
 {
+	public void load()
+	{
+	}
+	
 	// will return the name of a type based on an id
 	public String getById(String tableName, int id) 
 	{

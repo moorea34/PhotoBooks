@@ -15,6 +15,10 @@ public class StubGateway<T> implements IGateway<T>
 		idCounter = 0;
 	}
 	
+	public void load()
+	{
+	}
+	
 	public Collection<T> getAll()
 	{
 		return data;

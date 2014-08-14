@@ -3,18 +3,35 @@ package photobooks.gateways;
 import java.sql.Statement;
 
 
-public class GlobalGateway 
+public class GlobalGateway implements IGatewayInit
 {
 	private static final String ID = "ID";
 	
-	private Statement _statement;
+	private Statement _statement = null;
 	private IDao _dao;
 	private String _commandString;
 	
 	public GlobalGateway(IDao dao)
 	{
 		_dao = dao;
-		_statement = dao.getStatement();
+		load();
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
+		_statement = _dao.getStatement();
 	}
 	
 	public void delete(String tableName, int id) 

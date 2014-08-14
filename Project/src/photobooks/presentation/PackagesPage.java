@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.jface.viewers.ListViewer;
@@ -58,7 +59,7 @@ public class PackagesPage extends Composite
 	@SuppressWarnings("unused")
 	private IDao _dao;
 	private Composite _parent;
-	//private Shell shell;
+	private Shell shell;
 	private ProductPackageManager _packageManager;
 	private ProductManager _productManager;
 	private TreeViewer treeViewer;
@@ -85,7 +86,7 @@ public class PackagesPage extends Composite
 	public PackagesPage(Composite parent, int style, ProductPackageManager packageManager, ProductManager productManager) 
 	{
 		super(parent, style);
-		//shell = parent.getShell();
+		shell = parent.getShell();
 		Register.newWindow(this);
 		_parent = parent;
 		currSelectedID = -1;
@@ -748,14 +749,19 @@ public class PackagesPage extends Composite
 		
 		if(currSelectedType != "")
 		{
-			
 			if(currSelectedType.equals("Package"))
 			{
-				_packageManager.deleteProductPackage(_packageManager.getProductPackage(currSelectedID));
+				Package pack = _packageManager.getProductPackage(currSelectedID);
+				
+				if (pack != null && Utility.confirmDelete(shell, pack.getName()))
+					_packageManager.deleteProductPackage(pack);
 			}
 			else
 			{
-				_productManager.deleteProduct(_productManager.getProduct(currSelectedID));
+				Product prod = _productManager.getProduct(currSelectedID);
+				
+				if (prod != null && Utility.confirmDelete(shell, prod.getName()))
+					_productManager.deleteProduct(prod);
 			}
 		}
 		
@@ -789,6 +795,8 @@ public class PackagesPage extends Composite
 			if (p != null)
 				select(p);
 		}
+		else
+			selectedItem = null;
 	}
 	
 	public void refresh()

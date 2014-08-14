@@ -11,13 +11,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import photobooks.application.Globals;
 import photobooks.application.Utility;
 import photobooks.business.*;
+import photobooks.gateways.Dao;
 import photobooks.gateways.IDao;
 import photobooks.gateways.StubDao;
 import photobooks.objects.Package;
@@ -35,16 +35,17 @@ public class MainWindow {
 	private ProductManager _productManager;
 	private IDao _dao;
 	
-	private Composite clientsPage;
-	private Composite packagesPage;
-	private Composite billingPage;
+	private ClientsPage clientsPage;
+	private PackagesPage packagesPage;
+	private BillsPage billingPage;
+	private SettingsEditor settingsEditor;
 	
 	private TabFolder tabLayout;
-	private TabItem packagesTab, clientTab, billTab;
+	private TabItem packagesTab, clientTab, billTab, settingsTab;
 	
 	final private String PRODUCT_TYPE = "Product";
 	final private String PACKAGE_TYPE = "Package";
-	private MenuItem fileItem, exit;
+	private MenuItem fileItem, backupDBItem, restoreDBItem, exit;
 	//private MenuItem manageEvents, eventItem, checkForEventsItem;
 
 	public MainWindow() 
@@ -72,12 +73,23 @@ public class MainWindow {
 	}
 
 	public void open() {
-		Display display = Display.getDefault();
+		final Display display = Display.getDefault();
+		final int timer = 300000;
 		
 		createContents();	
 		
 		shell.open();
 		shell.layout();
+		
+		display.timerExec(timer, new Runnable() {
+		    public void run() {
+		        System.out.println("Autosaving database.");
+		        Globals.getDao().commitChanges();
+
+		        display.timerExec(timer, this);
+		    }
+
+		});
 		
 		if(EventLoop.isEnabled())
 		{
@@ -98,31 +110,15 @@ public class MainWindow {
 	protected void createContents() {
 		
 		shell = new Shell(SWT.SHELL_TRIM | SWT.RESIZE);
-		shell.setMinimumSize(new Point(700, 700));
+		shell.setMinimumSize(new Point(750, 750));
 		shell.setSize(600, 600);
 		shell.setText("PhotoBooks");
 		shell.setLayout(new FormLayout());
 		
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
-
-	    Menu fileMenu = new Menu(menuBar);
-
-	    fileItem = new MenuItem(menuBar, SWT.CASCADE);
-	    fileItem.setText("File");
-	    fileItem.setMenu(fileMenu);
 	    
-	    exit = new MenuItem(fileMenu, SWT.NONE);
-	    exit.addSelectionListener(new SelectionAdapter() 
-	    {
-	    	@Override
-	    	public void widgetSelected(SelectionEvent arg0) 
-	    	{
-	    		shell.dispose();
-	    	}
-	    });
-	    exit.setText("Exit");
-	    
+		setupFileMenu(menuBar);
 	    //setupEventMenu( menuBar );
 	    setupProductMenu( menuBar );
 	    setupPackageMenu( menuBar );
@@ -154,8 +150,98 @@ public class MainWindow {
 		
 		billTab.setControl(billingPage);
 		
+		settingsTab = new TabItem(tabLayout, SWT.NONE);
+		settingsEditor = new SettingsEditor(tabLayout, SWT.NONE);
+		
+		settingsTab.setText("Settings");
+		settingsTab.setControl(settingsEditor);
+		
 		Utility.setFont(shell);
 		Utility.centerScreen(shell);
+	}
+	
+	private void setupFileMenu(Menu menuBar)
+	{
+		Menu fileMenu = new Menu(menuBar);
+
+	    fileItem = new MenuItem(menuBar, SWT.CASCADE);
+	    fileItem.setText("File");
+	    fileItem.setMenu(fileMenu);
+	    
+	    backupDBItem = new MenuItem(fileMenu, SWT.NONE);
+	    backupDBItem.setText("Backup Database");
+	    backupDBItem.addSelectionListener(new SelectionAdapter()
+	    {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent arg0) 
+	    	{
+	    		if (Globals.getDao() instanceof Dao)
+	    		{
+	    			Dao dao = (Dao)Globals.getDao();
+		    		String dir = Utility.getDir(shell);
+		    		
+		    		if (dir != null)
+		    		{
+		    			dao.commitChanges();
+		    		
+		    			try
+		    			{
+		    				Utility.copyDatabase("./database", dir);
+		    			}
+		    			catch (Exception ex)
+		    			{
+		    				String msg = "Error backing up database: " + ex.toString();
+		    			
+		    				Utility.showErrorMessage(shell, msg);
+		    			}
+		    		}
+	    		}
+	    	}
+	    });
+	    
+	    restoreDBItem = new MenuItem(fileMenu, SWT.NONE);
+	    restoreDBItem.setText("Restore Database");
+	    restoreDBItem.addSelectionListener(new SelectionAdapter() 
+	    {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent arg0) 
+	    	{
+	    		if (Globals.getDao() instanceof Dao)
+	    		{
+	    			Dao dao = (Dao)Globals.getDao();
+	    			String src = Utility.getDir(shell);
+	    			
+	    			if (src != null)
+	    			{
+	    				try
+	    				{
+	    					dao.restore(src);
+	    					
+	    					clientsPage.refresh();
+	    					packagesPage.refresh();
+	    					billingPage.updateClientCB();
+	    				}
+	    				catch (Exception ex)
+	    				{
+	    					String msg = "Error backing up database: " + ex.toString();
+			    			
+		    				Utility.showErrorMessage(shell, msg);
+	    				}
+	    			}
+	    		}
+	    	}
+	    });
+	    
+	    exit = new MenuItem(fileMenu, SWT.NONE);
+	    exit.setText("Exit");
+	    exit.addSelectionListener(new SelectionAdapter() 
+	    {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent arg0) 
+	    	{
+	    		shell.dispose();
+	    	}
+	    });
 	}
 
 	/*private void setupEventMenu( Menu menuBar )

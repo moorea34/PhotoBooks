@@ -19,6 +19,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import photobooks.application.Globals;
@@ -26,6 +27,7 @@ import photobooks.application.Utility;
 import photobooks.business.ClientManager;
 import photobooks.objects.Client;
 import acceptanceTests.Register;
+
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment; 
@@ -45,10 +47,13 @@ public class ClientsPage extends Composite
 	
 	private BillsPage _billsPage;
 	
+	Shell shell;
+	
 	public ClientsPage(Composite parent, int style, ClientManager clientManager, BillsPage billsPage) 
 	{
 		super(parent, style);
 		Register.newWindow(this);
+		shell = parent.getShell();
 		
 		currClientID = -1;
 		_parent = parent;
@@ -178,16 +183,20 @@ public class ClientsPage extends Composite
 							}
 							
 							Client oldClient = _clientManager.getClientByID(currClientID);
-							_clientManager.removeClient(oldClient);
 							
-							if(_clientManager.getClientList().size() > 0)
-								currClientID = _clientManager.getClientList().get(0).getID();
-							else
-								currClientID = -1;
+							if (oldClient != null && Utility.confirmDelete(shell, oldClient.getFullName()))
+							{
+								_clientManager.removeClient(oldClient);
 							
-							updateList();
+								if(_clientManager.getClientList().size() > 0)
+									currClientID = _clientManager.getClientList().get(0).getID();
+								else
+									currClientID = -1;
 							
-							_billsPage.updateClientCB();
+								updateList();
+							
+								_billsPage.updateClientCB();
+							}
 						}
 					}
 				});

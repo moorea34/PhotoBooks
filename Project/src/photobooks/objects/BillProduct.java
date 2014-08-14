@@ -1,6 +1,6 @@
 package photobooks.objects;
 
-public class BillProduct extends DBObject
+public class BillProduct extends DBObject implements IBillItem
 {
 	private Product _product;
 	private int _billID;
@@ -42,6 +42,16 @@ public class BillProduct extends DBObject
 		setPrice(purchasePrice);
 		setAmount(amount);
 		setOrder(order);
+	}
+	
+	public boolean isPackage()
+	{
+		return false;
+	}
+	
+	public ProductBase getItem()
+	{
+		return _product;
 	}
 	
 	public Product getProduct()

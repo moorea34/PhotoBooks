@@ -21,7 +21,7 @@ public class EventGateway<T> implements IGateway<Event>
 	private static final String DESCRIPTION = "DESCRIPTION";
 	
 	private ResultSet _resultSet;
-	private Statement _statement;
+	private Statement _statement = null;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
@@ -29,7 +29,24 @@ public class EventGateway<T> implements IGateway<Event>
 	public EventGateway(IDao dao)
 	{
 		_dao = dao;
-		_statement = dao.getStatement();
+		load();
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
+		_statement = _dao.getStatement();
 	}
 	
 	private Event resultSetToEvent(ResultSet results) throws SQLException

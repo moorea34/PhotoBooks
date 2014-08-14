@@ -1,7 +1,9 @@
 package photobooks.application;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -30,10 +32,14 @@ public class Globals
 		return _gst;
 	}
 	
+	public static void setGst(double gst) { _gst = gst; }
+	
 	public static double getPst()
 	{
 		return _pst;
 	}
+	
+	public static void setPst(double pst) { _pst = pst; }
 	
 	public static Font getFont()
 	{
@@ -76,6 +82,24 @@ public class Globals
 		catch (Exception e)
 		{
 			System.out.println("Error reading settings file!" + e.toString());
+		}
+	}
+	
+	public static void saveSettings() {
+		try
+		{
+			FileWriter writer = new FileWriter(settingsFileName);
+			BufferedWriter fileOut = new BufferedWriter(writer);
+			
+			fileOut.write(String.format("gst : %s\n", String.valueOf(_gst)));
+			fileOut.write(String.format("pst : %s\n", String.valueOf(_pst)));
+			
+			fileOut.close();
+			writer.close();
+		}
+		catch (Exception ex)
+		{
+			
 		}
 	}
 }

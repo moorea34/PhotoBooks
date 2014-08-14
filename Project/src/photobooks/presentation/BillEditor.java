@@ -21,7 +21,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -247,7 +246,7 @@ public class BillEditor extends Composite {
 		lblAmountDueValue = new Label(this, SWT.NONE);
 		lblAmountDueValue.setText("0.0");
 		FormData fd_lblAmountDueValue = new FormData();
-		fd_lblAmountDueValue.bottom = new FormAttachment(100);
+		fd_lblAmountDueValue.bottom = new FormAttachment(100, -30);
 		fd_lblAmountDueValue.right = new FormAttachment(100, 0);
 		fd_lblAmountDueValue.width = 100;
 		lblAmountDueValue.setLayoutData(fd_lblAmountDueValue);
@@ -371,7 +370,7 @@ public class BillEditor extends Composite {
 		treeColumnItem.setText("Item");
 		
 		TreeColumn treeColumnDesc = new TreeColumn(packageTree, SWT.NONE);
-		treeColumnDesc.setWidth(200);
+		treeColumnDesc.setWidth(225);
 		treeColumnDesc.setText("Description");
 		
 		TreeColumn treeColumnAmount = new TreeColumn(packageTree, SWT.NONE);
@@ -608,12 +607,7 @@ public class BillEditor extends Composite {
 						}
 						catch (Exception ex)
 						{
-							MessageBox mb = new MessageBox(shell, SWT.OK);
-							
-							System.out.println("Error exporting invoice: " + ex.toString());
-							
-							mb.setMessage("Error exporting invoice.");
-							mb.open();
+							Utility.showErrorMessage(shell, "Error exporting invoice: " + ex.toString());
 						}
 						
 						/*try

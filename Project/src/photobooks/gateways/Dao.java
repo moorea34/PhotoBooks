@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.DriverManager;
 import java.sql.SQLWarning;
 
+import photobooks.application.Utility;
 import photobooks.objects.*;
 import photobooks.objects.Package;
 
@@ -36,6 +37,7 @@ public class Dao implements IDao
 	public Dao()
 	{
 		open();
+		
 		_globalGateway = new GlobalGateway(this);
 		_clientGateway = new ClientGateway<Client>(this);
 		_productGateway = new ProductGateway<Product>(this);
@@ -65,10 +67,43 @@ public class Dao implements IDao
 			processSQLError(e);
 		}
 		
-		System.out.println("Opened " + databaseType +" database " +databaseName);
+		System.out.println("Opened " + databaseType +" database " + databaseName);
 	}
 
 	public void commitChanges() 
+	{
+		dispose();
+		open();
+		
+		reloadGateways();
+	}
+	
+	public void reloadGateways()
+	{
+		_globalGateway.load();
+		_clientGateway.load();
+		_productGateway.load();
+		_packageGateway.load();
+		_billGateway.load();
+		_eventGateway.load();
+		_paymentGateway.load();
+		_phoneNumberGateway.load();
+		_billProductGateway.load();
+		_billPackageGateway.load();
+		_typeGateway.load();
+	}
+	
+	public void restore(String src) throws Exception
+	{
+		dispose();
+		
+		Utility.copyDatabase(src, "./database");
+		
+		open();
+		reloadGateways();
+	}
+
+	public void dispose() 
 	{
 		try
 		{
@@ -79,12 +114,7 @@ public class Dao implements IDao
 		catch (Exception e)
 		{
 			processSQLError(e);
-		}		
-	}
-
-	public void dispose() 
-	{
-		commitChanges();
+		}
 		
 		try
 		{

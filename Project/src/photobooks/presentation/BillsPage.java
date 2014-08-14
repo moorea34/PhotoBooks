@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import photobooks.application.Globals;
+import photobooks.application.Utility;
 import photobooks.business.BillManager;
 import photobooks.business.ClientManager;
 import photobooks.business.PaymentManager;
@@ -221,25 +222,31 @@ public class BillsPage extends Composite {
 
 					if (_billEditor.getVisible())
 					{
-						_billManager.delete(_bill);
-						_clientManager.recalculateClientBalance(_bill.getClient());
-						treeViewer.remove(_bill);
+						if (Utility.confirmDelete(shell, "this bill"))
+						{
+							_billManager.delete(_bill);
+							_clientManager.recalculateClientBalance(_bill.getClient());
+							treeViewer.remove(_bill);
 
-						_billEditor.clearTransactionFields();
+							_billEditor.clearTransactionFields();
 
-						_bill = null;
+							_bill = null;
+						}
 					}
 					else
 					{
-						_paymentManager.delete(_payment);
-						_clientManager.recalculateClientBalance(_payment.getClient());
+						if (Utility.confirmDelete(shell, "this payment"))
+						{
+							_paymentManager.delete(_payment);
+							_clientManager.recalculateClientBalance(_payment.getClient());
 
-						_bill.getPayments().remove(_payment);
-						treeViewer.remove(_payment);
+							_bill.getPayments().remove(_payment);
+							treeViewer.remove(_payment);
 
-						selectBill(_bill);
+							selectBill(_bill);
 
-						_payment = null;
+							_payment = null;
+						}
 					}
 
 					refresh();
@@ -709,6 +716,10 @@ public class BillsPage extends Composite {
 		
 		if (_payment != null)
 			selectPayment(_paymentManager.getByID(_payment.getID()));
+		else if (_bill != null)
+			selectBill(_billManager.getByID(_bill.getID()));
+		else if (_client != null)
+			selectClient(_clientManager.getClientByID(_client.getID()));
 	}
 
 	public void refresh()

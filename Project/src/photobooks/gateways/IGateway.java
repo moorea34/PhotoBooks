@@ -2,7 +2,7 @@ package photobooks.gateways;
 
 import java.util.Collection;
 
-public interface IGateway<T>
+public interface IGateway<T> extends IGatewayInit
 {
 	public Collection<T> getAll();
 	public T getByID(int id);

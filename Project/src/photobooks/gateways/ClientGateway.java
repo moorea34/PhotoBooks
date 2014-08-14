@@ -33,7 +33,7 @@ public class ClientGateway<T> implements IGateway<Client>
 	
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
-	private Statement _statement;
+	private Statement _statement = null;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
@@ -41,7 +41,24 @@ public class ClientGateway<T> implements IGateway<Client>
 	public ClientGateway(IDao dao)
 	{
 		_dao = dao;
-		_statement = dao.getStatement();
+		load();
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
+		_statement = _dao.getStatement();
 	}
 	
 	private Client resultSetToClient(ResultSet results) {

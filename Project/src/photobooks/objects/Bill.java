@@ -70,6 +70,43 @@ public class Bill extends DBObject implements ITransaction
 		return name;
 	}
 	
+	public ArrayList<IBillItem> getItems()
+	{
+		ArrayList<IBillItem> objs = new ArrayList<IBillItem>();
+		int packageIndex = 0, packageCount = _packages.size(), productIndex = 0, productCount = _products.size();
+		int totalCount = packageCount + productCount;
+		
+		for (int i = 0; i < totalCount; ++i) {
+			while (productIndex < productCount && _products.get(productIndex) == null) ++productIndex;
+			while (packageIndex < packageCount && _packages.get(packageIndex) == null) ++packageIndex;
+			
+			if (packageIndex < packageCount && productIndex < productCount) {
+				if (_products.get(productIndex).getOrder() < _packages.get(packageIndex).getOrder()) {
+					objs.add(_products.get(productIndex));
+					
+					++productIndex;
+				}
+				else {
+					objs.add(_packages.get(packageIndex));
+					
+					++packageIndex;
+				}
+			}
+			else if (packageIndex >= packageCount && productIndex < productCount) {
+				objs.add(_products.get(productIndex));
+				
+				++productIndex;
+			}
+			else {
+				objs.add(_packages.get(packageIndex));
+				
+				++packageIndex;
+			}
+		}
+		
+		return objs;
+	}
+	
 	public ArrayList<BillProduct> getProducts()
 	{
 		return _products;

@@ -27,23 +27,43 @@ public class PackageGateway<T> implements IGateway<Package>
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
 	//private ResultSet _resultSet2;
-	private Statement _statement;
+	private Statement _statement = null;
 	//private Statement _statement2;
 	//private Statement _statement3;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
 	
-	private ProductPackageGateway _productPackageGateway;
+	private ProductPackageGateway _productPackageGateway = null;
 	
 	public PackageGateway(IDao dao)
 	{
 		_dao = dao;
-		_statement = _dao.getStatement();
+		load();
 		//_statement2 = _dao.getStatement();
 		//_statement3 = _dao.getStatement();
 		
 		_productPackageGateway = new ProductPackageGateway(dao);
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
+		_statement = _dao.getStatement();
+		
+		if (_productPackageGateway != null)
+			_productPackageGateway.load();
 	}
 
 	public Collection<Package> getAll() 

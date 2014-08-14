@@ -26,7 +26,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 	
 	private static String EOF = "  ";
 	private ResultSet _resultSet;
-	private Statement _statement;
+	private Statement _statement = null;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
@@ -34,6 +34,23 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 	public PaymentGateway(IDao dao)
 	{
 		_dao = dao;
+		load();
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
 		_statement = _dao.getStatement();
 	}
 	

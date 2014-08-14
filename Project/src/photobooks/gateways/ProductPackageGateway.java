@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import photobooks.objects.Product;
 import photobooks.objects.ProductPackage;
 
-public class ProductPackageGateway {
+public class ProductPackageGateway implements IGatewayInit {
 	//table 
 	private static final String PRODUCT_PACKAGE_TABLE = "PRODUCTPACKAGE";
 	
@@ -21,13 +21,30 @@ public class ProductPackageGateway {
 	private static final String ORDER = "IORDER";
 	
 	private ResultSet _resultSet;
-	private Statement _statement;
+	private Statement _statement = null;
 	private IDao _dao;
 	private String _commandString;
 	private int _updateCount;
 	
 	public ProductPackageGateway(IDao dao) {
 		_dao = dao;
+		load();
+	}
+	
+	public void load()
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				_statement.close();
+			}
+			catch (Exception e)
+			{
+				_dao.processSQLError(e);
+			}
+		}
+		
 		_statement = _dao.getStatement();
 	}
 	
