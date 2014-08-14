@@ -55,6 +55,7 @@ public class PDFHelper {
 	
 	public static float drawBillItem(PDPageContentStream stream, float x, float y, float rowSize, PDFont font, float fontSize, float[] columnWidths, String[] items, float margin) throws IOException {
 		float result = rowSize;
+		float dollarSize = getStringWidth("  $", font, fontSize);
 		PDRectangle rect = new PDRectangle(1, rowSize);
 		HorizontalAlignment hAlign = HorizontalAlignment.CENTER;
 		
@@ -69,15 +70,27 @@ public class PDFHelper {
 			
 			if (i < items.length)
 			{
+				ArrayList<String> lines;
+				float offset = 0.0f;
 				PDRectangle drawRect = new PDRectangle(rect.getWidth() - (2.0f * margin), rect.getHeight() - (2.0f * margin));
 				drawRect.move(rect.getLowerLeftX() + margin, rect.getLowerLeftY() + margin);
 				
-				stream.beginText();
+				if (i > 1)
+					offset = dollarSize;
 				
-				drawString(stream, drawRect, hAlign, VerticalAlignment.CENTER, items[i], font, fontSize);
+				lines = fitStringToWidth(items[i], font, fontSize, drawRect.getWidth() - offset);
+				result = Math.max(result, rowSize * lines.size());
+				
+				stream.beginText();
 				
 				if (i > 1)
 					drawString(stream, drawRect, HorizontalAlignment.LEFT, VerticalAlignment.CENTER, "  $", font, fontSize);
+				
+				for (String str : lines)
+				{
+					drawString(stream, drawRect, hAlign, VerticalAlignment.CENTER, str, font, fontSize);
+					drawRect.move(0, -rowSize);
+				}
 				
 				stream.endText();
 			}
@@ -91,6 +104,34 @@ public class PDFHelper {
 		}
 		
 		return result;
+	}
+	
+	public static int linesRequiredForBillItem(String[] content, float[] columnWidths, PDFont font, float fontSize, float margin) throws IOException {
+		int lines = 1;
+		int i = 0;
+		
+		for (String str : content)
+		{
+			if (i < columnWidths.length)
+			{
+				lines = Math.max(lines, fitStringToWidth(str, font, fontSize, columnWidths[i] - (margin * 2.0f)).size());
+			}
+			
+			++i;
+		}
+		
+		return lines;
+	}
+	
+	public static int linesRequiredForAllBillItems(ArrayList<String[]> content, float[] columnWidths, PDFont font, float fontSize, float margin) throws IOException {
+		int lines = 0;
+		
+		for (String[] strings : content)
+		{
+			lines += linesRequiredForBillItem(strings, columnWidths, font, fontSize, margin);
+		}
+		
+		return lines;
 	}
 	
 	public static void drawBill(PDPageContentStream stream, PDRectangle rect, PDFont font, float fontSize, float scale, Bill bill) throws IOException {
@@ -119,7 +160,7 @@ public class PDFHelper {
 			}
 		}
 		
-		numRows = content.size();
+		numRows = linesRequiredForAllBillItems(content, columnWidths, font, fontSize, margin);
 		
 		if (numRows > totalRows - 2) {
 			float newRowSize = rect.getHeight() / (numRows + 2);
@@ -130,6 +171,8 @@ public class PDFHelper {
 			
 			fontSize = rowSize - (margin * 2.0f);
 			totalRows = Math.round(rect.getHeight() / rowSize);
+			
+			numRows = linesRequiredForAllBillItems(content, columnWidths, font, fontSize, margin);
 		}
 		
 		remainingRows = Math.max(totalRows - (numRows + 2), 0);
@@ -188,16 +231,23 @@ public class PDFHelper {
 		stream.setNonStrokingColor(0);
 		drawBox(stream, rect);
 		
-		for (y = rect.getUpperRightY() - rowSize; y >= rect.getLowerLeftY(); y -= rowSize) {
-			stream.drawLine(rect.getLowerLeftX(), y, rect.getUpperRightX(), y);
-		}
-		
 		i = 0;
-		y = rect.getUpperRightY() - (2.0f * rowSize);
+		y = rect.getUpperRightY() - rowSize;
+		
+		stream.drawLine(rect.getLowerLeftX(), y, rect.getUpperRightX(), y);
+		y -= rowSize;
 		
 		for (String[] strings : content) {
 			y -= drawBillItem(stream, rect.getLowerLeftX(), y, rowSize, font, fontSize, columnWidths, strings, margin);
+			stream.drawLine(rect.getLowerLeftX(), y + rowSize, rect.getUpperRightX(), y + rowSize);
 			++i;
+		}
+
+		stream.drawLine(rect.getLowerLeftX(), y + rowSize, rect.getUpperRightX(), y + rowSize);
+		
+		for (; y >= rect.getLowerLeftY(); y -= rowSize)
+		{
+			stream.drawLine(rect.getLowerLeftX(), y, rect.getUpperRightX(), y);
 		}
 	}
 	
@@ -262,6 +312,62 @@ public class PDFHelper {
 		
 		return x;
 	}
+	
+	public static ArrayList<String> fitStringToWidth(String str, PDFont font, float fontSize, float maxWidth) throws IOException {
+		ArrayList<String> out = new ArrayList<String>();
+		int firstChar = -1, lastWhiteSpace = -1;
+		int index = 0;
+		
+		if (str.length() == 0 || getStringWidth(str, font, fontSize) <= maxWidth)
+			out.add(str);
+		else
+		{
+			for (char ch : str.toCharArray())
+			{
+				if (Character.isWhitespace(ch))
+				{
+					if (firstChar >= 0)
+						lastWhiteSpace = index;
+				}
+				else if (firstChar == -1)
+					firstChar = index;
+				
+				if (getStringWidth(str.substring(0, index + 1), font, fontSize) > maxWidth)
+				{
+					if (lastWhiteSpace >= 0)
+					{
+						out.add(str.substring(0, lastWhiteSpace));
+						
+						if (str.length() > lastWhiteSpace + 1)
+							out.addAll(fitStringToWidth(str.substring(lastWhiteSpace + 1), font, fontSize, maxWidth));
+					}
+					else if (index == 0)
+					{
+						out.add(str.substring(0, 1));
+						
+						if (str.length() > 1)
+							out.addAll(fitStringToWidth(str.substring(1), font, fontSize, maxWidth));
+					}
+					else
+					{
+						out.add(str.substring(0, index));
+						
+						if (str.length() > index)
+							out.addAll(fitStringToWidth(str.substring(index), font, fontSize, maxWidth));
+					}
+					
+					//This line should always execute if str.width > maxWidth
+					break;
+				}
+				
+				++index;
+			}
+		}
+		
+		return out;
+	}
+	
+	public static float getStringWidth(String str, PDFont font, float fontSize) throws IOException { return fontSize * font.getStringWidth(str) / 1000.0f; }
 	
 	public static PDFont loadFont(PDDocument document, String fontName) {
 		PDFont font = null;
