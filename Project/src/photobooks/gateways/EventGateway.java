@@ -78,7 +78,42 @@ public class EventGateway<T> implements IGateway<Event>
 		
 		try
 		{
-			_commandString = "SELECT * FROM " + EVENT_TABLE + " ORDER BY " + DATE + " DESC";
+			_commandString = "SELECT * FROM " + EVENT_TABLE + " ORDER BY " + DATE;
+			_resultSet = _statement.executeQuery(_commandString);
+		}
+		catch (Exception e)
+		{
+			_dao.processSQLError(e);
+		}
+		
+		try
+		{
+			while (_resultSet.next())
+			{
+				events.add(resultSetToEvent(_resultSet));
+			}
+			
+			_resultSet.close();
+		}
+		catch (Exception e)
+		{
+			_dao.processSQLError(e);
+		}
+		
+		return events;
+	}
+	
+	public Collection<Event> getAllInRange(Calendar start, Calendar end, boolean keepNull) 
+	{
+		ArrayList<Event> events = new ArrayList<Event>();
+		String strKeepNull = "";
+		
+		if (keepNull)
+			strKeepNull = String.format("%s IS NULL OR", DATE);
+		
+		try
+		{
+			_commandString = String.format("SELECT * FROM %s WHERE (%s (convert(%s, DATE) >= '%s' AND convert(%s, DATE) <= '%s')) ORDER BY %s", EVENT_TABLE, strKeepNull, DATE, new Date(start.getTime().getTime()).toString(), DATE, new Date(end.getTime().getTime()).toString(), DATE);
 			_resultSet = _statement.executeQuery(_commandString);
 		}
 		catch (Exception e)

@@ -785,18 +785,16 @@ public class PackagesPage extends Composite
 		{
 			Package p = _packageManager.getProductPackage(id);
 			
-			if (p != null)
-				select(p);
+			select(p);
 		}
 		else if (selectedType.equals("Product"))
 		{
 			Product p = _productManager.getProduct(id);
 			
-			if (p != null)
-				select(p);
+			select(p);
 		}
 		else
-			selectedItem = null;
+			select(null);
 	}
 	
 	public void refresh()

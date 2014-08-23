@@ -865,6 +865,8 @@ public class BillEditor extends Composite {
 			
 			updateTotals();
 		}
+		else
+			clearAllFields();
 	}
 	
 	private void clearTotalFields()

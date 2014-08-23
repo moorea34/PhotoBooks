@@ -38,10 +38,11 @@ public class MainWindow {
 	private ClientsPage clientsPage;
 	private PackagesPage packagesPage;
 	private BillsPage billingPage;
+	private EventsPage eventsPage;
 	private SettingsEditor settingsEditor;
 	
 	private TabFolder tabLayout;
-	private TabItem packagesTab, clientTab, billTab, settingsTab;
+	private TabItem packagesTab, clientTab, billTab, eventTab, settingsTab;
 	
 	final private String PRODUCT_TYPE = "Product";
 	final private String PACKAGE_TYPE = "Package";
@@ -55,13 +56,13 @@ public class MainWindow {
 
 		_dao = Globals.getDao();
 		
-		_eventManager = new EventManager(_dao.eventGateway());
-		_clientManager = new ClientManager( _dao );
+		_eventManager = new EventManager(_dao);
+		_clientManager = new ClientManager(_dao);
 		_billManager = new BillManager(_dao);
 		_paymentManager = new PaymentManager(_dao.paymentGateway());
 		
-		_packageManager = new ProductPackageManager( _dao.packageGateway() );
-		_productManager = new ProductManager( _dao.productGateway(), _packageManager );
+		_packageManager = new ProductPackageManager(_dao.packageGateway());
+		_productManager = new ProductManager(_dao.productGateway(), _packageManager);
 		
 		if (_dao instanceof StubDao)
 		{
@@ -78,6 +79,7 @@ public class MainWindow {
 		
 		createContents();	
 		
+		shell.setMaximized(true);
 		shell.open();
 		shell.layout();
 		
@@ -135,8 +137,9 @@ public class MainWindow {
 		clientTab.setText("Clients");
 		
 		billingPage = new BillsPage(tabLayout, SWT.NONE, shell, _clientManager, _billManager, _paymentManager, _productManager, _packageManager);
+		eventsPage = new EventsPage(tabLayout, SWT.NONE, _eventManager);
 
-		clientsPage = new ClientsPage(tabLayout, SWT.NONE, _clientManager, (BillsPage)billingPage);
+		clientsPage = new ClientsPage(tabLayout, SWT.NONE, _clientManager, billingPage, eventsPage);
 		clientTab.setControl(clientsPage);
 
 		packagesTab = new TabItem(tabLayout, SWT.NONE);
@@ -149,6 +152,10 @@ public class MainWindow {
 		billTab.setText("Billing");
 		
 		billTab.setControl(billingPage);
+		
+		eventTab = new TabItem(tabLayout, SWT.NONE);
+		eventTab.setText("Events");
+		eventTab.setControl(eventsPage);
 		
 		settingsTab = new TabItem(tabLayout, SWT.NONE);
 		settingsEditor = new SettingsEditor(tabLayout, SWT.NONE);
@@ -223,7 +230,7 @@ public class MainWindow {
 	    				}
 	    				catch (Exception ex)
 	    				{
-	    					String msg = "Error backing up database: " + ex.toString();
+	    					String msg = "Error restoring database: " + ex.toString();
 			    			
 		    				Utility.showErrorMessage(shell, msg);
 	    				}

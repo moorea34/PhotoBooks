@@ -71,12 +71,109 @@ public class Utility {
 		return result;
 	}
 	
+	public static int dayOfWeek(Calendar day) {
+		int dayOfWeek = -1;
+		
+		switch (day.get(Calendar.DAY_OF_WEEK))
+		{
+			case Calendar.SUNDAY: dayOfWeek = 0;
+				break;
+			case Calendar.MONDAY: dayOfWeek = 1;
+				break;
+			case Calendar.TUESDAY: dayOfWeek = 2;
+				break;
+			case Calendar.WEDNESDAY: dayOfWeek = 3;
+				break;
+			case Calendar.THURSDAY: dayOfWeek = 4;
+				break;
+			case Calendar.FRIDAY: dayOfWeek = 5;
+				break;
+			case Calendar.SATURDAY: dayOfWeek = 6;
+				break;
+		}
+		
+		return dayOfWeek;
+	}
+	
 	public static String dayOfWeekToString( int dayOfWeek )
 	{
 		String result = "";
 		
-		if (dayOfWeek < 7 && dayOfWeek > 0)
+		if (dayOfWeek < 8 && dayOfWeek > 0)
 			result = DAYSOFWEEK[dayOfWeek - 1];
+		
+		return result;
+	}
+	
+	private static int getNextField(int calendarField) {
+		switch (calendarField)
+		{
+			case Calendar.YEAR:
+				calendarField = Calendar.MONTH;
+				break;
+			case Calendar.MONTH:
+				calendarField = Calendar.DAY_OF_MONTH;
+				break;
+			case Calendar.DAY_OF_MONTH:
+				calendarField = Calendar.HOUR_OF_DAY;
+				break;
+			case Calendar.HOUR_OF_DAY:
+				calendarField = Calendar.MINUTE;
+				break;
+			case Calendar.MINUTE:
+				calendarField = Calendar.SECOND;
+				break;
+			case Calendar.SECOND:
+				calendarField = Calendar.MILLISECOND;
+				break;
+			default:
+				calendarField = Calendar.WEEK_OF_YEAR;
+				break;
+		}
+		
+		return calendarField;
+	}
+	
+	public static int compareDates(Calendar _date, Calendar date) {
+		int result = 0;
+		int field = Calendar.YEAR;
+		
+		if (_date == null && date == null) result = 0;
+		else if (_date == null && date != null) result = -1;
+		else if (_date != null && date == null) result = 1;
+		else
+		{
+			while (result == 0 && field != Calendar.WEEK_OF_YEAR)
+			{
+				result = Integer.compare(_date.get(field), date.get(field));
+				field = getNextField(field);
+			}
+			
+			if (result < 0) result = -1;
+			else if (result > 0) result = 1;
+		}
+		
+		return result;
+	}
+	
+	public static int compareBirthdays(Calendar _date, Calendar date) {
+		int result = 0;
+		int field = Calendar.MONTH;
+		
+		if (_date == null && date == null) result = 0;
+		else if (_date == null && date != null) result = -1;
+		else if (_date != null && date == null) result = 1;
+		else
+		{
+			while (result == 0 && field != Calendar.HOUR_OF_DAY)
+			{
+				result = Integer.compare(_date.get(field), date.get(field));
+				field = getNextField(field);
+			}
+			
+			if (result < 0) result = -1;
+			else if (result > 0) result = 1;
+		}
 		
 		return result;
 	}
@@ -143,6 +240,24 @@ public class Utility {
 	public static String formatDate(Calendar calendar)
 	{
 		return String.format("%d / %d / %d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+	}
+	
+	public static String formatDateLong(Calendar calendar)
+	{
+		if (calendar == null) return "";
+		
+		return String.format("%s %d, %d", monthToString(calendar.get(Calendar.MONTH)), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.YEAR));
+	}
+	
+	public static String formatTime(Calendar calendar)
+	{
+		int hour = calendar.get(Calendar.HOUR);
+		String amPm = "AM";
+		
+		if (hour == 0) hour = 12;
+		if (calendar.get(Calendar.AM_PM) == Calendar.PM) amPm = "PM";
+		
+		return String.format("%d:%d %s", hour, calendar.get(Calendar.MINUTE), amPm);
 	}
 	
 	public static String formatMoney(double price)

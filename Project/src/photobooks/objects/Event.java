@@ -2,6 +2,8 @@ package photobooks.objects;
 
 import java.util.*;
 
+import photobooks.application.Utility;
+
 // Holds all the information for any type of event that may occur
 public class Event extends DBObject
 {
@@ -43,6 +45,14 @@ public class Event extends DBObject
 	public void setDescription(String description)
 	{
 		_description = description;
+	}
+	
+	public int compareDateTo(Calendar date) {
+		return Utility.compareDates(_date, date);
+	}
+	
+	public int compareDateTo(Event other) {
+		return compareDateTo(other._date);
 	}
 }
 

@@ -720,6 +720,11 @@ public class BillsPage extends Composite {
 			selectBill(_billManager.getByID(_bill.getID()));
 		else if (_client != null)
 			selectClient(_clientManager.getClientByID(_client.getID()));
+		else
+		{
+			_billEditor.setBill(null);
+			_paymentEditor.setPayment(null);
+		}
 	}
 
 	public void refresh()

@@ -46,10 +46,11 @@ public class ClientsPage extends Composite
 	private Button btnChooseDirectory, btnViewPhotos, btnRemoveClient, btnModifyClient, btnAddClient;
 	
 	private BillsPage _billsPage;
+	private EventsPage _eventsPage;
 	
 	Shell shell;
 	
-	public ClientsPage(Composite parent, int style, ClientManager clientManager, BillsPage billsPage) 
+	public ClientsPage(Composite parent, int style, ClientManager clientManager, BillsPage billsPage, EventsPage eventsPage) 
 	{
 		super(parent, style);
 		Register.newWindow(this);
@@ -59,6 +60,7 @@ public class ClientsPage extends Composite
 		_parent = parent;
 		_clientManager = clientManager;
 		_billsPage = billsPage;
+		_eventsPage = eventsPage;
 		modifying = false;
 		
 		setupUI();
@@ -120,6 +122,7 @@ public class ClientsPage extends Composite
 											{
 												IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 												Client selected = (Client)selection.getFirstElement();
+												
 												if(selected != null)
 												{
 													System.out.println("Selected client id: " + selected.getID());
@@ -196,6 +199,7 @@ public class ClientsPage extends Composite
 								updateList();
 							
 								_billsPage.updateClientCB();
+								_eventsPage.refresh();
 							}
 						}
 					}
@@ -247,6 +251,7 @@ public class ClientsPage extends Composite
 							listViewer.setSelection(new StructuredSelection(newClient));
 							
 							_billsPage.updateClientCB();
+							_eventsPage.refresh();
 						}
 
 						
@@ -380,7 +385,9 @@ public class ClientsPage extends Composite
 		if(currClientID != -1)
 		{
 			Client selected = _clientManager.getClientByID(currClientID);
-			listViewer.setSelection(new StructuredSelection(selected));
+			
+			if (selected != null)
+				listViewer.setSelection(new StructuredSelection(selected));
 			selectClient(selected);
 		}
 	}
@@ -418,6 +425,7 @@ public class ClientsPage extends Composite
 				updateList();
 
 				_billsPage.updateClientCB();
+				_eventsPage.refresh();
 			}
 		}
 	}

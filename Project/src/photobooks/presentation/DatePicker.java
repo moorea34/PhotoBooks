@@ -93,7 +93,7 @@ public class DatePicker extends Composite {
 		Calendar date = null;
 		int year = nudYear.getSelection(), month = Utility.stringToMonth(comboViewer.getCombo().getText()), day = nudDay.getSelection();
 		
-		if (day != 0 || year != 0 || month >= 0)
+		if ((day != 0 || year != 0) && month >= 0)
 		{
 			date = Calendar.getInstance();
 			date.set(year, month, day);

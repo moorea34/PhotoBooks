@@ -39,3 +39,5 @@ Icon
 #My ignores
 Project/bin/photobooks/*.class
 Project/bin/tests/*.class
+.jar
+.app

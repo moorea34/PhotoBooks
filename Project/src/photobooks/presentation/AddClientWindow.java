@@ -56,7 +56,7 @@ public class AddClientWindow extends Dialog
 	private void createContents() 
 	{
 		shell = new Shell(getParent(), getStyle() | SWT.APPLICATION_MODAL);
-		shell.setSize(411, 451);
+		shell.setSize(411, 545);
 		shell.setMinimumSize(500, 600);
 		shell.setText(getText());
 		shell.setLayout(new FormLayout());
