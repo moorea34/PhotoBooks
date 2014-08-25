@@ -3,6 +3,8 @@ package photobooks.objects;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import photobooks.objects.PhoneNumber.PhoneNumberType;
+
 public class Client extends DBObject
 {
 	private String _firstName;
@@ -83,6 +85,38 @@ public class Client extends DBObject
 	public String getFullName()
 	{
 		return _firstName + " " + _lastName;
+	}
+	
+	//Returns the first number by priority from Home -> Cell -> Work -> Alternative
+	public PhoneNumber getFirstNumber()
+	{
+		PhoneNumber first = null;
+		
+		for (PhoneNumber number : _phoneNumbers)
+		{
+			if (first == null)
+				first = number;
+			else if (first.getType() == PhoneNumberType.Alternative)
+			{
+				if (number.getType() != PhoneNumberType.Alternative)
+					first = number;
+			}
+			else if (first.getType() == PhoneNumberType.Work)
+			{
+				if (number.getType() == PhoneNumberType.Home || number.getType() == PhoneNumberType.Cellular)
+					first = number;
+			}
+			else if (first.getType() == PhoneNumberType.Cellular)
+			{
+				if (number.getType() == PhoneNumberType.Home)
+					first = number;
+			}
+			
+			if (first.getType() == PhoneNumberType.Home)
+				break;
+		}
+		
+		return first;
 	}
 	
 	public ArrayList<PhoneNumber> getNumbers()

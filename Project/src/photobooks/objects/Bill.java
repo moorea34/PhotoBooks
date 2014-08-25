@@ -202,9 +202,10 @@ public class Bill extends DBObject implements ITransaction
 	
 	public double getTaxes()
 	{
-		double _total =  subtotal();
+		/*double _total =  subtotal();
 		
-		return (_total * _gst) + (_total * _pst);
+		return (_total * _gst) + (_total * _pst);*/
+		return _gst + _pst;
 	}
 	
 	public void cancel()

@@ -70,7 +70,7 @@ public class InvoiceExporter {
 		
 		//Table vars
 		PDRectangle tableBox = new PDRectangle(bannerWidth, 1000.0f * scale);
-		PDRectangle totalBox, taxesBox, labelBox;
+		PDRectangle totalBox, labelBox;
 		
 		footerLine.move(margin, margin);
 		
@@ -97,21 +97,12 @@ public class InvoiceExporter {
 		//Construct phone numbers
 		if (client.getNumbers().size() > 0)
 		{
-			String phone = "Phone";
-			int i = 0;
+			String phone = "";
+			PhoneNumber phoneNumber = client.getFirstNumber();
 			
-			for (PhoneNumber phoneNumber : client.getNumbers())
-			{
-				if (i > 0)
-					phone += ", ";
-				else
-					phone += " ";
-				
-				phone += Utility.formatPhoneNumber(phoneNumber.getNumber());
-				++i;
-			}
+			if (phoneNumber != null) phone = Utility.formatPhoneNumber(phoneNumber.getNumber());
 			
-			customerLines.add(phone);
+			customerLines.add("Phone " + phone);
 		}
 		
 		addressHeight = (customerLines.size() * addressLineHeight) + ((customerLines.size() - 1) * addressLineOffset);
@@ -160,18 +151,15 @@ public class InvoiceExporter {
 		numberLength = fontSize * font.getStringWidth(number) / 1000.0f;
 		
 		line1y = bannerY - offsetY;
-		line2y = line1y - (325.0f * scale);
+		line2y = line1y - (300.0f * scale);
 		
 		tableBox.move(margin, line2y - (tableBox.getHeight() + (40.0f * scale)));
 		
-		totalBox = new PDRectangle(tableBox.getWidth(), (tableBox.getLowerLeftY() - (footerBarY + footerBarHeight)) / 2.0f);
+		totalBox = new PDRectangle(tableBox.getWidth(), (tableBox.getLowerLeftY() - (footerBarY + footerBarHeight)) / 4.0f);
 		totalBox.move(margin, footerBarY + footerBarHeight);
 		
-		taxesBox = new PDRectangle(tableBox.getWidth(), totalBox.getHeight());
-		taxesBox.move(margin, totalBox.getUpperRightY());
-		
 		labelBox = new PDRectangle(600.0f * scale, totalBox.getHeight());
-		labelBox.move(pageWidth - (margin + labelBox.getWidth()), taxesBox.getLowerLeftY());
+		labelBox.move(pageWidth - (margin + labelBox.getWidth()), totalBox.getLowerLeftY());
 		
 		addressBoxHeight = line1y - line2y;
 		addressY = (5.0f * scale) + line1y - (fontSize + ((addressBoxHeight - addressHeight) / 2.0f));
@@ -235,12 +223,21 @@ public class InvoiceExporter {
 			footerLine.move(0, footerLineHeight);
 		}
 		
-		PDFHelper.drawString(contentStream, labelBox, PDFHelper.HorizontalAlignment.LEFT, PDFHelper.VerticalAlignment.CENTER, "  TAXES", font, fontSize);
-		labelBox.move(0, -taxesBox.getHeight());
 		PDFHelper.drawString(contentStream, labelBox, PDFHelper.HorizontalAlignment.LEFT, PDFHelper.VerticalAlignment.CENTER, "  TOTAL", font, fontSize);
-		
-		PDFHelper.drawString(contentStream, taxesBox, PDFHelper.HorizontalAlignment.RIGHT, PDFHelper.VerticalAlignment.CENTER, String.format("$%s", Utility.formatMoneyExport(bill.getTaxes())), font, fontSize);
+		labelBox.move(0, labelBox.getHeight());
+		PDFHelper.drawString(contentStream, labelBox, PDFHelper.HorizontalAlignment.LEFT, PDFHelper.VerticalAlignment.CENTER, "  PST", font, fontSize);
+		labelBox.move(0, labelBox.getHeight());
+		PDFHelper.drawString(contentStream, labelBox, PDFHelper.HorizontalAlignment.LEFT, PDFHelper.VerticalAlignment.CENTER, "  GST", font, fontSize);
+		labelBox.move(0, labelBox.getHeight());
+		PDFHelper.drawString(contentStream, labelBox, PDFHelper.HorizontalAlignment.LEFT, PDFHelper.VerticalAlignment.CENTER, "  SUBTOTAL", font, fontSize);
+
 		PDFHelper.drawString(contentStream, totalBox, PDFHelper.HorizontalAlignment.RIGHT, PDFHelper.VerticalAlignment.CENTER, String.format("$%s", Utility.formatMoneyExport(bill.total())), font, fontSize);
+		totalBox.move(0, totalBox.getHeight());
+		PDFHelper.drawString(contentStream, totalBox, PDFHelper.HorizontalAlignment.RIGHT, PDFHelper.VerticalAlignment.CENTER, String.format("$%s", Utility.formatMoneyExport(bill.getPst())), font, fontSize);
+		totalBox.move(0, totalBox.getHeight());
+		PDFHelper.drawString(contentStream, totalBox, PDFHelper.HorizontalAlignment.RIGHT, PDFHelper.VerticalAlignment.CENTER, String.format("$%s", Utility.formatMoneyExport(bill.getGst())), font, fontSize);
+		totalBox.move(0, totalBox.getHeight());
+		PDFHelper.drawString(contentStream, totalBox, PDFHelper.HorizontalAlignment.RIGHT, PDFHelper.VerticalAlignment.CENTER, String.format("$%s", Utility.formatMoneyExport(bill.subtotal())), font, fontSize);
 		
 		//contentStream.drawString("End.");
 		

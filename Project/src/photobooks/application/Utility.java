@@ -363,19 +363,33 @@ public class Utility {
         return dirDialog.open();
 	}
 	
-	public static String getSaveLoc(Shell shell, String defaultName)
+	public static String getSaveLoc(Shell shell, String defaultName, String[] filterNames, String[] filterExtensions)
 	{
 		FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
 		
 		fileDialog.setText("Save");
 		
-		fileDialog.setFilterNames(new String[] { "PDF Files" });
-		fileDialog.setFilterExtensions(new String[] { "*.pdf" });
+		fileDialog.setFilterNames(filterNames);
+		fileDialog.setFilterExtensions(filterExtensions);
 		
 		if (defaultName != null)
-			fileDialog.setFileName(defaultName + ".pdf");
+			fileDialog.setFileName(defaultName);
 		
 		return fileDialog.open();
+	}
+	
+	public static String getSaveLocPDF(Shell shell, String defaultName)
+	{
+		if (defaultName == null) defaultName = "";
+		
+		return getSaveLoc(shell, defaultName + ".pdf", new String[] { "PDF Files" }, new String[] { "*.pdf" });
+	}
+	
+	public static String getSaveLocTXT(Shell shell, String defaultName)
+	{
+		if (defaultName == null) defaultName = "";
+		
+		return getSaveLoc(shell, defaultName + ".txt", new String[] { "txt Files" }, new String[] { "*.txt" });
 	}
 
 	public static void openDir(Shell shell, String path)

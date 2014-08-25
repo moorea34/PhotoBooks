@@ -39,10 +39,11 @@ public class MainWindow {
 	private PackagesPage packagesPage;
 	private BillsPage billingPage;
 	private EventsPage eventsPage;
+	private ReportsPage reportsPage;
 	private SettingsEditor settingsEditor;
 	
 	private TabFolder tabLayout;
-	private TabItem packagesTab, clientTab, billTab, eventTab, settingsTab;
+	private TabItem packagesTab, clientTab, billTab, eventTab, reportsTab, settingsTab;
 	
 	final private String PRODUCT_TYPE = "Product";
 	final private String PACKAGE_TYPE = "Package";
@@ -156,6 +157,11 @@ public class MainWindow {
 		eventTab = new TabItem(tabLayout, SWT.NONE);
 		eventTab.setText("Events");
 		eventTab.setControl(eventsPage);
+		
+		reportsPage = new ReportsPage(tabLayout, SWT.NONE, _clientManager, _billManager, _paymentManager);
+		reportsTab = new TabItem(tabLayout, SWT.NONE);
+		reportsTab.setText("Reports");
+		reportsTab.setControl(reportsPage);
 		
 		settingsTab = new TabItem(tabLayout, SWT.NONE);
 		settingsEditor = new SettingsEditor(tabLayout, SWT.NONE);

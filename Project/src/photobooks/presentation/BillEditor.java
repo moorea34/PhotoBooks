@@ -481,6 +481,8 @@ public class BillEditor extends Composite {
 					
 					TreeItem item = new TreeItem(packageViewer.getTree(), SWT.NONE);
 					setTreeItem(item, result);
+					
+					recalculateTaxes();
 				}
 
 				updateTotals();
@@ -518,6 +520,7 @@ public class BillEditor extends Composite {
 						}
 						
 						setTreeItem(treeItems[0], result);
+						recalculateTaxes();
 					}
 
 					updateTotals();
@@ -542,7 +545,10 @@ public class BillEditor extends Composite {
 				for (TreeItem item : treeItems)
 				{
 					if (item.getData() instanceof BillPackage || item.getData() instanceof BillProduct)
+					{
 						item.dispose();
+						recalculateTaxes();
+					}
 				}
 
 				updateTotals();
@@ -585,7 +591,7 @@ public class BillEditor extends Composite {
 				{
 					//String line;
 					//String html = HtmlGenerator.createBill(_bill);
-					String fileName = Utility.getSaveLoc(shell, String.format("%s %s %s %d", _bill.getClient().getLastName(), _bill.getClient().getFirstName(), _bill.getType().toString(), _bill.getID()));
+					String fileName = Utility.getSaveLocPDF(shell, String.format("%s %s %s %d", _bill.getClient().getLastName(), _bill.getClient().getFirstName(), _bill.getType().toString(), _bill.getID()));
 					
 					if (fileName != null)
 					{
@@ -729,6 +735,19 @@ public class BillEditor extends Composite {
 		}
 		
 		_client = client;
+	}
+	
+	public void recalculateTaxes()
+	{
+		Bill bill = new Bill();
+		double subtotal = 0;
+			
+		getBillFromFields(bill);
+		
+		subtotal = bill.subtotal();
+		
+		tbGst.setText(Utility.formatMoney(subtotal * Globals.getGst()));
+		tbPst.setText(Utility.formatMoney(subtotal * Globals.getPst()));
 	}
 	
 	public void updateTotals()
@@ -883,8 +902,8 @@ public class BillEditor extends Composite {
 		lblBillNumber.setText("-");
 		lblDateValue.setText("-");
 		tbDescription.setText("");
-		tbGst.setText(format.format(Globals.getGst()));
-		tbPst.setText(format.format(Globals.getPst()));
+		tbGst.setText(ZERO);
+		tbPst.setText(ZERO);
 		
 		clearTotalFields();
 	}
