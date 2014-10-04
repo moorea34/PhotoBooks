@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.Payment;
 
 public class PaymentGateway<T> implements IConditionalGateway<Payment>
@@ -81,7 +82,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 				clientId = _resultSet.getInt(CLIENT_ID);
 				billId = _resultSet.getInt(BILL_ID);
 				amount = _resultSet.getDouble(AMOUNT);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				if (tempDate != null) {
 					date = Calendar.getInstance();
@@ -126,7 +127,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 				clientId = _resultSet.getInt(CLIENT_ID);
 				billId = _resultSet.getInt(BILL_ID);
 				amount = _resultSet.getDouble(AMOUNT);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				if (tempDate != null) {
 					date = Calendar.getInstance();
@@ -167,7 +168,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 			values = "NULL, " + clientId
 					+ ", " + newObj.getInvoiceId() //invoice id is the same as bill id
 					+ ", " + newObj.getAmount()
-					+ ", '" + newObj.getDescription()
+					+ ", '" + Utility.formatSqlString(newObj.getDescription())
 					+ "'";
 			if (date != null)
 				values += ", '" + date.toString() + "'";
@@ -216,7 +217,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 			values = CLIENT_ID + " = " + clientId
 					+ ", " + BILL_ID + " = " + obj.getInvoiceId() //invoice id is the same as bill id
 					+ ", " + AMOUNT + " = " + obj.getAmount()
-					+ ", " + DESCRIPTION + " = '" + obj.getDescription()
+					+ ", " + DESCRIPTION + " = '" + Utility.formatSqlString(obj.getDescription())
 					+ "'";
 			if (date != null)
 				values += ", " + DATE + " = '" + date.toString() + "'";
@@ -266,7 +267,7 @@ public class PaymentGateway<T> implements IConditionalGateway<Payment>
 				paymentId = _resultSet.getInt(ID);
 				clientId = _resultSet.getInt(CLIENT_ID);
 				amount = _resultSet.getDouble(AMOUNT);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				if (tempDate != null) {
 					date = Calendar.getInstance();

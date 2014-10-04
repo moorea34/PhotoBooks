@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.PhoneNumber;
 
 public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
@@ -69,7 +70,7 @@ public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
 			{
 				phoneNumberId = _resultSet.getInt(ID);
 				clientId = _resultSet.getInt(CLIENT_ID);
-				phoneNumberValue = _resultSet.getString(PHONE_NUMBER);
+				phoneNumberValue = Utility.unformatSqlString(_resultSet.getString(PHONE_NUMBER));
 				typeId = _resultSet.getInt(PHONETYPE_ID);
 				typeValue = _dao.typeGateway().getById(PHONE_TABLE, typeId);
 				
@@ -101,7 +102,7 @@ public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
 			while (_resultSet.next())
 			{
 				phoneNumberId = _resultSet.getInt(ID);
-				phoneNumberValue = _resultSet.getString(PHONE_NUMBER);
+				phoneNumberValue = Utility.unformatSqlString(_resultSet.getString(PHONE_NUMBER));
 				typeId = _resultSet.getInt(PHONETYPE_ID);
 				typeValue = _dao.typeGateway().getById(PHONE_TABLE, typeId);	
 				
@@ -129,7 +130,7 @@ public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
 			typeId = _dao.typeGateway().getByType(PHONE_TABLE, newObj.getType().toString());
 			
 			values = "NULL, " + newObj.getClientId() 
-					+ ", '" + newObj.getNumber()
+					+ ", '" + Utility.formatSqlString(newObj.getNumber())
 					+ "', " + typeId
 					+ "";			
 			_commandString = "INSERT INTO " + PHONE_TABLE + " VALUES(" + values + ")";
@@ -169,7 +170,7 @@ public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
 			typeId = _dao.typeGateway().getByType(PHONE_TABLE, obj.getType().toString());
 			
 			values = CLIENT_ID + " = " + obj.getClientId() 
-					+ ", " + PHONE_NUMBER + " = '" + obj.getNumber()
+					+ ", " + PHONE_NUMBER + " = '" + Utility.formatSqlString(obj.getNumber())
 					+ "', " + PHONETYPE_ID + " = " + typeId
 					+ "";	
 			where = "WHERE " + ID + " = " + obj.getID();
@@ -208,7 +209,7 @@ public class PhoneNumberGateway<T> implements IConditionalGateway<PhoneNumber>
 			while (_resultSet.next())
 			{
 				phoneNumberId = _resultSet.getInt(ID);
-				phoneNumberValue = _resultSet.getString(PHONE_NUMBER);
+				phoneNumberValue = Utility.unformatSqlString(_resultSet.getString(PHONE_NUMBER));
 				typeId = _resultSet.getInt(PHONETYPE_ID);
 				typeValue = _dao.typeGateway().getById(PHONE_TABLE, typeId);
 				

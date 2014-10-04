@@ -72,6 +72,7 @@ public class EventsPage extends Composite {
 		
 		dtWeek = new DateTime(this, SWT.CALENDAR);
 		FormData fd_dtWeek = new FormData();
+		fd_dtWeek.width = 300;
 		fd_dtWeek.top = new FormAttachment(0, 6);
 		fd_dtWeek.left = new FormAttachment(0, 6);
 		dtWeek.setLayoutData(fd_dtWeek);

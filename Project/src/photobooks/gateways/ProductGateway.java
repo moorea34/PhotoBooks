@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.Product;
 
 public class ProductGateway<T> implements IGateway<Product>
@@ -69,8 +70,8 @@ public class ProductGateway<T> implements IGateway<Product>
 			while (_resultSet.next())
 			{
 				id = _resultSet.getInt(ID);
-				name = _resultSet.getString(NAME);
-				description = _resultSet.getString(DESCRIPTION);
+				name = Utility.unformatSqlString(_resultSet.getString(NAME));
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				price = _resultSet.getDouble(PRICE);
 				
 				product = new Product(name, description, price);
@@ -101,8 +102,8 @@ public class ProductGateway<T> implements IGateway<Product>
 			while (_resultSet.next())
 			{
 				id = _resultSet.getInt(ID);
-				name = _resultSet.getString(NAME);
-				description = _resultSet.getString(DESCRIPTION);
+				name = Utility.unformatSqlString(_resultSet.getString(NAME));
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				price = _resultSet.getDouble(PRICE);
 				
 				product = new Product(name, description, price);
@@ -126,8 +127,8 @@ public class ProductGateway<T> implements IGateway<Product>
 		
 		try
 		{
-			values = "NULL, '" + newObj.getName() 
-					+ "', '" + newObj.getDescription()
+			values = "NULL, '" + Utility.formatSqlString(newObj.getName()) 
+					+ "', '" + Utility.formatSqlString(newObj.getDescription())
 					+ "', " + newObj.getPrice();
 			
 			_commandString = "INSERT INTO " + PRODUCT_TABLE + " VALUES(" + values +")";
@@ -162,8 +163,8 @@ public class ProductGateway<T> implements IGateway<Product>
 		
 		try
 		{
-			values = NAME + " = '" + obj.getName() 
-					+ "', " + DESCRIPTION + " = '" + obj.getDescription()
+			values = NAME + " = '" + Utility.formatSqlString(obj.getName()) 
+					+ "', " + DESCRIPTION + " = '" + Utility.formatSqlString(obj.getDescription())
 					+ "', " + PRICE + " = " + obj.getPrice();
 			
 			where = "WHERE " + ID + " = " + obj.getID();

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.Bill;
 import photobooks.objects.BillPackage;
 import photobooks.objects.BillProduct;
@@ -91,7 +92,7 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 				client = _dao.clientGateway().getByID(clientId);
 				typeId = _resultSet.getInt(TRANSACTIONTYPE_ID);
 				typeValue = _dao.typeGateway().getById(TRANSACTIONTYPE_TABLE, typeId);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				if (tempDate != null) {
 					date = Calendar.getInstance();
@@ -144,7 +145,7 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 				client = _dao.clientGateway().getByID(clientId);
 				typeId = _resultSet.getInt(TRANSACTIONTYPE_ID);
 				typeValue = _dao.typeGateway().getById(TRANSACTIONTYPE_TABLE, typeId);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				if (tempDate != null) {
 					date = Calendar.getInstance();
@@ -203,7 +204,7 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 				client = _dao.clientGateway().getByID(clientId);
 				typeId = _resultSet.getInt(TRANSACTIONTYPE_ID);
 				typeValue = _dao.typeGateway().getById(TRANSACTIONTYPE_TABLE, typeId);
-				description = _resultSet.getString(DESCRIPTION);
+				description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 				tempDate = _resultSet.getTimestamp(DATE);
 				
 				if (tempDate != null) {
@@ -252,7 +253,7 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 		
 			values = "NULL, " + clientId 
 					+ ", " + typeId 
-					+ ", '" + newObj.getDescription()
+					+ ", '" + Utility.formatSqlString(newObj.getDescription())
 					+ "'";
 			if (date != null)
 				values += ", '" + date.toString() + "'";
@@ -322,7 +323,7 @@ public class BillGateway<T> implements IConditionalGateway<Bill>
 		
 			values = CLIENT_ID + " = " + clientId
 					+ ", " + TRANSACTIONTYPE_ID + " = " + typeId
-					+ ", " + DESCRIPTION + " = '" + obj.getDescription()
+					+ ", " + DESCRIPTION + " = '" + Utility.formatSqlString(obj.getDescription())
 					+ "'";	
 			if (date != null)
 				values += ", " + DATE + " = '" + date.toString() + "'";

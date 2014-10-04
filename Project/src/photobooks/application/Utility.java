@@ -311,6 +311,26 @@ public class Utility {
 		return result;
 	}
 	
+	public static String formatSqlString(String str){
+		String result = str;
+		
+		if (result != null) {
+			result = result.replace("'", "\\apostrophe");
+		}
+		
+		return result;
+	}
+	
+	public static String unformatSqlString(String str){
+		String result = str;
+		
+		if (result != null){
+			result = result.replace("\\apostrophe", "'");
+		}
+		
+		return result;
+	}
+	
 	public static boolean confirmDelete(Shell shell, String item) {
 		MessageBox mb = new MessageBox(shell, SWT.YES | SWT.NO);
 		

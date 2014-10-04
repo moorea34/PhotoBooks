@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.Event;
 
 public class EventGateway<T> implements IGateway<Event>
@@ -58,7 +59,7 @@ public class EventGateway<T> implements IGateway<Event>
 		Timestamp tempDate;
 		
 		eventId = _resultSet.getInt(ID);
-		description = _resultSet.getString(DESCRIPTION);
+		description = Utility.unformatSqlString(_resultSet.getString(DESCRIPTION));
 		tempDate = _resultSet.getTimestamp(DATE);
 		
 		if (tempDate != null) {
@@ -180,7 +181,7 @@ public class EventGateway<T> implements IGateway<Event>
 			else
 				values += ", NULL";
 			
-			values += ", '" + newObj.getDescription() + "'";
+			values += ", '" + Utility.formatSqlString(newObj.getDescription()) + "'";
 			
 			_commandString = String.format("INSERT INTO %s VALUES(%s)", EVENT_TABLE, values);
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -224,7 +225,7 @@ public class EventGateway<T> implements IGateway<Event>
 			else
 				values = DATE + " = NULL";
 			
-			values += ", " + DESCRIPTION + " = '" + obj.getDescription() + "'";
+			values += ", " + DESCRIPTION + " = '" + Utility.formatSqlString(obj.getDescription()) + "'";
 			
 			where = String.format("%s = %d", ID, obj.getID());
 			

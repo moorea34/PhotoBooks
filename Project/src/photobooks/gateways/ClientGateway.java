@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import photobooks.application.Utility;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
 
@@ -74,15 +75,15 @@ public class ClientGateway<T> implements IGateway<Client>
 		try
 		{
 			id = results.getInt(ID);
-			firstName = results.getString(FIRST_NAME);
-			lastName = results.getString(LAST_NAME);
-			email = results.getString(EMAIL);
-			directory = results.getString(DIRECTORY);
+			firstName = Utility.unformatSqlString(results.getString(FIRST_NAME));
+			lastName = Utility.unformatSqlString(results.getString(LAST_NAME));
+			email = Utility.unformatSqlString(results.getString(EMAIL));
+			directory = Utility.unformatSqlString(results.getString(DIRECTORY));
 			
-			address = results.getString(ADDRESS);
-			city = results.getString(CITY);
-			province = results.getString(PROVINCE);
-			postalCode = results.getString(POSTALCODE);
+			address = Utility.unformatSqlString(results.getString(ADDRESS));
+			city = Utility.unformatSqlString(results.getString(CITY));
+			province = Utility.unformatSqlString(results.getString(PROVINCE));
+			postalCode = Utility.unformatSqlString(results.getString(POSTALCODE));
 			accountBalance = results.getDouble(ACCOUNTBALANCE);
 			
 			tempDate = results.getTimestamp(BIRTHDAY);
@@ -185,8 +186,8 @@ public class ClientGateway<T> implements IGateway<Client>
 			birthday = newObj.getBirthday() != null ? new Date(newObj.getBirthday().getTime().getTime()) : null;
 			anniversary = newObj.getAnniversary() != null ? new Date(newObj.getAnniversary().getTime().getTime()) : null;
 			
-			values = "NULL, '" + newObj.getFirstName() 
-					+ "', '" + newObj.getLastName()
+			values = "NULL, '" + Utility.formatSqlString(newObj.getFirstName()) 
+					+ "', '" + Utility.formatSqlString(newObj.getLastName())
 					+ "'";
 			
 			if (birthday != null)
@@ -199,11 +200,11 @@ public class ClientGateway<T> implements IGateway<Client>
 			else
 				values += ", NULL";
 			
-			values += ", '" + newObj.getEmail()
-					+ "', '" + newObj.getDirectory() 
+			values += ", '" + Utility.formatSqlString(newObj.getEmail())
+					+ "', '" + Utility.formatSqlString(newObj.getDirectory()) 
 					+ "'";
 			
-			values += String.format(", '%s', '%s', '%s', '%s', %.6f", newObj.getAddress(), newObj.getCity(), newObj.getProvince(), newObj.getPostalCode(), newObj.getAccountBalance());
+			values += String.format(", '%s', '%s', '%s', '%s', %.6f", Utility.formatSqlString(newObj.getAddress()), Utility.formatSqlString(newObj.getCity()), Utility.formatSqlString(newObj.getProvince()), Utility.formatSqlString(newObj.getPostalCode()), newObj.getAccountBalance());
 			
 			_commandString = "INSERT INTO " + CLIENT_TABLE + " VALUES(" + values + ")";
 			_updateCount = _statement.executeUpdate(_commandString);
@@ -255,8 +256,8 @@ public class ClientGateway<T> implements IGateway<Client>
 			birthday = obj.getBirthday() != null ? new Date(obj.getBirthday().getTime().getTime()) : null;
 			anniversary = obj.getAnniversary() != null ? new Date(obj.getAnniversary().getTime().getTime()) : null;
 			
-			values = FIRST_NAME + " = '" + obj.getFirstName() 
-					+ "', " + LAST_NAME + " = '" + obj.getLastName()
+			values = FIRST_NAME + " = '" + Utility.formatSqlString(obj.getFirstName()) 
+					+ "', " + LAST_NAME + " = '" + Utility.formatSqlString(obj.getLastName())
 					+ "'";
 			
 			if (birthday != null)
@@ -269,12 +270,12 @@ public class ClientGateway<T> implements IGateway<Client>
 			else
 				values += ", " + ANNIVERSARY + " = NULL";
 			
-			values += ", " + EMAIL + " = '" + obj.getEmail()
-					+ "', " + DIRECTORY + " = '" + obj.getDirectory()
+			values += ", " + EMAIL + " = '" + Utility.formatSqlString(obj.getEmail())
+					+ "', " + DIRECTORY + " = '" + Utility.formatSqlString(obj.getDirectory())
 					+ "'";
 			
-			values += String.format(", %s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = %.6f", ADDRESS, obj.getAddress(), CITY, obj.getCity(),
-					PROVINCE, obj.getProvince(), POSTALCODE, obj.getPostalCode(), ACCOUNTBALANCE, obj.getAccountBalance());
+			values += String.format(", %s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = %.6f", ADDRESS, Utility.formatSqlString(obj.getAddress()), CITY, Utility.formatSqlString(obj.getCity()),
+					PROVINCE, Utility.formatSqlString(obj.getProvince()), POSTALCODE, Utility.formatSqlString(obj.getPostalCode()), ACCOUNTBALANCE, obj.getAccountBalance());
 			
 			where = "WHERE " + ID + " = " + obj.getID();
 			_commandString = "UPDATE " + CLIENT_TABLE + " SET " + values + " " + where;
