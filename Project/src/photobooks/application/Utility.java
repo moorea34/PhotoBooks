@@ -349,6 +349,15 @@ public class Utility {
 		mb.open();
 	}
 	
+	public static void showMessage(Shell shell, String msg, String title) {
+		MessageBox mb = new MessageBox(shell, SWT.OK);
+		
+		mb.setMessage(msg);
+		mb.setText(title);
+		
+		mb.open();
+	}
+	
 	public static void copyDatabase(String srcFolder, String destFolder) throws Exception
 	{
 		copyFile(srcFolder + "/PhotoBooks.properties", destFolder + "/PhotoBooks.properties");

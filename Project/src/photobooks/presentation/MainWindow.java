@@ -125,6 +125,7 @@ public class MainWindow {
 	    //setupEventMenu( menuBar );
 	    setupProductMenu( menuBar );
 	    setupPackageMenu( menuBar );
+	    setupAboutMenu(menuBar);
 
 		tabLayout = new TabFolder(shell, SWT.NONE);
 		FormData fd = new FormData();
@@ -370,5 +371,21 @@ public class MainWindow {
 	    		tabLayout.setSelection(packagesTab);
 	    	}
 	    });
+	}
+	
+	private void setupAboutMenu(Menu menuBar) {
+		Menu aboutMenu = new Menu(menuBar);
+		
+		MenuItem aboutItem = new MenuItem(menuBar, SWT.CASCADE);
+		aboutItem.setText("About");
+		aboutItem.setMenu(aboutMenu);
+		
+		MenuItem versionItem = new MenuItem(aboutMenu, SWT.NONE);
+		versionItem.setText("Version");
+		versionItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent arg0) {
+				Utility.showMessage(shell, "PhotoBooks version 1.1", "Version...");
+			}
+		});
 	}
 }
