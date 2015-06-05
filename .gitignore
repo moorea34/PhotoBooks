@@ -40,5 +40,6 @@ Icon
 Project/bin/*
 Project/libs/swt.jar
 .metadata/*
+.recommenders/*
 *.jar
 *.app
