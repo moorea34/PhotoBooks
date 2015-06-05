@@ -66,7 +66,7 @@ public class HSQLDBDao implements IDao {
 	private void close(String commandString) {
 		if (connection != null) {
 			ResultSet resultSet;
-			Statement statement;
+			Statement statement = null;
 			
 			closeGateways();
 			
@@ -77,6 +77,14 @@ public class HSQLDBDao implements IDao {
 			}
 			catch (Exception e) {
 				System.out.println("Failed to " + commandString + " " + databaseName + ": \n\t" + e.getMessage());
+			}
+			
+			if (statement != null) {
+				try {
+					statement.close();
+				}
+				catch (Exception e) {
+				}
 			}
 		
 			try {

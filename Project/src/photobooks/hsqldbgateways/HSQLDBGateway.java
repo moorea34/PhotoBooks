@@ -178,10 +178,6 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		
 		return obj;
 	}
-
-	//Callback for subclasses to perform additional processing when an object is added successfully
-	protected void addSuccess(T obj) throws Exception {
-	}
 		
 	//Adds a new object to the table, newObj's id will be set to the new objects id
 	@Override
@@ -207,8 +203,6 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 				newObj.setID(id);
 
 				resultSet.close();
-				
-				addSuccess(newObj);
 			}
 			else {
 				//Print out errors and warnings
@@ -226,10 +220,6 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		
 		return true;
 	}
-	
-	//Callback for subclasses to perform additional processing when an object is updated successfully
-	protected void updateSuccess(T obj) throws Exception {
-	}
 
 	//Updates an existing object in the table
 	@Override
@@ -241,10 +231,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		try {
 			updateCount = _statement.executeUpdate(commandString);
 			
-			if (updateCount == 1 && noWarnings(_statement)) {
-				updateSuccess(obj);
-			}
-			else {
+			if (updateCount != 1 || !noWarnings(_statement)) {
 				//Print out errors and warnings
 				logWarnings();
 				
