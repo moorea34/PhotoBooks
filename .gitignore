@@ -37,7 +37,8 @@ Icon
 
 
 #My ignores
-Project/bin/photobooks/*.class
-Project/bin/tests/*.class
-.jar
-.app
+Project/bin/*
+Project/libs/swt.jar
+.metadata/*
+*.jar
+*.app
