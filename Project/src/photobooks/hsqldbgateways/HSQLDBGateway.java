@@ -46,13 +46,23 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		_tableName = tableName;
 	}
 	
+	//Wraps strings in quotation marks and handles apostrophes appropriately (returns the string "NULL" if str is null)
+	protected String formatSqlString(String str) {
+		if (str != null) {
+			return String.format("'%s'", str.replace("'", "\\apostrophe"));
+		}
+		else {
+			return "NULL";
+		}
+	}
+	
 	//Prints out the exception message
-	private void logException(Exception e) {
+	protected void logException(Exception e) {
 		System.out.println(e.getMessage());
 	}
 	
 	//Prints out the warning messages
-	private void logWarnings() {
+	protected void logWarnings() {
 		try {
 			SQLWarning warning = _statement.getWarnings();
 			Exception e = warning.getNextWarning();
