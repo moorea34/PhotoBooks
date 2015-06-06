@@ -14,4 +14,7 @@ public interface IDao {
 
 	//Gets the phone number gateway
 	public IPhoneNumberGateway phoneNumberGateway();
+	
+	//Gets the type gateway
+	public ITypeGateway typeGateway();
 }

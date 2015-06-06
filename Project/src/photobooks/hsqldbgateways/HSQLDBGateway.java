@@ -27,8 +27,8 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	//Luckily all tables id fields are spelled the same way
 	static final String ID = "ID";
 
-	private HSQLDBDao _dao = null;
-	private Statement _statement = null;
+	protected HSQLDBDao _dao = null;
+	protected Statement _statement = null;
 	
 	private String _tableName;
 	
@@ -47,7 +47,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	}
 	
 	//Wraps strings in quotation marks and handles apostrophes appropriately (returns the string "NULL" if str is null)
-	protected String formatSqlString(String str) {
+	public static String formatSqlString(String str) {
 		if (str != null) {
 			return String.format("'%s'", str.replace("'", "\\apostrophe"));
 		}
@@ -56,8 +56,19 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		}
 	}
 	
+	//Unhandles apostrophes stored in the database string
+	public static String unformatSqlString(String str){
+		String result = str;
+		
+		if (result != null){
+			result = result.replace("\\apostrophe", "'");
+		}
+		
+		return result;
+	}
+	
 	//Prints out the exception message
-	protected void logException(Exception e) {
+	public static void logException(Exception e) {
 		System.out.println(e.getMessage());
 	}
 	
@@ -78,7 +89,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	}
 	
 	//Returns true if their are no warnings in the statement
-	protected boolean noWarnings(Statement statement)
+	protected static boolean noWarnings(Statement statement)
 	{
 		boolean result = true;
 		

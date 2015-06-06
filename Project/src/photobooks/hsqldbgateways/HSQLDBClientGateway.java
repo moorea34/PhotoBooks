@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
-import photobooks.application.Utility;
 import photobooks.gateways2.IGateway;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
@@ -49,15 +48,15 @@ public class HSQLDBClientGateway extends HSQLDBGateway<Client> implements IGatew
 		
 		try {
 			id = resultSet.getInt(ID);
-			firstName = Utility.unformatSqlString(resultSet.getString(FIRST_NAME));
-			lastName = Utility.unformatSqlString(resultSet.getString(LAST_NAME));
-			email = Utility.unformatSqlString(resultSet.getString(EMAIL));
-			directory = Utility.unformatSqlString(resultSet.getString(DIRECTORY));
+			firstName = unformatSqlString(resultSet.getString(FIRST_NAME));
+			lastName = unformatSqlString(resultSet.getString(LAST_NAME));
+			email = unformatSqlString(resultSet.getString(EMAIL));
+			directory = unformatSqlString(resultSet.getString(DIRECTORY));
 			
-			address = Utility.unformatSqlString(resultSet.getString(ADDRESS));
-			city = Utility.unformatSqlString(resultSet.getString(CITY));
-			province = Utility.unformatSqlString(resultSet.getString(PROVINCE));
-			postalCode = Utility.unformatSqlString(resultSet.getString(POSTALCODE));
+			address = unformatSqlString(resultSet.getString(ADDRESS));
+			city = unformatSqlString(resultSet.getString(CITY));
+			province = unformatSqlString(resultSet.getString(PROVINCE));
+			postalCode = unformatSqlString(resultSet.getString(POSTALCODE));
 			accountBalance = resultSet.getDouble(ACCOUNTBALANCE);
 			
 			tempDate = resultSet.getTimestamp(BIRTHDAY);

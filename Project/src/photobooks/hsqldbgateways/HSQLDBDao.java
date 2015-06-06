@@ -22,6 +22,7 @@ public class HSQLDBDao implements IDao {
 	//Gateways
 	private IGateway<Client> _clientGateway = null;
 	private IPhoneNumberGateway _phoneNumberGateway = null;
+	private ITypeGateway _typeGateway = null;
 	
 	//Constructor taking the database name to open
 	//The database is lazy loaded
@@ -60,6 +61,7 @@ public class HSQLDBDao implements IDao {
 	private void closeGateways() {
 		if (_clientGateway != null) { _clientGateway.close(); _clientGateway = null; }
 		if (_phoneNumberGateway != null) { _phoneNumberGateway.close(); _phoneNumberGateway = null; }
+		if (_typeGateway != null) { _typeGateway.close(); _typeGateway = null; }
 	}
 	
 	//Close the connection object with the given command
@@ -133,6 +135,13 @@ public class HSQLDBDao implements IDao {
 	public IPhoneNumberGateway phoneNumberGateway() {
 		if (_phoneNumberGateway == null) _phoneNumberGateway = new HSQLDBPhoneNumberGateway(this);
 		return _phoneNumberGateway;
+	}
+
+	//Gets the type gateway
+	@Override
+	public ITypeGateway typeGateway() {
+		if (_typeGateway == null) _typeGateway = new HSQLDBTypeGateway(this);
+		return _typeGateway;
 	}
 
 }
