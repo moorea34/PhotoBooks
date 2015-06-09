@@ -1,5 +1,7 @@
 package tests;
 
+import tests.objectTests.ClientTest;
+
 import junit.framework.TestSuite;
 import junit.framework.Test;
 
@@ -18,6 +20,6 @@ public class UnitTests {
 	
 	private static void testObjects()
 	{
-		suite.addTestSuite(ExampleTest.class);
+		suite.addTestSuite(ClientTest.class);
 	}
 }
