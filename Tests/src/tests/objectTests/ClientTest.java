@@ -51,6 +51,7 @@ public class ClientTest extends TestCase {
 		client = new Client();
 		
 		assertNotNull(client);
+		assertTrue(client.getID() == 0);
 		
 		assertTrue(client.getFirstName().equals(""));
 		assertTrue(client.getLastName().equals(""));
@@ -74,6 +75,7 @@ public class ClientTest extends TestCase {
 		client = new Client(FIRST_NAME, LAST_NAME);
 		
 		assertNotNull(client);
+		assertTrue(client.getID() == 0);
 		
 		assertTrue(client.getFirstName().equals(FIRST_NAME));
 		assertTrue(client.getLastName().equals(LAST_NAME));
@@ -108,6 +110,7 @@ public class ClientTest extends TestCase {
 		client = new Client(FIRST_NAME, LAST_NAME, EMAIL, dob, ann, numbers);
 		
 		assertNotNull(client);
+		assertTrue(client.getID() == 0);
 		
 		assertTrue(client.getFirstName().equals(FIRST_NAME));
 		assertTrue(client.getLastName().equals(LAST_NAME));
@@ -159,6 +162,7 @@ public class ClientTest extends TestCase {
 		client = new Client(FIRST_NAME, LAST_NAME, EMAIL, dob, ann, numbers, DIRECTORY);
 		
 		assertNotNull(client);
+		assertTrue(client.getID() == 0);
 		
 		assertTrue(client.getFirstName().equals(FIRST_NAME));
 		assertTrue(client.getLastName().equals(LAST_NAME));
@@ -211,6 +215,7 @@ public class ClientTest extends TestCase {
 		client = new Client(FIRST_NAME, LAST_NAME, EMAIL, dob, ann, numbers, ADDRESS, CITY, PROVINCE, POSTAL_CODE, ACCOUNT_BALANCE, DIRECTORY);
 		
 		assertNotNull(client);
+		assertTrue(client.getID() == 0);
 		
 		assertTrue(client.getFirstName().equals(FIRST_NAME));
 		assertTrue(client.getLastName().equals(LAST_NAME));
@@ -250,6 +255,9 @@ public class ClientTest extends TestCase {
 		Client client;
 		
 		client = new Client();
+		client.setID(5);
+		assertTrue(client.getID() == 5);
+		
 		client.setFirstName(FIRST_NAME);
 		client.setLastName(LAST_NAME);
 		
