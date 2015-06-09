@@ -159,7 +159,6 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		}
 		catch (Exception e) {
 			logException(e);
-			objs = new ArrayList<T>();
 		}
 		
 		return objs;
@@ -304,21 +303,17 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	
 	//Converts T object to insert string parameters
 	protected String toInsertString(T newObj) {
-		String insertString = "";
+		//Important: Luckily all tables start with ID which is NULL on insert
+		String insertString = "NULL";
 		Collection<KeyValuePair<String, String>> pairs = toKeyValuePairs(newObj);
 		Iterator<KeyValuePair<String, String>> it;
 		KeyValuePair<String, String> next;
 		
-		if (pairs.size() > 0) {
-			it = pairs.iterator();
+		it = pairs.iterator();
 			
+		while (it.hasNext()) {
 			next = it.next();
-			insertString += next.value;
-			
-			while (it.hasNext()) {
-				next = it.next();
-				insertString += ", " + next.value;
-			}
+			insertString += ", " + next.value;
 		}
 		
 		return insertString;
@@ -354,6 +349,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	}
 	
 	//Creates collection of key value pairs representing the T object
+	//Key value pairs should be in order that inserting into the database expects them to be
 	protected Collection<KeyValuePair<String, String>> toKeyValuePairs(T obj) {
 		return null;
 	}

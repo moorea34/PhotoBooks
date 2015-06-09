@@ -1,6 +1,7 @@
 package photobooks.hsqldbgateways;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import photobooks.gateways2.IPhoneNumberGateway;
@@ -39,17 +40,18 @@ public class HSQLDBPhoneNumberGateway extends HSQLDBGateway<PhoneNumber> impleme
 	@Override
 	protected PhoneNumber fromResultSet(ResultSet resultSet) {
 		PhoneNumber pn = null;
-		int id, typeID;
+		int id, typeID, clientID;
 		String number, typeValue = null;
 		
 		try {
 			id = resultSet.getInt(ID);
 			number = unformatSqlString(resultSet.getString(PHONE_NUMBER));
 			typeID = resultSet.getInt(PHONETYPE_ID);
+			typeValue = _dao.typeGateway().getById(PHONE_TABLE, typeID);
+			clientID = resultSet.getInt(CLIENT_ID);
 			
-			//TODO: get phonetype value from type gateway
-			
-			pn = new PhoneNumber(PhoneNumber.PhoneNumberType.valueOf(typeValue), number);
+			pn = new PhoneNumber(PhoneNumber.PhoneNumberType.valueOf(typeValue), number, clientID);
+			pn.setID(id);
 		}
 		catch (Exception e) {
 			logException(e);
@@ -61,6 +63,17 @@ public class HSQLDBPhoneNumberGateway extends HSQLDBGateway<PhoneNumber> impleme
 	//Creates collection of key value pairs representing the PhoneNumber object
 	@Override
 	protected Collection<KeyValuePair<String, String>> toKeyValuePairs(PhoneNumber obj) {
-		return null;
+		ArrayList<KeyValuePair<String, String>> pairs = new ArrayList<KeyValuePair<String,String>>();
+		int typeID;
+		
+		if (obj != null) {
+			typeID = _dao.typeGateway().getByType(PHONE_TABLE, obj.getType().toString());
+			
+			pairs.add(new KeyValuePair<String, String>(CLIENT_ID, String.valueOf(obj.getClientId())));
+			pairs.add(new KeyValuePair<String, String>(PHONE_NUMBER, formatSqlString(obj.getNumber())));
+			pairs.add(new KeyValuePair<String, String>(PHONETYPE_ID, String.valueOf(typeID)));
+		}
+		
+		return pairs;
 	}
 }

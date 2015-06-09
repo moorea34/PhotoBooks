@@ -3,6 +3,7 @@ package photobooks.objects;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import photobooks.application.Utility;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
 
 public class Client extends DBObject
@@ -19,18 +20,18 @@ public class Client extends DBObject
 	private String _address, _city, _province, _postalCode;
 	
 	public Client()
-	{		
-		this("", "", "", null, null, new ArrayList<PhoneNumber>(), "");
+	{
+		this("", "", "", null, null, new ArrayList<PhoneNumber>(), "", "", "", "", 0, "");
 	}
 	
 	public Client(String firstName, String lastName)
-	{		
-		this( firstName, lastName, "", null, null, new ArrayList<PhoneNumber>(), "");
+	{
+		this(firstName, lastName, "", null, null, new ArrayList<PhoneNumber>(), "", "", "", "", 0, "");
 	}
 	
 	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers)
 	{
-		this( firstName, lastName, email, birthday, anniversary, phoneNumbers, "");
+		this( firstName, lastName, email, birthday, anniversary, phoneNumbers, "", "", "", "", 0, "");
 	}
 	
 	public Client(String firstName, String lastName, String email, Calendar birthday, Calendar anniversary, ArrayList<PhoneNumber> phoneNumbers, String directory)
@@ -165,10 +166,17 @@ public class Client extends DBObject
 
 	public boolean searchAll(String text) 
 	{
+		if (text == null) return false;
+		
+		text = text.toLowerCase();
+		
 		if(_firstName.toLowerCase().contains(text))
 			return true;
 		
 		if(_lastName.toLowerCase().contains(text))
+			return true;
+		
+		if (_email.toLowerCase().contains(text))
 			return true;
 		
 		for(PhoneNumber n : _phoneNumbers)
@@ -176,6 +184,16 @@ public class Client extends DBObject
 			if(n.getNumber().toLowerCase().contains(text))
 				return true;
 		}
+		
+		if (_birthday != null && (String.valueOf(_birthday.get(Calendar.YEAR)).contains(text) ||
+				Utility.monthToString(_birthday.get(Calendar.MONTH)).toLowerCase().contains(text) ||
+				String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH)).contains(text)))
+			return true;
+		
+		if (_anniversary != null && (String.valueOf(_anniversary.get(Calendar.YEAR)).contains(text) ||
+				Utility.monthToString(_anniversary.get(Calendar.MONTH)).toLowerCase().contains(text) ||
+				String.valueOf(_anniversary.get(Calendar.DAY_OF_MONTH)).contains(text)))
+			return true;
 		
 		if (_address.toLowerCase().contains(text))
 			return true;
@@ -187,6 +205,9 @@ public class Client extends DBObject
 			return true;
 		
 		if (_postalCode.toLowerCase().contains(text))
+			return true;
+		
+		if (_directory.toLowerCase().contains(text))
 			return true;
 		
 		return false;

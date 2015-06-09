@@ -61,12 +61,12 @@ public class Utility {
 		return result;
 	}
 	
-	public static String monthToString( int dayOfMonth )
+	public static String monthToString( int monthIndex )
 	{
 		String result = "";
 		
-		if (dayOfMonth < MONTHS.length && dayOfMonth >= 0)
-			result = MONTHS[dayOfMonth];
+		if (monthIndex < MONTHS.length && monthIndex >= 0)
+			result = MONTHS[monthIndex];
 		
 		return result;
 	}

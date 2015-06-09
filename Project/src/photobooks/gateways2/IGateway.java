@@ -13,6 +13,8 @@ public interface IGateway<T extends DBObject> {
 	 * count: Number of objects to get
 	 * orderBy: Comma separated list of columns to order by
 	 * orderDesc: True to return collection in descending order otherwise ascending (only if orderBy parameter is specified)
+	 * 
+	 * Returns the list of items found. On error returns null.
 	 * */
 	public Collection<T> select(int offset, int count, String orderBy, boolean orderDesc);
 	//Gets a specific object from the table
