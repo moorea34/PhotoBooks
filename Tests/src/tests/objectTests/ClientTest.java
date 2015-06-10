@@ -6,6 +6,7 @@ import java.util.Calendar;
 import photobooks.objects.Client;
 import photobooks.objects.PhoneNumber;
 import photobooks.objects.PhoneNumber.PhoneNumberType;
+
 import junit.framework.TestCase;
 
 //Client object unit test
