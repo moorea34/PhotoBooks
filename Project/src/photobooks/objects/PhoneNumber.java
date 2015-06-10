@@ -16,10 +16,8 @@ public class PhoneNumber extends DBObject
 	
 	public PhoneNumber(PhoneNumberType type, String number)
 	{
-		_type = type;
-		_number = number;
-		//0 means unassigned, real id's will be > 0
-		_clientId = 0;
+		//ClientID 0 means unassigned, real id's will be > 0
+		this(type, number, 0);
 	}
 	
 	public PhoneNumber(PhoneNumberType type, String number, int clientId)

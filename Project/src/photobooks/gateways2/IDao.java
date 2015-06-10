@@ -6,8 +6,8 @@ public interface IDao {
 	
 	//Save changes to the database
 	public void commitChanges();
-	//Close the connection to the database (connection is automatically re-opened if necessary)
-	public void dispose();
+	//Close the connection to the database and roll back changes (connection is automatically re-opened if necessary)
+	public void rollback();
 	
 	//Gets the client gateway
 	public IGateway<Client> clientGateway();

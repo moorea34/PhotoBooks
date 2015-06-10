@@ -109,7 +109,7 @@ public class HSQLDBDao implements IDao {
 
 	//Closes the connection to the database without saving changes
 	@Override
-	public void dispose() {
+	public void rollback() {
 		close("SHUTDOWN");
 	}
 	

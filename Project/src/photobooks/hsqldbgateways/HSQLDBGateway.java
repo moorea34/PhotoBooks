@@ -137,7 +137,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	protected Collection<T> select(int offset, int count, String orderBy, boolean orderDesc, String where) {
 		ResultSet resultSet;
 		Collection<T> objs = null;
-		String _order = "", _where = "", limit = String.format("LIMIT %d %d", offset, count);
+		String _order = "", dir = "ASC", _where = "", limit = String.format("LIMIT %d %d", offset, count);
 		String commandString;
 		
 		if (where != null && !where.isEmpty()) {
@@ -145,7 +145,11 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		}
 		
 		if (orderBy != null && !orderBy.isEmpty()) {
-			_order = String.format("ORDER BY %s", orderBy);
+			if (orderDesc) {
+				dir = "DESC";
+			}
+			
+			_order = String.format("ORDER BY %s %s", orderBy, dir);
 		}
 		
 		commandString = String.format("SELECT * FROM %s %s %s %s", _tableName, _where, _order, limit);
