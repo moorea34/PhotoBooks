@@ -3,6 +3,7 @@ package photobooks.hsqldbgateways;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import photobooks.gateways2.*;
@@ -20,9 +21,9 @@ public class HSQLDBDao implements IDao {
 	private Connection connection = null;
 	
 	//Gateways
-	private IGateway<Client> _clientGateway = null;
-	private IPhoneNumberGateway _phoneNumberGateway = null;
-	private ITypeGateway _typeGateway = null;
+	private HSQLDBClientGateway _clientGateway = null;
+	private HSQLDBPhoneNumberGateway _phoneNumberGateway = null;
+	private HSQLDBTypeGateway _typeGateway = null;
 	
 	//Constructor taking the database name to open
 	//The database is lazy loaded
@@ -46,6 +47,7 @@ public class HSQLDBDao implements IDao {
 		try
 		{		
 			connection = DriverManager.getConnection(url, "SA", "");
+			connection.setAutoCommit(false);
 		}
 		catch (Exception e) 
 		{
@@ -103,14 +105,40 @@ public class HSQLDBDao implements IDao {
 
 	//Commits changes to the database
 	@Override
-	public void commitChanges() {
-		close("SHUTDOWN COMPACT");
+	public boolean commitChanges() {
+		if (connection != null) {
+			try {
+				connection.commit();
+			}
+			catch (SQLException e) {
+				System.out.println("Error committing changes: " + e.getMessage());
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
-	//Closes the connection to the database without saving changes
+	//Rollback to before the current transaction was started
 	@Override
-	public void rollback() {
-		close("SHUTDOWN");
+	public boolean rollback() {
+		if (connection != null) {
+			try {
+				connection.rollback();
+			}
+			catch (SQLException e) {
+				System.out.println("Error during rollback: " + e.getMessage());
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	//Closes the database connection
+	@Override
+	public void dispose() {
+		close("SHUTDOWN COMPACT");
 	}
 	
 	//Opens the database if it isn't already and creates a Statement object
@@ -121,6 +149,69 @@ public class HSQLDBDao implements IDao {
 		else {
 			throw new Exception("Cannot createStatement: failed to open database!");
 		}
+	}
+	
+	//Returns true if the table exists within the database (tableName is case sensitive)
+	public boolean tableExists(String tableName) {
+		Statement statement = null;
+		String query = String.format("SELECT COUNT(*) as \"Count\" From INFORMATION_SCHEMA.SYSTEM_TABLES Where TABLE_NAME = '%s'", tableName);
+		ResultSet resultSet = null;
+		boolean result = false;
+		
+		try {
+			statement = createStatement();
+			resultSet = statement.executeQuery(query);
+			
+			while (resultSet.next()) {
+				if (resultSet.getInt("Count") > 0) {
+					result = true;
+				}
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Failed to open " + databaseName + " to check if table exists:\n\t" + e.getMessage());
+		}
+
+		
+		//Close result set because the error might have happened after
+		if (resultSet != null) {
+			try {
+				resultSet.close();
+			}
+			catch (Exception e) {
+			}
+		}
+		
+		//Close statement because the error might have been the query or result set
+		if (statement != null) {
+			try {
+				statement.close();
+			}
+			catch (Exception e) {
+			}
+		}
+		
+		return result;
+	}
+
+	//Initialize gateways to ensure tables exist
+	public boolean initialize() {
+		boolean result = true;
+		
+		//Create lazy loaded gateway objects
+		clientGateway();
+		phoneNumberGateway();
+		typeGateway();
+		
+		//Initialize gateway objects one at a time to ensure order
+		result = result && _clientGateway.initialize();
+		result = result && _phoneNumberGateway.initialize();
+		
+		if (result == false) {
+			rollback();
+		}
+		
+		return result;
 	}
 
 	//Gets the client gateway

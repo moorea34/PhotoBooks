@@ -5,9 +5,11 @@ import photobooks.objects.Client;
 public interface IDao {
 	
 	//Save changes to the database
-	public void commitChanges();
-	//Close the connection to the database and roll back changes (connection is automatically re-opened if necessary)
-	public void rollback();
+	public boolean commitChanges();
+	//Roll back changes to before beginning of transaction
+	public boolean rollback();
+	//Close database connection
+	public void dispose();
 	
 	//Gets the client gateway
 	public IGateway<Client> clientGateway();

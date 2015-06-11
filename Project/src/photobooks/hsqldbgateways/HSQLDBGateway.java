@@ -46,6 +46,11 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		_tableName = tableName;
 	}
 	
+	//Ensures the table exists in the database
+	public boolean initialize() {
+		return false;
+	}
+	
 	//Wraps strings in quotation marks and handles apostrophes appropriately (returns the string "NULL" if str is null)
 	public static String formatSqlString(String str) {
 		if (str != null) {
