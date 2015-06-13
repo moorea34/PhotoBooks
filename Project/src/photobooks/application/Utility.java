@@ -446,6 +446,23 @@ public class Utility {
 		
 	}
 	
+	public static void deleteRecursive(File file) {
+		if (file != null) {
+			try {
+				if (file.isDirectory()) {
+					for (File f : file.listFiles()) {
+						deleteRecursive(f);
+					}
+				}
+				
+				file.delete();
+			}
+			catch (Exception e) {
+				System.out.println("Failed to delete file or directory " + file.getName() + ": " + e.getMessage());
+			}
+		}
+	}
+	
 	public static void centerScreen(Shell shell)
 	{
 		Monitor primary = Display.getCurrent().getPrimaryMonitor();

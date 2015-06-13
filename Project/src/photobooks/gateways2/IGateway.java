@@ -1,6 +1,6 @@
 package photobooks.gateways2;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 import photobooks.objects.DBObject;
 
@@ -16,7 +16,7 @@ public interface IGateway<T extends DBObject> {
 	 * 
 	 * Returns the list of items found. On error returns null.
 	 * */
-	public Collection<T> select(int offset, int count, String orderBy, boolean orderDesc);
+	public ArrayList<T> select(int offset, int count, String orderBy, boolean orderDesc);//TODO: add filter parameter
 	//Gets a specific object from the table
 	public T getByID(int id);
 	//Adds a new object to the table

@@ -33,7 +33,7 @@ public class HSQLDBDao implements IDao {
 	
 	//Opens the database connection and returns true on success
 	private boolean open() {
-		String url = "jdbc:hsqldb:database/" + databaseName;
+		String url = "jdbc:hsqldb:" + databaseName;
 		
 		if (jdbcDriver == null) {
 			try {

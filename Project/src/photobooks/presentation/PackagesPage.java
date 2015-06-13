@@ -158,7 +158,6 @@ public class PackagesPage extends Composite
 			
 		});
 		
-		//TODO
 		_packageInfo = new PackageInfoEditor(this, SWT.NONE);
 		FormData fd = new FormData();
 		fd.left = new FormAttachment(tree, 6, SWT.RIGHT);

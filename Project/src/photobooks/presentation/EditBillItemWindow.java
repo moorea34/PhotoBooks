@@ -138,7 +138,6 @@ public class EditBillItemWindow extends Dialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
 				Object item = objects.get(cbItem.getSelectionIndex());
 				
 				if (tbDescValue != null && tbPrice != null)
@@ -162,7 +161,6 @@ public class EditBillItemWindow extends Dialog {
 			
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 		});

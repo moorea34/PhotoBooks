@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import photobooks.gateways2.IGateway;
@@ -116,7 +115,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	}
 	
 	//Creates a collection of objects from a result set
-	protected Collection<T> parseCollection(ResultSet resultSet) throws Exception {
+	protected ArrayList<T> parseCollection(ResultSet resultSet) throws Exception {
 		ArrayList<T> objs = new ArrayList<T>();
 		T currentObj;
 		
@@ -139,9 +138,9 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	 * orderDesc: True to return collection in desc order otherwise ascending (only if orderBy parameter is specified)
 	 * where: Where clause of an SQL statement
 	 * */
-	protected Collection<T> select(int offset, int count, String orderBy, boolean orderDesc, String where) {
+	protected ArrayList<T> select(int offset, int count, String orderBy, boolean orderDesc, String where) {
 		ResultSet resultSet;
-		Collection<T> objs = null;
+		ArrayList<T> objs = null;
 		String _order = "", dir = "ASC", _where = "", limit = String.format("LIMIT %d %d", offset, count);
 		String commandString;
 		
@@ -181,7 +180,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	 * orderDesc: True to return collection in desc order otherwise ascending (only if orderBy parameter is specified)
 	 * */
 	@Override
-	public Collection<T> select(int offset, int count, String orderBy, boolean orderDesc) {
+	public ArrayList<T> select(int offset, int count, String orderBy, boolean orderDesc) {
 		return select(offset, count, orderBy, orderDesc, "");
 	}
 
@@ -314,7 +313,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	protected String toInsertString(T newObj) {
 		//Important: Luckily all tables start with ID which is NULL on insert
 		String insertString = "NULL";
-		Collection<KeyValuePair<String, String>> pairs = toKeyValuePairs(newObj);
+		ArrayList<KeyValuePair<String, String>> pairs = toKeyValuePairs(newObj);
 		Iterator<KeyValuePair<String, String>> it;
 		KeyValuePair<String, String> next;
 		
@@ -331,7 +330,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	//Converts T object to update string parameters
 	protected String toUpdateString(T obj) {
 		String updateString = "";
-		Collection<KeyValuePair<String, String>> pairs = toKeyValuePairs(obj);
+		ArrayList<KeyValuePair<String, String>> pairs = toKeyValuePairs(obj);
 		Iterator<KeyValuePair<String, String>> it;
 		KeyValuePair<String, String> next;
 		
@@ -359,7 +358,7 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	
 	//Creates collection of key value pairs representing the T object
 	//Key value pairs should be in order that inserting into the database expects them to be
-	protected Collection<KeyValuePair<String, String>> toKeyValuePairs(T obj) {
+	protected ArrayList<KeyValuePair<String, String>> toKeyValuePairs(T obj) {
 		return null;
 	}
 }

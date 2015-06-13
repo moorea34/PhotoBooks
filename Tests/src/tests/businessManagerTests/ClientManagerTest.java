@@ -1,5 +1,8 @@
 package tests.businessManagerTests;
 
+import java.io.File;
+
+import photobooks.application.Utility;
 import photobooks.business2.ClientManager;
 import photobooks.gateways2.IDao;
 import photobooks.hsqldbgateways.HSQLDBDao;
@@ -15,7 +18,10 @@ public class ClientManagerTest extends TestCase {
 		IDao _dao = null;
 		ClientManager _clientManager = null;
 		
-		HSQLDBDao dao = new HSQLDBDao("Test");
+		//Delete database so we can test with a clean one every time
+		Utility.deleteRecursive(new File("database"));
+		
+		HSQLDBDao dao = new HSQLDBDao("database/Test");
 		dao.initialize();
 		dao.commitChanges();
 		
