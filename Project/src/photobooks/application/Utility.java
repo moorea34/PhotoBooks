@@ -463,6 +463,14 @@ public class Utility {
 		}
 	}
 	
+	//Returns true if the directory is empty, false if the path is not a directory or it contains sub files/folders
+	public static boolean isDirectoryEmpty(String folderName) {
+		File file = new File(folderName);
+		String[] list = file.list();
+		
+		return (file.isDirectory() || !file.exists()) && (list == null || list.length == 0);
+	}
+	
 	public static void centerScreen(Shell shell)
 	{
 		Monitor primary = Display.getCurrent().getPrimaryMonitor();

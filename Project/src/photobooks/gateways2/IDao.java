@@ -13,10 +13,4 @@ public interface IDao {
 	
 	//Gets the client gateway
 	public IGateway<Client> clientGateway();
-
-	//Gets the phone number gateway
-	public IPhoneNumberGateway phoneNumberGateway();
-	
-	//Gets the type gateway
-	public ITypeGateway typeGateway();
 }

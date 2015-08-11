@@ -1,9 +1,11 @@
 package photobooks.hsqldbgateways;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import photobooks.gateways2.*;
@@ -12,23 +14,163 @@ import photobooks.objects.Client;
 public class HSQLDBDao implements IDao {
 	
 	//Static variables
-	private static final String databaseType = "HSQL";	
-	
 	private static Object jdbcDriver = null;
 	
 	//Instance variables
-	private String databaseName;
+	private String databaseName = null;
 	private Connection connection = null;
 	
 	//Gateways
-	private HSQLDBClientGateway _clientGateway = null;
-	private HSQLDBPhoneNumberGateway _phoneNumberGateway = null;
-	private HSQLDBTypeGateway _typeGateway = null;
+	private IGateway<Client> _clientGateway = null;
+	private IPhoneNumberGateway _phoneNumberGateway = null;
+	private ITypeGateway _typeGateway = null;
 	
-	//Constructor taking the database name to open
-	//The database is lazy loaded
-	public HSQLDBDao(String dbName) {
-		databaseName = dbName;
+	
+	public static boolean dbExists(String dbFolder) {
+		String dbFile = dbFolder + "/PhotoBooks.script";
+		File file = new File(dbFile);
+		
+		if (file.exists() && !file.isDirectory()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	//Loads an existing database (returns null if it does not exist or fails to open)
+	public static HSQLDBDao loadDB(String dbFolder) {
+		HSQLDBDao dao = null;
+		
+		if (dbExists(dbFolder)) {
+			dao = new HSQLDBDao(dbFolder);
+			
+			if (!dao.open()) {
+				dao.dispose();
+				dao = null;
+			}
+		}
+		
+		return dao;
+	}
+
+	//Creates a new database (returns null if the folder is not empty or fails to create the database)
+	public static HSQLDBDao createDB(String dbFolder) {
+		HSQLDBDao dao = null;
+		
+		if (photobooks.application.Utility.isDirectoryEmpty(dbFolder)) {
+			dao = new HSQLDBDao(dbFolder);
+			
+			if (!dao.open()) {
+				dao.dispose();
+				dao = null;
+			}
+			else if (!dao.commitChanges()) {
+				dao.dispose();
+				dao = null;
+			}
+		}
+		
+		return dao;
+	}
+
+	//Prints out the exception message
+	public static void logException(Exception e) {
+		System.out.println(e.getMessage());
+	}
+	
+	//Returns true if their are no warnings in the statement
+	protected static boolean noWarnings(Statement statement)
+	{
+		boolean result = true;
+		
+		try
+		{
+			SQLWarning warning = statement.getWarnings();
+			
+			if (warning != null) {
+				result = false;
+			}
+		}
+		catch (Exception e)
+		{
+			logException(e);
+			result = false;
+		}
+		
+		return result;
+	}
+	
+	//Prints out the warning messages
+	public static void logWarnings(Connection connection) {
+		try {
+			SQLWarning warning = connection.getWarnings();
+
+			if (warning != null) {
+				System.out.println("Connection warnings");
+			}
+			
+			while (warning != null) {
+				logException(warning);
+				warning = warning.getNextWarning();
+			}
+		}
+		catch (Exception e) {
+			logException(e);
+		}
+	}
+
+	//Prints out the warning messages
+	public static void logWarnings(Statement statement) {
+		try {
+			try {
+				SQLWarning warning = statement.getWarnings();
+
+				if (warning != null) {
+					System.out.println("Connection warnings");
+				}
+				
+				while (warning != null) {
+					logException(warning);
+					warning = warning.getNextWarning();
+				}
+			}
+			catch (Exception e) {
+				logException(e);
+			}
+		}
+		catch (Exception e) {
+			logException(e);
+		}
+	}
+	
+	//Prints out the warning messages
+	public static void logWarnings(ResultSet resultSet) {
+		try {
+			try {
+				SQLWarning warning = resultSet.getWarnings();
+
+				if (warning != null) {
+					System.out.println("Connection warnings");
+				}
+				
+				while (warning != null) {
+					logException(warning);
+					warning = warning.getNextWarning();
+				}
+			}
+			catch (Exception e) {
+				logException(e);
+			}
+		}
+		catch (Exception e) {
+			logException(e);
+		}
+	}
+	
+	
+	private HSQLDBDao(String dbFolder) {
+		databaseName = dbFolder + "/PhotoBooks";
 	}
 	
 	//Opens the database connection and returns true on success
@@ -41,13 +183,16 @@ public class HSQLDBDao implements IDao {
 			}
 			catch (Exception e) {
 				System.out.println("Failed to load HSQLDB JDBC driver:\n\t" + e.getMessage());
+				return false;
 			}
 		}
 		
 		try
 		{		
 			connection = DriverManager.getConnection(url, "SA", "");
+			logWarnings(connection);
 			connection.setAutoCommit(false);
+			logWarnings(connection);
 		}
 		catch (Exception e) 
 		{
@@ -55,15 +200,37 @@ public class HSQLDBDao implements IDao {
 			return false;
 		}
 		
-		System.out.println("Opened " + databaseType +" database " + databaseName);
+		if (!createGateways()) {
+			System.out.println("Failed to create and initialize gateways");
+			return false;
+		}
+		
+		System.out.println("Opened HSQL database " + databaseName);
 		return true;
 	}
 	
-	//Releases resources used by the gateways
-	private void closeGateways() {
-		if (_clientGateway != null) { _clientGateway.close(); _clientGateway = null; }
-		if (_phoneNumberGateway != null) { _phoneNumberGateway.close(); _phoneNumberGateway = null; }
-		if (_typeGateway != null) { _typeGateway.close(); _typeGateway = null; }
+	//Creates all gateway objects
+	private boolean createGateways() {
+		_clientGateway = new HSQLDBClientGateway(this);
+		_phoneNumberGateway = new HSQLDBPhoneNumberGateway(this);
+		_typeGateway = new HSQLDBTypeGateway(this);
+		
+		return initialize();
+	}
+
+	//Initialize gateways to ensure tables exist and were able to create a statement object
+	private boolean initialize() {
+		boolean result = true;
+		
+		//Initialize gateway objects one at a time to ensure order
+		result = result && _clientGateway.initialize();
+		result = result && _phoneNumberGateway.initialize();
+		
+		if (result == false) {
+			rollback();
+		}
+		
+		return result;
 	}
 	
 	//Close the connection object with the given command
@@ -95,12 +262,19 @@ public class HSQLDBDao implements IDao {
 				connection.close();
 				connection = null;
 				
-				System.out.println("Closed " + databaseType + " database " + databaseName);
+				System.out.println("Closed HSQL database " + databaseName);
 			}
 			catch (Exception e) {
 				System.out.println("Failed to close " + databaseName + ":\n\t" + e.getMessage());
 			}
 		}
+	}
+
+	//Releases resources used by the gateways
+	private void closeGateways() {
+		if (_clientGateway != null) { _clientGateway.close(); _clientGateway = null; }
+		if (_phoneNumberGateway != null) { _phoneNumberGateway.close(); _phoneNumberGateway = null; }
+		if (_typeGateway != null) { _typeGateway.close(); _typeGateway = null; }
 	}
 
 	//Commits changes to the database
@@ -109,6 +283,7 @@ public class HSQLDBDao implements IDao {
 		if (connection != null) {
 			try {
 				connection.commit();
+				logWarnings(connection);
 			}
 			catch (SQLException e) {
 				System.out.println("Error committing changes: " + e.getMessage());
@@ -125,6 +300,7 @@ public class HSQLDBDao implements IDao {
 		if (connection != null) {
 			try {
 				connection.rollback();
+				logWarnings(connection);
 			}
 			catch (SQLException e) {
 				System.out.println("Error during rollback: " + e.getMessage());
@@ -141,14 +317,19 @@ public class HSQLDBDao implements IDao {
 		close("SHUTDOWN COMPACT");
 	}
 	
-	//Opens the database if it isn't already and creates a Statement object
+	//Creates a Statement object (fails if the connection is not open)
 	public Statement createStatement() throws Exception {
-		if (connection != null || open()) {
-			return connection.createStatement();
+		Statement statement = null;
+		
+		if (connection != null) {
+			statement = connection.createStatement();
+			logWarnings(connection);
 		}
 		else {
-			throw new Exception("Cannot createStatement: failed to open database!");
+			throw new Exception("Cannot createStatement: database not open!");
 		}
+		
+		return statement;
 	}
 	
 	//Returns true if the table exists within the database (tableName is case sensitive)
@@ -161,15 +342,18 @@ public class HSQLDBDao implements IDao {
 		try {
 			statement = createStatement();
 			resultSet = statement.executeQuery(query);
+			logWarnings(connection);
 			
 			while (resultSet.next()) {
 				if (resultSet.getInt("Count") > 0) {
 					result = true;
 				}
+
+				logWarnings(resultSet);
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Failed to open " + databaseName + " to check if table exists:\n\t" + e.getMessage());
+			System.out.println("Failed to check if table exists:\n\t" + e.getMessage());
 		}
 
 		
@@ -193,46 +377,15 @@ public class HSQLDBDao implements IDao {
 		
 		return result;
 	}
-
-	//Initialize gateways to ensure tables exist
-	public boolean initialize() {
-		boolean result = true;
-		
-		//Create lazy loaded gateway objects
-		clientGateway();
-		phoneNumberGateway();
-		typeGateway();
-		
-		//Initialize gateway objects one at a time to ensure order
-		result = result && _clientGateway.initialize();
-		result = result && _phoneNumberGateway.initialize();
-		
-		if (result == false) {
-			rollback();
-		}
-		
-		return result;
-	}
+	
 
 	//Gets the client gateway
 	@Override
-	public IGateway<Client> clientGateway() {
-		if (_clientGateway == null) _clientGateway = new HSQLDBClientGateway(this);
-		return _clientGateway;
-	}
+	public IGateway<Client> clientGateway() { return _clientGateway; }
 
 	//Gets the phone number gateway
-	@Override
-	public IPhoneNumberGateway phoneNumberGateway() {
-		if (_phoneNumberGateway == null) _phoneNumberGateway = new HSQLDBPhoneNumberGateway(this);
-		return _phoneNumberGateway;
-	}
+	public IPhoneNumberGateway phoneNumberGateway() { return _phoneNumberGateway; }
 
 	//Gets the type gateway
-	@Override
-	public ITypeGateway typeGateway() {
-		if (_typeGateway == null) _typeGateway = new HSQLDBTypeGateway(this);
-		return _typeGateway;
-	}
-
+	public ITypeGateway typeGateway() { return _typeGateway; }
 }

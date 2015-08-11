@@ -1,24 +1,11 @@
 package photobooks.hsqldbgateways;
 
 import java.sql.ResultSet;
-import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import photobooks.gateways2.IGateway;
 import photobooks.objects.DBObject;
-
-//Used to represent columns and values in a database
-class KeyValuePair<T, U> {
-	public T key;
-	public U value;
-	
-	public KeyValuePair(T _key, U _value) {
-		key = _key;
-		value = _value;
-	}
-}
 
 //Base HSQLDB gateway class
 public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
@@ -31,29 +18,49 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	
 	private String _tableName;
 	
-	
-	public HSQLDBGateway(HSQLDBDao dao, String tableName) {
-		_dao = dao;
+
+	//Executes the update on the statement and returns the number of records modified
+	public static int ExecuteUpdate(String query, Statement statement) {
+		int count = -1;
 		
 		try {
-			_statement = _dao.createStatement();
+			count = statement.executeUpdate(query);
+			HSQLDBDao.logWarnings(statement);
 		}
 		catch (Exception e) {
-			logException(e);
+			System.out.println(String.format("Error executing update: %s", query));
+			HSQLDBDao.logException(e);
 		}
 		
-		_tableName = tableName;
+		return count;
 	}
 	
-	//Ensures the table exists in the database
-	public boolean initialize() {
-		return false;
+	//Executes the query on the statement and returns the result set on success otherwise null
+	public static ResultSet ExecuteQuery(String query, Statement statement) {
+		ResultSet resultSet = null;
+		
+		try {
+			resultSet = statement.executeQuery(query);
+			HSQLDBDao.logWarnings(statement);
+		}
+		catch (Exception e) {
+			System.out.println(String.format("Error executing query: %s", query));
+			HSQLDBDao.logException(e);
+		}
+		
+		return resultSet;
+	}
+	
+
+	//Replaces the character ' with a suitable substitute for the DB
+	public static String formatApostrophe(String str) {
+		return str.replace("'", "\\apostrophe");
 	}
 	
 	//Wraps strings in quotation marks and handles apostrophes appropriately (returns the string "NULL" if str is null)
 	public static String formatSqlString(String str) {
 		if (str != null) {
-			return String.format("'%s'", str.replace("'", "\\apostrophe"));
+			return String.format("'%s'", formatApostrophe(str));
 		}
 		else {
 			return "NULL";
@@ -71,59 +78,54 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		return result;
 	}
 	
-	//Prints out the exception message
-	public static void logException(Exception e) {
-		System.out.println(e.getMessage());
-	}
 	
-	//Prints out the warning messages
-	protected void logWarnings() {
+	public HSQLDBGateway(HSQLDBDao dao, String tableName) {
+		_dao = dao;
+		_tableName = tableName;
+		
 		try {
-			SQLWarning warning = _statement.getWarnings();
-			Exception e = warning.getNextWarning();
-			
-			while (e != null) {
-				logException(e);
-				e = warning.getNextWarning();
-			}
+			_statement = _dao.createStatement();
+			HSQLDBDao.logWarnings(_statement);
 		}
 		catch (Exception e) {
-			logException(e);
+			HSQLDBDao.logException(e);
 		}
 	}
 	
-	//Returns true if their are no warnings in the statement
-	protected static boolean noWarnings(Statement statement)
-	{
-		boolean result = true;
-		
-		try
-		{
-			SQLWarning warning = statement.getWarnings();
-			
-			if (warning != null) {
-				result = false;
+	//Ensures the table exists in the database
+	@Override
+	public boolean initialize() {
+		return false;
+	}
+
+	//Closes the statement object
+	@Override
+	public void close() {
+		if (_statement != null) {
+			try {
+				_statement.close();
+			} catch (Exception e) {
+				HSQLDBDao.logException(e);
 			}
+			
+			_statement = null;
 		}
-		catch (Exception e)
-		{
-			logException(e);
-			result = false;
-		}
-		
-		return result;
 	}
 	
 	//Creates a collection of objects from a result set
 	protected ArrayList<T> parseCollection(ResultSet resultSet) throws Exception {
 		ArrayList<T> objs = new ArrayList<T>();
 		T currentObj;
-		
+
 		while (resultSet.next()) {
 			currentObj = fromResultSet(resultSet);
+			HSQLDBDao.logWarnings(resultSet);
 			
 			if (currentObj != null) {
 				objs.add(currentObj);
+			}
+			else {
+				throw new Exception("Error parsing object from result set!");
 			}
 		}
 		
@@ -156,32 +158,37 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 			_order = String.format("ORDER BY %s %s", orderBy, dir);
 		}
 		
-		commandString = String.format("SELECT * FROM %s %s %s %s", _tableName, _where, _order, limit);
+		commandString = String.format("SELECT %s * FROM %s %s %s", limit, _tableName, _where, _order);
 		
 		try {
 			resultSet = _statement.executeQuery(commandString);
+			HSQLDBDao.logWarnings(_statement);
 			
 			objs = parseCollection(resultSet);
 			
 			resultSet.close();
 		}
 		catch (Exception e) {
-			logException(e);
+			System.out.println(String.format("Error executing: %s", commandString));
+			HSQLDBDao.logException(e);
 		}
 		
 		return objs;
 	}
 
-	/*Selects a subset of objects from the table
+	/* Selects a subset of objects from the table
 	 * 
 	 * offset: Number of objects to skip
 	 * count: Number of objects to get
-	 * orderBy: Column to order by
-	 * orderDesc: True to return collection in desc order otherwise ascending (only if orderBy parameter is specified)
+	 * filter: String to filter objects by (gateway implementation specific)
+	 * orderBy: Comma separated list of columns to order by
+	 * orderDesc: True to return collection in descending order otherwise ascending (only if orderBy parameter is specified)
+	 * 
+	 * Returns the list of items found. On error returns null.
 	 * */
 	@Override
-	public ArrayList<T> select(int offset, int count, String orderBy, boolean orderDesc) {
-		return select(offset, count, orderBy, orderDesc, "");
+	public ArrayList<T> select(int offset, int count, String filter, String orderBy, boolean orderDesc) {
+		return null;
 	}
 
 	//Gets a single object by id
@@ -193,39 +200,47 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 		
 		try {
 			resultSet = _statement.executeQuery(commandString);
+			HSQLDBDao.logWarnings(_statement);
 			
 			if (resultSet.next()) {
 				obj = fromResultSet(resultSet);
+				HSQLDBDao.logWarnings(resultSet);
 			}
 			
 			resultSet.close();
 		}
 		catch (Exception e) {
-			logException(e);
+			System.out.println(String.format("Error executing get by id statement: %s", commandString));
+			HSQLDBDao.logException(e);
 		}
 		
 		return obj;
 	}
-		
-	//Adds a new object to the table, newObj's id will be set to the new objects id
-	@Override
-	public boolean add(T newObj) {
-		String values = toInsertString(newObj);
+	
+	protected boolean add(String query, T newObj) {
+		String commandString;
 		int updateCount;
 		int id = 0;
 		ResultSet resultSet;
-		String commandString = String.format("INSERT INTO %s VALUES(%s)", _tableName, values);
 		
 		try {
-			updateCount = _statement.executeUpdate(commandString);
+			updateCount = _statement.executeUpdate(query);
+			HSQLDBDao.logWarnings(_statement);
 			
-			if (updateCount == 1 && noWarnings(_statement)) {
+			if (updateCount == 1) {
 				commandString = "CALL IDENTITY()";
+				
 				resultSet = _statement.executeQuery(commandString);
+				HSQLDBDao.logWarnings(_statement);
 				
 				while (resultSet.next())
 				{
 					id = resultSet.getInt(1);
+					HSQLDBDao.logWarnings(resultSet);
+				}
+				
+				if (id == 0) {
+					throw new Exception("Failed to obtain new object ID!");
 				}
 				
 				newObj.setID(id);
@@ -233,16 +248,39 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 				resultSet.close();
 			}
 			else {
-				//Print out errors and warnings
-				logWarnings();
-				
-				if (updateCount != 1) {
-					throw new Exception(String.format("HSQLDB add method updated %d objects!", updateCount));
-				}
+				throw new Exception(String.format("HSQLDB add method updated %d objects!", updateCount));
 			}
 		}
 		catch (Exception e) {
-			logException(e);
+			System.out.println(String.format("Error executing add statement: %s", query));
+			HSQLDBDao.logException(e);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	//Adds a new object to the table, newObj's id will be set to the new objects id
+	@Override
+	public boolean add(T newObj) {
+		return false;
+	}
+
+	//Updates an existing object in the table
+	protected boolean update(String query) {
+		int updateCount;
+		
+		try {
+			updateCount = _statement.executeUpdate(query);
+			HSQLDBDao.logWarnings(_statement);
+			
+			if (updateCount != 1) {
+				throw new Exception(String.format("HSQLDB update method updated %d objects!", updateCount));
+			}
+		}
+		catch (Exception e) {
+			System.out.println(String.format("Error executing update statement: %s", query));
+			HSQLDBDao.logException(e);
 			return false;
 		}
 		
@@ -252,113 +290,22 @@ public class HSQLDBGateway<T extends DBObject> implements IGateway<T> {
 	//Updates an existing object in the table
 	@Override
 	public boolean update(T obj) {
-		String updateString = toUpdateString(obj);
-		int updateCount;
-		String commandString = String.format("UPDATE %s SET %s where %s = %d", _tableName, updateString, ID, obj.getID());
-		
-		try {
-			updateCount = _statement.executeUpdate(commandString);
-			
-			if (updateCount != 1 || !noWarnings(_statement)) {
-				//Print out errors and warnings
-				logWarnings();
-				
-				if (updateCount != 1) {
-					throw new Exception(String.format("HSQLDB update method updated %d objects!", updateCount));
-				}
-			}
-		}
-		catch (Exception e) {
-			logException(e);
-			return false;
-		}
-		
-		return true;
+		return false;
 	}
 
 	//Removes an object from the table
 	@Override
 	public boolean delete(T obj) {
-		String commandString;
-		
-		try
-		{
-			commandString = String.format("DELETE FROM %s WHERE %s = %d", _tableName, ID, obj.getID());
-			_statement.executeUpdate(commandString);		
-		}
-		catch (Exception e)
-		{
-			logException(e);
-			return false;
+		if (obj != null) {
+			String commandString = String.format("DELETE FROM %s WHERE %s = %d", _tableName, ID, obj.getID());
+			return ExecuteUpdate(commandString, _statement) == 1;
 		}
 		
-		return true;
+		return false;
 	}
-	
-	//Closes the statement object
-	@Override
-	public void close() {
-		if (_statement != null) {
-			try {
-				_statement.close();
-			} catch (Exception e) {
-				logException(e);
-			}
-			
-			_statement = null;
-		}
-	}
-	
-	//Converts T object to insert string parameters
-	protected String toInsertString(T newObj) {
-		//Important: Luckily all tables start with ID which is NULL on insert
-		String insertString = "NULL";
-		ArrayList<KeyValuePair<String, String>> pairs = toKeyValuePairs(newObj);
-		Iterator<KeyValuePair<String, String>> it;
-		KeyValuePair<String, String> next;
-		
-		it = pairs.iterator();
-			
-		while (it.hasNext()) {
-			next = it.next();
-			insertString += ", " + next.value;
-		}
-		
-		return insertString;
-	}
-	
-	//Converts T object to update string parameters
-	protected String toUpdateString(T obj) {
-		String updateString = "";
-		ArrayList<KeyValuePair<String, String>> pairs = toKeyValuePairs(obj);
-		Iterator<KeyValuePair<String, String>> it;
-		KeyValuePair<String, String> next;
-		
-		if (pairs.size() > 0) {
-			it = pairs.iterator();
-			
-			next = it.next();
-			updateString += next.key + " = " + next.value;
-			
-			while (it.hasNext()) {
-				next = it.next();
-				updateString += ", " + next.key + " = " + next.value;
-			}
-		}
-		
-		return updateString;
-	}
-	
-	//Methods to be overridden in a sub class
 	
 	//Creates T object from result set
 	protected T fromResultSet(ResultSet resultSet) {
-		return null;
-	}
-	
-	//Creates collection of key value pairs representing the T object
-	//Key value pairs should be in order that inserting into the database expects them to be
-	protected ArrayList<KeyValuePair<String, String>> toKeyValuePairs(T obj) {
 		return null;
 	}
 }

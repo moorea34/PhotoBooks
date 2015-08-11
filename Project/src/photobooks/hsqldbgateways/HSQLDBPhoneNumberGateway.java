@@ -51,7 +51,7 @@ public class HSQLDBPhoneNumberGateway extends HSQLDBGateway<PhoneNumber> impleme
 			}
 		}
 		
-		return true;
+		return _statement != null;
 	}
 
 	/*Selects a subset of phone numbers from the table
@@ -65,6 +65,43 @@ public class HSQLDBPhoneNumberGateway extends HSQLDBGateway<PhoneNumber> impleme
 	@Override
 	public ArrayList<PhoneNumber> getByClientID(int clientID, int offset, int count, String orderBy, boolean orderDesc) {
 		return select(offset, count, orderBy, orderDesc, String.format("%s = %d", CLIENT_ID, clientID));
+	}
+
+	//Adds a new object to the table, newObj's id will be set to the new objects id
+	@Override
+	public boolean add(PhoneNumber newObj) {
+		if (newObj != null) {
+			int typeId = _dao.typeGateway().getByType(PHONE_TABLE, newObj.getType().toString());
+			
+			if (typeId == 0) return false;
+			
+			String phoneNumberString = String.format("INSERT INTO %s VALUES(NULL, %d, %s, %d)", PHONE_TABLE,
+					newObj.getClientId(), formatSqlString(newObj.getNumber()), typeId);
+			
+			return add(phoneNumberString, newObj);
+		}
+		else {
+			return false;
+		}
+	}
+
+	//Updates an existing object in the table
+	@Override
+	public boolean update(PhoneNumber obj) {
+		if (obj != null) {
+			int typeId = _dao.typeGateway().getByType(PHONE_TABLE, obj.getType().toString());
+			
+			if (typeId == 0) return false;
+			
+			String phoneNumberString = String.format("UPDATE %s SET %s = %s, %s = %s, %s = %s WHERE %s = %d", PHONE_TABLE,
+					CLIENT_ID, obj.getClientId(), PHONE_NUMBER, formatSqlString(obj.getNumber()),
+					PHONETYPE_ID, typeId, ID, obj.getID());
+			
+			return update(phoneNumberString);
+		}
+		else {
+			return false;
+		}
 	}
 	
 	//Creates Phone Number object from result set
@@ -85,26 +122,9 @@ public class HSQLDBPhoneNumberGateway extends HSQLDBGateway<PhoneNumber> impleme
 			pn.setID(id);
 		}
 		catch (Exception e) {
-			logException(e);
+			HSQLDBDao.logException(e);
 		}
 		
 		return pn;
-	}
-	
-	//Creates collection of key value pairs representing the PhoneNumber object
-	@Override
-	protected ArrayList<KeyValuePair<String, String>> toKeyValuePairs(PhoneNumber obj) {
-		ArrayList<KeyValuePair<String, String>> pairs = new ArrayList<KeyValuePair<String,String>>();
-		int typeID;
-		
-		if (obj != null) {
-			typeID = _dao.typeGateway().getByType(PHONE_TABLE, obj.getType().toString());
-			
-			pairs.add(new KeyValuePair<String, String>(CLIENT_ID, String.valueOf(obj.getClientId())));
-			pairs.add(new KeyValuePair<String, String>(PHONE_NUMBER, formatSqlString(obj.getNumber())));
-			pairs.add(new KeyValuePair<String, String>(PHONETYPE_ID, String.valueOf(typeID)));
-		}
-		
-		return pairs;
 	}
 }

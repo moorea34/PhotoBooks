@@ -24,7 +24,7 @@ public class HSQLDBTypeGateway implements ITypeGateway {
 			_statement = _dao.createStatement();
 		}
 		catch (Exception e) {
-			HSQLDBGateway.logException(e);
+			HSQLDBDao.logException(e);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class HSQLDBTypeGateway implements ITypeGateway {
 		}
 		catch (Exception e)
 		{
-			HSQLDBGateway.logException(e);
+			HSQLDBDao.logException(e);
 		}
 		
 		return typeValue;
@@ -75,7 +75,7 @@ public class HSQLDBTypeGateway implements ITypeGateway {
 		}
 		catch (Exception e)
 		{
-			HSQLDBGateway.logException(e);
+			HSQLDBDao.logException(e);
 		}
 		
 		return typeId;
@@ -89,7 +89,7 @@ public class HSQLDBTypeGateway implements ITypeGateway {
 				_statement.close();
 			}
 			catch (Exception e) {
-				HSQLDBGateway.logException(e);
+				HSQLDBDao.logException(e);
 			}
 			
 			_statement = null;
